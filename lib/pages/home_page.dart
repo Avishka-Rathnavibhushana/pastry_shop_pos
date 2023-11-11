@@ -5,9 +5,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return const SafeArea(
       child: Center(
-        child: Text('Home Page'),
+        child: Text(
+          'Home Page',
+        ),
       ),
     );
   }

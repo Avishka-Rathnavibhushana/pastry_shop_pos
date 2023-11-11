@@ -15,11 +15,13 @@ class MyApp extends StatelessWidget {
       title: 'Pastry Shop POS',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+        ),
         useMaterial3: true,
       ),
-      home: Material(
-        child: const HomePage(),
+      home: const Material(
+        child: HomePage(),
       ),
     );
   }
