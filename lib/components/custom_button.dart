@@ -8,6 +8,7 @@ class CustomButton extends StatelessWidget {
     this.fontSize = 18,
     this.padding = 10,
     this.styleFormPadding = 20,
+    this.backgroundColor = const Color(0xFF1B78C4),
   });
 
   final void Function() onPressed;
@@ -15,6 +16,7 @@ class CustomButton extends StatelessWidget {
   final double fontSize;
   final double padding;
   final double styleFormPadding;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class CustomButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         padding:
             EdgeInsets.symmetric(vertical: 0, horizontal: styleFormPadding),
-        backgroundColor: const Color(0xFF1B78C4),
+        backgroundColor: backgroundColor,
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
