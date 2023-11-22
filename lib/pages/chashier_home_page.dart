@@ -4,6 +4,7 @@ import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
 
+// ignore: must_be_immutable
 class CashierHomePage extends StatelessWidget {
   CashierHomePage({
     super.key,

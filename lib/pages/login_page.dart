@@ -52,14 +52,24 @@ class _LoginPageState extends State<LoginPage> {
 
   void _addOrRemoveAdminPanelItem() {
     // Add a new item to the dropdown list
+    setState(() {
+      shopDropdownItems = [];
+    });
     if (roleSelectedValue == "Admin") {
-      shopDropdownItems.insert(
-        1,
+      shopDropdownItems.addAll([
+        const DropdownMenuItem(
+            value: "Select a shop", child: Text("Select a shop")),
         const DropdownMenuItem(
             value: "Admin Panel", child: Text("Admin Panel")),
-      );
+      ]);
     } else {
-      shopDropdownItems.removeWhere((item) => item.value == "Admin Panel");
+      shopDropdownItems.addAll([
+        const DropdownMenuItem(
+            value: "Select a shop", child: Text("Select a shop")),
+        const DropdownMenuItem(value: "Shop 1", child: Text("Shop 1")),
+        const DropdownMenuItem(value: "Shop 2", child: Text("Shop 2")),
+        const DropdownMenuItem(value: "Shop 3", child: Text("Shop 3")),
+      ]);
     }
 
     shopSelectedValue = "Select a shop";

@@ -6,10 +6,12 @@ class UserPageLayout extends StatelessWidget {
     super.key,
     required this.pageWidgets,
     required this.shopName,
+    this.topDividerSpace = 20,
   });
 
   final List<Widget> pageWidgets;
   final String? shopName;
+  final double topDividerSpace;
 
   @override
   Widget build(BuildContext context) {
@@ -73,11 +75,12 @@ class UserPageLayout extends StatelessWidget {
                 color: Colors.black38,
                 thickness: 1,
               ),
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: topDividerSpace,
               ),
               Expanded(
                 child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
