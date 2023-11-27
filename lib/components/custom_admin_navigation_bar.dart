@@ -37,7 +37,7 @@ class CustomAdminNavigationBar extends StatelessWidget {
           ),
           CustomButton(
             onPressed: onPressed[1],
-            text: "Add Shop",
+            text: "Suppliers",
             fontSize: 13,
             padding: 0,
             backgroundColor: selectedPage == 1

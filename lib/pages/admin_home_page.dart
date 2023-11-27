@@ -4,7 +4,8 @@ import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/add_shop.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/supplier.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/suppliers.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/dashboard.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops.dart';
 
@@ -21,13 +22,34 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
-  int selectedPage = 0;
+  int selectedPage = 1;
 
-  final List<Widget> pages = [
-    DashboardPage(),
-    AddShopPage(),
-    ShopsPage(),
-  ];
+  List<Widget> pages = [];
+
+  bool showSupplier = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    setState(() {
+      pages = [
+        DashboardPage(),
+        SuppliersPage(
+          onPressed: (String id) {
+            print(id);
+            setState(() {
+              showSupplier = true;
+            });
+          },
+        ),
+        ShopsPage(),
+      ];
+    });
+  }
+
+  // var onPressed =
 
   @override
   Widget build(BuildContext context) {
@@ -36,38 +58,33 @@ class _AdminHomePageState extends State<AdminHomePage> {
       child: UserPageLayout(
         topDividerSpace: 0,
         pageWidgets: [
-          CustomAdminNavigationBar(selectedPage: selectedPage, onPressed: [
-            () {
-              setState(() {
-                selectedPage = 0;
-              });
-            },
-            () {
-              setState(() {
-                selectedPage = 1;
-              });
-            },
-            () {
-              setState(() {
-                selectedPage = 2;
-              });
-            },
-          ]),
+          CustomAdminNavigationBar(
+            selectedPage: selectedPage,
+            onPressed: [
+              () {
+                setState(() {
+                  selectedPage = 0;
+                  showSupplier = false;
+                });
+              },
+              () {
+                setState(() {
+                  selectedPage = 1;
+                  showSupplier = false;
+                });
+              },
+              () {
+                setState(() {
+                  selectedPage = 2;
+                  showSupplier = false;
+                });
+              },
+            ],
+          ),
           SizedBox(
             height: 20,
           ),
-          CustomContainer(
-            outerPadding: const EdgeInsets.symmetric(
-              vertical: 0,
-              horizontal: 0,
-            ),
-            innerPadding: const EdgeInsets.symmetric(
-              vertical: 0,
-              horizontal: 0,
-            ),
-            containerColor: const Color(0xFFCDE8FF),
-            child: pages[selectedPage],
-          ),
+          showSupplier ? SupplierPage() : pages[selectedPage],
         ],
         shopName: widget.shopName,
       ),
