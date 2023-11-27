@@ -6,16 +6,16 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomContainer(
-      outerPadding: const EdgeInsets.symmetric(
+    return const CustomContainer(
+      outerPadding: EdgeInsets.symmetric(
         vertical: 0,
         horizontal: 0,
       ),
-      innerPadding: const EdgeInsets.symmetric(
+      innerPadding: EdgeInsets.symmetric(
         vertical: 30,
         horizontal: 0,
       ),
-      containerColor: const Color(0xFFCDE8FF),
+      containerColor: Color(0xFFCDE8FF),
       child: Center(
         child: Text(
           "Welcome to Admin Dashboard",

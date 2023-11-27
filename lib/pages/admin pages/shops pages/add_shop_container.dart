@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
-import 'package:pastry_shop_pos/components/custom_dropdown.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
@@ -15,7 +14,6 @@ class AddShopContainer extends StatefulWidget {
 class _AddShopContainerState extends State<AddShopContainer> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -24,7 +22,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Align(
+        const Align(
           alignment: Alignment.topLeft,
           child: Text(
             'Add Shop',
@@ -35,7 +33,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         CustomContainer(
@@ -55,7 +53,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                   horizontal: 30,
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   child: CustomTextField(
                     controller: TextEditingController(),
@@ -69,7 +67,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                   horizontal: 30,
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   child: CustomTextField(
                     controller: TextEditingController(),
@@ -83,7 +81,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                   horizontal: 30,
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   child: CustomTextField(
                     controller: TextEditingController(),
@@ -97,7 +95,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                   horizontal: 30,
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   child: CustomTextField(
                     controller: TextEditingController(),
@@ -115,7 +113,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (BuildContext context) => AdminHomePage(
+                      builder: (BuildContext context) => const AdminHomePage(
                         shopName: "shopSelectedValue",
                       ),
                     ),

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pastry_shop_pos/components/custom_admin_navigation_bar.dart';
-import 'package:pastry_shop_pos/components/custom_button.dart';
-import 'package:pastry_shop_pos/components/custom_container.dart';
-import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
-
 import 'package:pastry_shop_pos/pages/admin%20pages/dashboard.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/shop.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/supplier.dart';
@@ -33,15 +29,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     setState(() {
       pages = [
-        DashboardPage(),
+        const DashboardPage(),
         SuppliersPage(
           onPressed: (String id) {
-            print(id);
             setState(() {
               showSupplier = true;
             });
@@ -49,7 +43,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
         ),
         ShopsPage(
           onPressed: (String id) {
-            print(id);
             setState(() {
               showShop = true;
             });
@@ -94,13 +87,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
               },
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           showSupplier
-              ? SupplierPage()
+              ? const SupplierPage()
               : showShop
-                  ? ShopPage()
+                  ? const ShopPage()
                   : pages[selectedPage],
         ],
         shopName: widget.shopName,

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
-import 'package:pastry_shop_pos/components/custom_text_field.dart';
-import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
+// ignore: must_be_immutable
 class SuppliersContainer extends StatelessWidget {
   SuppliersContainer({super.key, required this.onPressed});
 
@@ -54,7 +53,7 @@ class SuppliersContainer extends StatelessWidget {
                 },
                 isIcon: true,
                 isText: false,
-                icon: Icon(
+                icon: const Icon(
                   Icons.edit,
                   color: Colors.white,
                 ),
@@ -71,7 +70,7 @@ class SuppliersContainer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Align(
+        const Align(
           alignment: Alignment.topLeft,
           child: Text(
             'Suppliers',
@@ -82,7 +81,7 @@ class SuppliersContainer extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         CustomContainer(

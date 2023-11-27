@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
-import 'package:pastry_shop_pos/components/custom_text_field.dart';
-import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
+// ignore: must_be_immutable
 class ShopsContainer extends StatelessWidget {
   ShopsContainer({super.key, required this.onPressed});
 
@@ -52,7 +51,7 @@ class ShopsContainer extends StatelessWidget {
       if (value["suppliers"] != null) {
         suppliersList = value["suppliers"] as List<String>;
       }
-      String suppliers = "[ " + suppliersList.join(" ,").toString() + " ]";
+      String suppliers = "[ ${suppliersList.join(" ,")} ]";
 
       rows.add(
         DataRow(
@@ -68,7 +67,7 @@ class ShopsContainer extends StatelessWidget {
                 },
                 isIcon: true,
                 isText: false,
-                icon: Icon(
+                icon: const Icon(
                   Icons.description,
                   color: Colors.white,
                 ),
@@ -85,7 +84,7 @@ class ShopsContainer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Align(
+        const Align(
           alignment: Alignment.topLeft,
           child: Text(
             'Suppliers',
@@ -96,7 +95,7 @@ class ShopsContainer extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         CustomContainer(

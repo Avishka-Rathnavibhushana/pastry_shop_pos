@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
-import 'package:pastry_shop_pos/components/custom_text_field.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/add_supplier_container.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/suppliers_container.dart';
-import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
 class SupplierPage extends StatefulWidget {
   const SupplierPage({super.key});
@@ -75,7 +71,6 @@ class _SupplierPageState extends State<SupplierPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setState(() {
       dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -111,7 +106,7 @@ class _SupplierPageState extends State<SupplierPage> {
     return Center(
       child: Column(
         children: [
-          Align(
+          const Align(
             alignment: Alignment.topLeft,
             child: Text(
               'Supplier 1',
@@ -122,7 +117,7 @@ class _SupplierPageState extends State<SupplierPage> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Row(
@@ -131,12 +126,12 @@ class _SupplierPageState extends State<SupplierPage> {
               Text(
                 dateInput,
                 textAlign: TextAlign.start,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               CustomButton(
@@ -153,8 +148,7 @@ class _SupplierPageState extends State<SupplierPage> {
                     //pickedDate output format => 2021-03-10 00:00:00.000
                     String formattedDate =
                         DateFormat('yyyy-MM-dd').format(pickedDate);
-                    print(
-                        formattedDate); //formatted date output using intl package =>  2021-03-16
+                    //formatted date output using intl package =>  2021-03-16
                     setState(() {
                       dateInput =
                           formattedDate; //set output date to TextField value.
@@ -167,7 +161,7 @@ class _SupplierPageState extends State<SupplierPage> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           CustomContainer(

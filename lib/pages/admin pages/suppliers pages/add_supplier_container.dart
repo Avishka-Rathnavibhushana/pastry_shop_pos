@@ -31,7 +31,6 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _populateDropdownItems();
   }
@@ -41,7 +40,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Align(
+        const Align(
           alignment: Alignment.topLeft,
           child: Text(
             'Add Supplier',
@@ -52,7 +51,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         CustomContainer(
@@ -72,7 +71,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                   horizontal: 30,
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   child: CustomTextField(
                     controller: TextEditingController(),
@@ -86,7 +85,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                   horizontal: 30,
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   child: CustomTextField(
                     controller: TextEditingController(),
@@ -100,7 +99,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                   horizontal: 30,
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   child: CustomTextField(
                     controller: TextEditingController(),
@@ -114,7 +113,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                   horizontal: 30,
                   vertical: 10,
                 ),
-                child: Container(
+                child: SizedBox(
                   width: 300,
                   child: CustomDropdown(
                     dropdownItems: shopDropdownItems,
@@ -135,7 +134,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (BuildContext context) => AdminHomePage(
+                      builder: (BuildContext context) => const AdminHomePage(
                         shopName: "shopSelectedValue",
                       ),
                     ),

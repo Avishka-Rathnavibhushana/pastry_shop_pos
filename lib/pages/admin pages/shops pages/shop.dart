@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
-import 'package:pastry_shop_pos/components/custom_text_field.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/add_supplier_container.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/suppliers_container.dart';
-import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -139,7 +135,6 @@ class _ShopPageState extends State<ShopPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setState(() {
       dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -157,10 +152,10 @@ class _ShopPageState extends State<ShopPage> {
         String qty = itemData["qty"].toString();
         String sold = itemData["sold"].toString();
         String balance = (0).toString();
-        String sale_price = (150).toString();
-        String sale_price_total = (150 * 10).toString();
-        String purchase_price = (200).toString();
-        String purchase_price_total = (200 * 10).toString();
+        String salePrice = (150).toString();
+        String salePriceTotal = (150 * 10).toString();
+        String purchasePrice = (200).toString();
+        String purchasePriceTotal = (200 * 10).toString();
         String cheap = (200).toString();
 
         itemListWidget.add(
@@ -169,10 +164,10 @@ class _ShopPageState extends State<ShopPage> {
             DataCell(Text(qty)),
             DataCell(Text(sold)),
             DataCell(Text(balance)),
-            DataCell(Text(sale_price)),
-            DataCell(Text(sale_price_total)),
-            DataCell(Text(purchase_price)),
-            DataCell(Text(purchase_price_total)),
+            DataCell(Text(salePrice)),
+            DataCell(Text(salePriceTotal)),
+            DataCell(Text(purchasePrice)),
+            DataCell(Text(purchasePriceTotal)),
             DataCell(Text(cheap)),
           ]),
         );
@@ -297,7 +292,7 @@ class _ShopPageState extends State<ShopPage> {
     return Center(
       child: Column(
         children: [
-          Align(
+          const Align(
             alignment: Alignment.topLeft,
             child: Text(
               'Shop 1 Summary',
@@ -308,7 +303,7 @@ class _ShopPageState extends State<ShopPage> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Row(
@@ -317,12 +312,12 @@ class _ShopPageState extends State<ShopPage> {
               Text(
                 dateInput,
                 textAlign: TextAlign.start,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               CustomButton(
@@ -339,8 +334,7 @@ class _ShopPageState extends State<ShopPage> {
                     //pickedDate output format => 2021-03-10 00:00:00.000
                     String formattedDate =
                         DateFormat('yyyy-MM-dd').format(pickedDate);
-                    print(
-                        formattedDate); //formatted date output using intl package =>  2021-03-16
+                    //formatted date output using intl package =>  2021-03-16
                     setState(() {
                       dateInput =
                           formattedDate; //set output date to TextField value.
@@ -353,19 +347,19 @@ class _ShopPageState extends State<ShopPage> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          CustomContainer(
-            outerPadding: const EdgeInsets.symmetric(
+          const CustomContainer(
+            outerPadding: EdgeInsets.symmetric(
               vertical: 0,
               horizontal: 0,
             ),
-            innerPadding: const EdgeInsets.symmetric(
+            innerPadding: EdgeInsets.symmetric(
               vertical: 30,
               horizontal: 30,
             ),
-            containerColor: const Color(0xFFCDE8FF),
+            containerColor: Color(0xFFCDE8FF),
             child: Column(
               children: [
                 Row(
@@ -452,10 +446,10 @@ class _ShopPageState extends State<ShopPage> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Align(
+          const Align(
             alignment: Alignment.topLeft,
             child: Text(
               'Suppliers Summary',
@@ -466,7 +460,7 @@ class _ShopPageState extends State<ShopPage> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           ...supplierContainerListWidget,

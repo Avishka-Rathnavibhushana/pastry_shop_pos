@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/add_shop_container.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/shops_container.dart';
 
@@ -13,8 +12,8 @@ class ShopsPage extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          AddShopContainer(),
-          SizedBox(
+          const AddShopContainer(),
+          const SizedBox(
             height: 20,
           ),
           ShopsContainer(

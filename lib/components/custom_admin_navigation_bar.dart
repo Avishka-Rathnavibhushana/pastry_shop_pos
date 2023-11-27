@@ -11,8 +11,8 @@ class CustomAdminNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color buttonBackgroundColorNotSelected = const Color(0xFF5E86A6);
-    final Color buttonBackgroundColorSelected = Color(0xFF1B78C4);
+    const Color buttonBackgroundColorNotSelected = Color(0xFF5E86A6);
+    const Color buttonBackgroundColorSelected = Color(0xFF1B78C4);
 
     return CustomContainer(
       outerPadding: const EdgeInsets.symmetric(
@@ -25,6 +25,7 @@ class CustomAdminNavigationBar extends StatelessWidget {
       ),
       containerColor: const Color(0xFFCDE8FF),
       child: ButtonBar(
+        alignment: MainAxisAlignment.start,
         children: [
           CustomButton(
             onPressed: onPressed[0],
@@ -54,7 +55,6 @@ class CustomAdminNavigationBar extends StatelessWidget {
                 : buttonBackgroundColorNotSelected,
           ),
         ],
-        alignment: MainAxisAlignment.start,
       ),
     );
   }
