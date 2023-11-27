@@ -3,8 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/add_supplier_container.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/suppliers_container%20copy.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/add_supplier_container.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/suppliers_container.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
 class SupplierPage extends StatefulWidget {
@@ -16,12 +16,6 @@ class SupplierPage extends StatefulWidget {
 
 class _SupplierPageState extends State<SupplierPage> {
   String dateInput = "";
-
-  var supplier = {
-    "name": "supplier 1",
-    "address": "25, dias place, panadura",
-    "tel": "0723884992",
-  };
 
   var items = [
     {

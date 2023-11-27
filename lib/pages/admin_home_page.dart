@@ -4,9 +4,11 @@ import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/supplier.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/suppliers.dart';
+
 import 'package:pastry_shop_pos/pages/admin%20pages/dashboard.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/shop.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/supplier.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/suppliers.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops.dart';
 
 class AdminHomePage extends StatefulWidget {
@@ -22,11 +24,12 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
-  int selectedPage = 1;
+  int selectedPage = 2;
 
   List<Widget> pages = [];
 
   bool showSupplier = false;
+  bool showShop = false;
 
   @override
   void initState() {
@@ -44,7 +47,14 @@ class _AdminHomePageState extends State<AdminHomePage> {
             });
           },
         ),
-        ShopsPage(),
+        ShopsPage(
+          onPressed: (String id) {
+            print(id);
+            setState(() {
+              showShop = true;
+            });
+          },
+        ),
       ];
     });
   }
@@ -65,18 +75,21 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 setState(() {
                   selectedPage = 0;
                   showSupplier = false;
+                  showShop = false;
                 });
               },
               () {
                 setState(() {
                   selectedPage = 1;
                   showSupplier = false;
+                  showShop = false;
                 });
               },
               () {
                 setState(() {
                   selectedPage = 2;
                   showSupplier = false;
+                  showShop = false;
                 });
               },
             ],
@@ -84,7 +97,11 @@ class _AdminHomePageState extends State<AdminHomePage> {
           SizedBox(
             height: 20,
           ),
-          showSupplier ? SupplierPage() : pages[selectedPage],
+          showSupplier
+              ? SupplierPage()
+              : showShop
+                  ? ShopPage()
+                  : pages[selectedPage],
         ],
         shopName: widget.shopName,
       ),

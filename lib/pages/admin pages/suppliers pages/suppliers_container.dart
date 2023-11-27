@@ -14,16 +14,19 @@ class SuppliersContainer extends StatelessWidget {
       "name": "supplier 1",
       "address": "25, dias place, panadura",
       "tel": "0723884992",
+      "shop": "shop 1",
     },
     "supplier 2": {
       "name": "supplier 2",
       "address": "12, galle road, colombo",
       "tel": "0723884992",
+      "shop": "shop 2",
     },
     "supplier 3": {
       "name": "supplier 3",
       "address": "25, dias place, panadura",
       "tel": "0723884992",
+      "shop": "shop 1",
     },
   };
 
@@ -35,6 +38,7 @@ class SuppliersContainer extends StatelessWidget {
       String name = value["name"].toString();
       String address = value["address"].toString();
       String tel = value["tel"].toString();
+      String shop = value["shop"].toString();
 
       rows.add(
         DataRow(
@@ -42,6 +46,7 @@ class SuppliersContainer extends StatelessWidget {
             DataCell(Text(name)),
             DataCell(Text(address)),
             DataCell(Text(tel)),
+            DataCell(Text(shop)),
             DataCell(
               CustomButton(
                 onPressed: () {
@@ -113,6 +118,15 @@ class SuppliersContainer extends StatelessWidget {
               DataColumn(
                 label: Text(
                   'Telephone',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Shop',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
