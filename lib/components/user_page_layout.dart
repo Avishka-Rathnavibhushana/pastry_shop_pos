@@ -66,6 +66,17 @@ class UserPageLayout extends StatelessWidget {
                       fontWeight: FontWeight.normal,
                     ),
                   ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.logout,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(

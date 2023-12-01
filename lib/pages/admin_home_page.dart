@@ -20,7 +20,7 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
-  int selectedPage = 2;
+  int selectedPage = 0;
 
   List<Widget> pages = [];
 
@@ -95,6 +95,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
               : showShop
                   ? const ShopPage()
                   : pages[selectedPage],
+          const SizedBox(
+            height: 10,
+          ),
         ],
         shopName: widget.shopName,
       ),

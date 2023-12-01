@@ -3,6 +3,7 @@ import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_dropdown.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
+import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 import 'package:pastry_shop_pos/pages/chashier_home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -211,14 +212,26 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     CustomButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => CashierHomePage(
-                              shopName: shopSelectedValue,
+                        if (roleSelectedValue == "Admin") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) => AdminHomePage(
+                                shopName: shopSelectedValue,
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        } else if (roleSelectedValue != "Select a role") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) =>
+                                  CashierHomePage(
+                                shopName: shopSelectedValue,
+                              ),
+                            ),
+                          );
+                        }
                       },
                       text: "Sign in",
                     ),

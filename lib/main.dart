@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pastry_shop_pos/pages/admin_home_page.dart';
+import 'package:pastry_shop_pos/pages/chashier_home_page.dart';
 import 'package:pastry_shop_pos/pages/login_page.dart';
 
 void main() {
@@ -16,12 +18,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
+          seedColor: Colors.blueAccent,
         ),
         useMaterial3: true,
       ),
-      home: const Material(
+      home: Material(
         child: LoginPage(),
+        //     CashierHomePage(
+        //   shopName: "test",
+        // ),
+        //     AdminHomePage(
+        //   shopName: "Admin Panel",
+        // ),
       ),
     );
   }
