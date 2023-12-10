@@ -16,51 +16,51 @@ class _ShopPageState extends State<ShopPage> {
   var data = {
     "supplier 1": [
       {
-        "item": "paan",
+        "item": "පාන්",
         "qty": 12,
         "sold": 12,
       },
       {
-        "item": "thati paan",
+        "item": "තැටි පාන්",
         "qty": 7,
         "sold": 7,
       },
       {
-        "item": "rose paan",
+        "item": "රෝස් පාන්",
         "qty": 10,
         "sold": 10,
       },
       {
-        "item": "biththara bun",
+        "item": "බිත්තර බන්",
         "qty": 3,
         "sold": 1,
       },
       {
-        "item": "jaam paan",
+        "item": "ජෑම් පාන්",
         "qty": 3,
         "sold": 2,
       },
     ],
     "supplier 2": [
       {
-        "item": "rose paan",
+        "item": "රෝස් පාන්",
         "qty": 10,
         "sold": 10,
       },
       {
-        "item": "biththara bun",
+        "item": "බිත්තර බන්",
         "qty": 3,
         "sold": 1,
       },
       {
-        "item": "jaam paan",
+        "item": "ජෑම් පාන්",
         "qty": 3,
         "sold": 2,
       },
     ],
     "supplier 3": [
       {
-        "item": "paan",
+        "item": "පාන්",
         "qty": 12,
         "sold": 12,
       },
@@ -72,27 +72,27 @@ class _ShopPageState extends State<ShopPage> {
       {
         "2023-11-17": [
           {
-            "item": "paan",
+            "item": "පාන්",
             "sale price": 140,
             "purchasePrice": 115,
           },
           {
-            "item": "thati paan",
+            "item": "තැටි පාන්",
             "sale price": 120,
             "purchasePrice": 100,
           },
           {
-            "item": "rose paan",
+            "item": "රෝස් පාන්",
             "sale price": 40,
             "purchasePrice": 30,
           },
           {
-            "item": "biththara bun",
+            "item": "බිත්තර බන්",
             "sale price": 60,
             "purchasePrice": 40,
           },
           {
-            "item": "jaam paan",
+            "item": "ජෑම් පාන්",
             "sale price": 60,
             "purchasePrice": 40,
           },
@@ -103,17 +103,17 @@ class _ShopPageState extends State<ShopPage> {
       {
         "2023-11-17": [
           {
-            "item": "rose paan",
+            "item": "රෝස් පාන්",
             "sale price": 40,
             "purchasePrice": 30,
           },
           {
-            "item": "biththara bun",
+            "item": "බිත්තර බන්",
             "sale price": 60,
             "purchasePrice": 40,
           },
           {
-            "item": "jaam paan",
+            "item": "ජෑම් පාන්",
             "sale price": 60,
             "purchasePrice": 40,
           },
@@ -124,7 +124,7 @@ class _ShopPageState extends State<ShopPage> {
       {
         "2023-11-17": [
           {
-            "item": "paan",
+            "item": "පාන්",
             "sale price": 140,
             "purchasePrice": 115,
           },
@@ -140,6 +140,11 @@ class _ShopPageState extends State<ShopPage> {
       dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
     });
   }
+
+  TextStyle tableColumnHeaderStyle = const TextStyle(
+    fontSize: 17,
+    fontWeight: FontWeight.bold,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -194,91 +199,78 @@ class _ShopPageState extends State<ShopPage> {
                 ),
               ),
               DataTable(
-                columns: const [
+                columns: [
                   DataColumn(
-                    label: Text(
-                      'ITEM',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label: Text('ITEM', style: tableColumnHeaderStyle),
                   ),
                   DataColumn(
-                    label: Text(
-                      'QTY',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label: Text('QTY', style: tableColumnHeaderStyle),
                   ),
                   DataColumn(
-                    label: Text(
-                      'SOLD',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label: Text('SOLD', style: tableColumnHeaderStyle),
                   ),
                   DataColumn(
-                    label: Text(
-                      'Balance',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label: Text('Balance', style: tableColumnHeaderStyle),
                   ),
                   DataColumn(
-                    label: Text(
-                      'Sale\nPrice',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label: Text('Sale\nPrice', style: tableColumnHeaderStyle),
                   ),
                   DataColumn(
-                    label: Text(
-                      'Sale Price\nTotal',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label: Text('Sale Price\nTotal',
+                        style: tableColumnHeaderStyle),
                   ),
                   DataColumn(
-                    label: Text(
-                      'Purchase\nPrice',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label:
+                        Text('Purchase\nPrice', style: tableColumnHeaderStyle),
                   ),
                   DataColumn(
-                    label: Text(
-                      'Purchase Price\nTotal',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label: Text('Purchase Price\nTotal',
+                        style: tableColumnHeaderStyle),
                   ),
                   DataColumn(
-                    label: Text(
-                      'CHEAP',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    label: Text('CHEAP', style: tableColumnHeaderStyle),
                   ),
                 ],
                 rows: [
                   ...itemListWidget,
+                  DataRow(cells: [
+                    DataCell(Text(
+                      "",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      "10",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      "8",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      "2",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      "",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      "6700",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      "",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      "4500",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      "2200",
+                      style: tableColumnHeaderStyle,
+                    )),
+                  ]),
                 ],
               ),
             ],
