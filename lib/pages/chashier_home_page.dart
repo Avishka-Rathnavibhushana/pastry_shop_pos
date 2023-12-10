@@ -16,51 +16,51 @@ class CashierHomePage extends StatelessWidget {
   var data = {
     "supplier 1": [
       {
-        "item": "paan",
+        "item": "පාන්",
         "qty": 12,
         "sold": 12,
       },
       {
-        "item": "thati paan",
+        "item": "තැටි පාන්",
         "qty": 7,
         "sold": 7,
       },
       {
-        "item": "rose paan",
+        "item": "රෝස් පාන්",
         "qty": 10,
         "sold": 10,
       },
       {
-        "item": "biththara bun",
+        "item": "බිත්තර බන්",
         "qty": 3,
         "sold": 1,
       },
       {
-        "item": "jaam paan",
+        "item": "ජෑම් පාන්",
         "qty": 3,
         "sold": 2,
       },
     ],
     "supplier 2": [
       {
-        "item": "rose paan",
+        "item": "රෝස් පාන්",
         "qty": 10,
         "sold": 10,
       },
       {
-        "item": "biththara bun",
+        "item": "බිත්තර බන්",
         "qty": 3,
         "sold": 1,
       },
       {
-        "item": "jaam paan",
+        "item": "ජෑම් පාන්",
         "qty": 3,
         "sold": 2,
       },
     ],
     "supplier 3": [
       {
-        "item": "paan",
+        "item": "පාන්",
         "qty": 12,
         "sold": 12,
       },
@@ -72,27 +72,27 @@ class CashierHomePage extends StatelessWidget {
       {
         "2023-11-17": [
           {
-            "item": "paan",
+            "item": "පාන්",
             "sale price": 140,
             "purchasePrice": 115,
           },
           {
-            "item": "thati paan",
+            "item": "තැටි පාන්",
             "sale price": 120,
             "purchasePrice": 100,
           },
           {
-            "item": "rose paan",
+            "item": "රෝස් පාන්",
             "sale price": 40,
             "purchasePrice": 30,
           },
           {
-            "item": "biththara bun",
+            "item": "බිත්තර බන්",
             "sale price": 60,
             "purchasePrice": 40,
           },
           {
-            "item": "jaam paan",
+            "item": "ජෑම් පාන්",
             "sale price": 60,
             "purchasePrice": 40,
           },
@@ -103,17 +103,17 @@ class CashierHomePage extends StatelessWidget {
       {
         "2023-11-17": [
           {
-            "item": "rose paan",
+            "item": "රෝස් පාන්",
             "sale price": 40,
             "purchasePrice": 30,
           },
           {
-            "item": "biththara bun",
+            "item": "බිත්තර බන්",
             "sale price": 60,
             "purchasePrice": 40,
           },
           {
-            "item": "jaam paan",
+            "item": "ජෑම් පාන්",
             "sale price": 60,
             "purchasePrice": 40,
           },
@@ -124,7 +124,7 @@ class CashierHomePage extends StatelessWidget {
       {
         "2023-11-17": [
           {
-            "item": "paan",
+            "item": "පාන්",
             "sale price": 140,
             "purchasePrice": 115,
           },

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
@@ -5,6 +6,7 @@ import 'package:pastry_shop_pos/components/custom_dropdown.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 import 'package:pastry_shop_pos/pages/chashier_home_page.dart';
+import 'package:pastry_shop_pos/pages/chashier_home_page_2.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,6 +31,8 @@ class _LoginPageState extends State<LoginPage> {
           value: "Select a role", child: Text("Select a role")),
       const DropdownMenuItem(value: "Admin", child: Text("Admin")),
       const DropdownMenuItem(value: "Cashier", child: Text("Cashier")),
+      const DropdownMenuItem(
+          value: "Third Person", child: Text("Third Person")),
     ]);
 
     shopDropdownItems.addAll(
@@ -51,33 +55,33 @@ class _LoginPageState extends State<LoginPage> {
     _populateDropdownItems();
   }
 
-  void _addOrRemoveAdminPanelItem() {
-    // Add a new item to the dropdown list
-    setState(() {
-      shopDropdownItems = [];
-    });
-    if (roleSelectedValue == "Admin") {
-      shopDropdownItems.addAll([
-        const DropdownMenuItem(
-            value: "Select a shop", child: Text("Select a shop")),
-        const DropdownMenuItem(
-            value: "Admin Panel", child: Text("Admin Panel")),
-      ]);
-    } else {
-      shopDropdownItems.addAll([
-        const DropdownMenuItem(
-            value: "Select a shop", child: Text("Select a shop")),
-        const DropdownMenuItem(value: "Shop 1", child: Text("Shop 1")),
-        const DropdownMenuItem(value: "Shop 2", child: Text("Shop 2")),
-        const DropdownMenuItem(value: "Shop 3", child: Text("Shop 3")),
-      ]);
-    }
+  // void _addOrRemoveAdminPanelItem() {
+  //   // Add a new item to the dropdown list
+  //   setState(() {
+  //     shopDropdownItems = [];
+  //   });
+  //   if (roleSelectedValue == "Admin") {
+  //     shopDropdownItems.addAll([
+  //       const DropdownMenuItem(
+  //           value: "Select a shop", child: Text("Select a shop")),
+  //       const DropdownMenuItem(
+  //           value: "Admin Panel", child: Text("Admin Panel")),
+  //     ]);
+  //   } else {
+  //     shopDropdownItems.addAll([
+  //       const DropdownMenuItem(
+  //           value: "Select a shop", child: Text("Select a shop")),
+  //       const DropdownMenuItem(value: "Shop 1", child: Text("Shop 1")),
+  //       const DropdownMenuItem(value: "Shop 2", child: Text("Shop 2")),
+  //       const DropdownMenuItem(value: "Shop 3", child: Text("Shop 3")),
+  //     ]);
+  //   }
 
-    shopSelectedValue = "Select a shop";
+  //   shopSelectedValue = "Select a shop";
 
-    // Rebuild the widget to reflect the changes
-    setState(() {});
-  }
+  //   // Rebuild the widget to reflect the changes
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -188,25 +192,28 @@ class _LoginPageState extends State<LoginPage> {
                           setState(() {
                             roleSelectedValue = newValue;
                           });
-                          _addOrRemoveAdminPanelItem();
+                          // _addOrRemoveAdminPanelItem();
                         },
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 10,
-                      ),
-                      child: CustomDropdown(
-                        dropdownItems: shopDropdownItems,
-                        selectedValue: shopSelectedValue!,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            shopSelectedValue = newValue;
-                          });
-                        },
-                      ),
-                    ),
+                    roleSelectedValue == "Cashier" ||
+                            roleSelectedValue == "Third Person"
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 10,
+                            ),
+                            child: CustomDropdown(
+                              dropdownItems: shopDropdownItems,
+                              selectedValue: shopSelectedValue!,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  shopSelectedValue = newValue;
+                                });
+                              },
+                            ),
+                          )
+                        : Container(),
                     const SizedBox(
                       height: 20,
                     ),
@@ -216,21 +223,36 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute<void>(
-                              builder: (BuildContext context) => AdminHomePage(
-                                shopName: shopSelectedValue,
-                              ),
-                            ),
-                          );
-                        } else if (roleSelectedValue != "Select a role") {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute<void>(
                               builder: (BuildContext context) =>
-                                  CashierHomePage(
-                                shopName: shopSelectedValue,
+                                  const AdminHomePage(
+                                shopName: "Admin Panel",
                               ),
                             ),
                           );
+                        } else if (roleSelectedValue == "Cashier") {
+                          if (shopSelectedValue != "Select a shop") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) =>
+                                    CashierHomePage(
+                                  shopName: shopSelectedValue,
+                                ),
+                              ),
+                            );
+                          }
+                        } else if (roleSelectedValue == "Third Person") {
+                          if (shopSelectedValue != "Select a shop") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) =>
+                                    CashierHomePage2(
+                                  shopName: "Third Person View",
+                                ),
+                              ),
+                            );
+                          }
                         }
                       },
                       text: "Sign in",
