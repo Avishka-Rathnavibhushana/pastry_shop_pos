@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "945867413250",
+    "firebase_url": "https://pastry-shop-pos-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "pastry-shop-pos",
+    "storage_bucket": "pastry-shop-pos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945867413250:android:b0162351e2e6b66293d41b",
+        "android_client_info": {
+          "package_name": "com.example.pastry_shop_pos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD82d2XJd9aSV6gAiKQTBbM7dZogugyfRM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
