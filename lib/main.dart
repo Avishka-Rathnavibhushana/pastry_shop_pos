@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get/route_manager.dart';
+import 'package:pastry_shop_pos/controllers/app_binding.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 import 'package:pastry_shop_pos/pages/chashier_home_page.dart';
 import 'package:pastry_shop_pos/pages/login_page.dart';
@@ -7,7 +9,7 @@ import 'package:pastry_shop_pos/pages/login_page.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: FirebaseOptions(
+    options: const FirebaseOptions(
         apiKey: "AIzaSyAHfpKmCi9-K3bR3Aj0qdC8Bu4bK-pG_CY",
         authDomain: "pastry-shop-pos.firebaseapp.com",
         databaseURL:
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Pastry Shop POS',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -36,6 +38,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
+      initialBinding: AppBinding(),
       home: Material(
         child: LoginPage(),
         //     CashierHomePage(

@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_dropdown.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
+import 'package:pastry_shop_pos/controllers/auth_controller.dart';
+import 'package:pastry_shop_pos/models/user.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 import 'package:pastry_shop_pos/pages/chashier_home_page.dart';
 import 'package:pastry_shop_pos/pages/chashier_home_page_2.dart';
@@ -218,7 +221,42 @@ class _LoginPageState extends State<LoginPage> {
                       height: 20,
                     ),
                     CustomButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        AuthController authController =
+                            Get.find<AuthController>();
+
+                        // authController.createUserWithId(
+                        //   "user2",
+                        //   User(
+                        //     username: "user2",
+                        //     role: "admin",
+                        //     password: "password",
+                        //     address: "address",
+                        //     tel: "tel",
+                        //   ),
+                        // );
+
+                        // final a = await authController.getUsersList();
+                        // print(a.length);
+
+                        // final a = await authController.getUserById("user1");
+                        // print(a);
+                        // print(a!.toMap().toString());
+
+                        // await authController.updateUserById(
+                        //   "user2",
+                        //   User(
+                        //     username: "user2",
+                        //     role: "Cashier",
+                        //     password: "password",
+                        //     address: "address",
+                        //     tel: "tel",
+                        //     shop: "Shop 1",
+                        //   ),
+                        // );
+
+                        // await authController.deleteUserById("user2");
+
                         if (roleSelectedValue == "Admin") {
                           Navigator.push(
                             context,
