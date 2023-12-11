@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
+import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 
 class UserPageLayout extends StatelessWidget {
   const UserPageLayout({
@@ -71,6 +73,9 @@ class UserPageLayout extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
+                      AuthController authController =
+                          Get.find<AuthController>();
+                      authController.logoutUser(snackBar: true);
                       Navigator.pop(context);
                     },
                     icon: const Icon(

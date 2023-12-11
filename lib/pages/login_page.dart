@@ -5,6 +5,7 @@ import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_dropdown.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/models/user.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
@@ -28,23 +29,61 @@ class _LoginPageState extends State<LoginPage> {
   List<DropdownMenuItem<String>> shopDropdownItems = [];
   String? shopSelectedValue = "Select a shop";
 
-  void _populateDropdownItems() {
-    roleDropdownItems.addAll([
-      const DropdownMenuItem(
-          value: "Select a role", child: Text("Select a role")),
-      const DropdownMenuItem(value: "Admin", child: Text("Admin")),
-      const DropdownMenuItem(value: "Cashier", child: Text("Cashier")),
-      const DropdownMenuItem(
-          value: "Third Person", child: Text("Third Person")),
-    ]);
+  AuthController authController = Get.find<AuthController>();
+
+  Future<void> _populateDropdownItems() async {
+    // await authController.createUserWithId(
+    //   "user2",
+    //   User(
+    //     username: "user2",
+    //     role: "CASHIER",
+    //     password: "password",
+    //     address: "address",
+    //     shop: "shop1",
+    //     tel: "tel",
+    //   ),
+    // );
+    authController.logoutUser();
+
+    List<List<String>> rolesAndShops = await authController.loadRolesAndShops();
+    List<String> roles = rolesAndShops[0];
+    List<String> shops = rolesAndShops[1];
+
+    List<DropdownMenuItem<String>> roleDropdownItemsData = [];
+
+    for (int i = 0; i < roles.length; i++) {
+      roleDropdownItemsData.add(
+        DropdownMenuItem(
+          value: roles[i],
+          child: Text(roles[i]),
+        ),
+      );
+    }
+
+    roleDropdownItems.addAll(
+      [
+        const DropdownMenuItem(
+            value: "Select a role", child: Text("Select a role")),
+        ...roleDropdownItemsData,
+      ],
+    );
+
+    List<DropdownMenuItem<String>> shopDropdownItemsData = [];
+
+    for (int i = 0; i < shops.length; i++) {
+      shopDropdownItemsData.add(
+        DropdownMenuItem(
+          value: shops[i],
+          child: Text(shops[i]),
+        ),
+      );
+    }
 
     shopDropdownItems.addAll(
       [
         const DropdownMenuItem(
             value: "Select a shop", child: Text("Select a shop")),
-        const DropdownMenuItem(value: "Shop 1", child: Text("Shop 1")),
-        const DropdownMenuItem(value: "Shop 2", child: Text("Shop 2")),
-        const DropdownMenuItem(value: "Shop 3", child: Text("Shop 3")),
+        ...shopDropdownItemsData,
       ],
     );
     setState(() {});
@@ -199,8 +238,8 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                     ),
-                    roleSelectedValue == "Cashier" ||
-                            roleSelectedValue == "Third Person"
+                    roleSelectedValue == Constants.Cashier ||
+                            roleSelectedValue == Constants.Accountant
                         ? Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 30,
@@ -222,42 +261,19 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     CustomButton(
                       onPressed: () async {
-                        AuthController authController =
-                            Get.find<AuthController>();
+                        bool isSuccessful =
+                            await authController.authenticateUser(
+                          emailController.text,
+                          passwordController.text,
+                          roleSelectedValue!,
+                          shop: shopSelectedValue,
+                        );
 
-                        // authController.createUserWithId(
-                        //   "user2",
-                        //   User(
-                        //     username: "user2",
-                        //     role: "admin",
-                        //     password: "password",
-                        //     address: "address",
-                        //     tel: "tel",
-                        //   ),
-                        // );
+                        if (!isSuccessful) {
+                          return;
+                        }
 
-                        // final a = await authController.getUsersList();
-                        // print(a.length);
-
-                        // final a = await authController.getUserById("user1");
-                        // print(a);
-                        // print(a!.toMap().toString());
-
-                        // await authController.updateUserById(
-                        //   "user2",
-                        //   User(
-                        //     username: "user2",
-                        //     role: "Cashier",
-                        //     password: "password",
-                        //     address: "address",
-                        //     tel: "tel",
-                        //     shop: "Shop 1",
-                        //   ),
-                        // );
-
-                        // await authController.deleteUserById("user2");
-
-                        if (roleSelectedValue == "Admin") {
+                        if (roleSelectedValue == Constants.Admin) {
                           Navigator.push(
                             context,
                             MaterialPageRoute<void>(
@@ -267,26 +283,28 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           );
-                        } else if (roleSelectedValue == "Cashier") {
+                        } else if (roleSelectedValue == Constants.Cashier) {
                           if (shopSelectedValue != "Select a shop") {
                             Navigator.push(
                               context,
                               MaterialPageRoute<void>(
                                 builder: (BuildContext context) =>
                                     CashierHomePage(
-                                  shopName: shopSelectedValue,
+                                  shopName:
+                                      "${roleSelectedValue!} - ${shopSelectedValue!}",
                                 ),
                               ),
                             );
                           }
-                        } else if (roleSelectedValue == "Third Person") {
+                        } else if (roleSelectedValue == Constants.Accountant) {
                           if (shopSelectedValue != "Select a shop") {
                             Navigator.push(
                               context,
                               MaterialPageRoute<void>(
                                 builder: (BuildContext context) =>
                                     CashierHomePage2(
-                                  shopName: "Third Person View",
+                                  shopName:
+                                      "${roleSelectedValue!} - ${shopSelectedValue!}",
                                 ),
                               ),
                             );

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/route_manager.dart';
 import 'package:get/state_manager.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/user.dart';
 
 class AuthController extends GetxController {
@@ -21,9 +23,10 @@ class AuthController extends GetxController {
           .collection('users')
           .doc(userId)
           .set(user.toMap());
-      Get.snackbar("Successful!", "Successfully created the user.");
+      Helpers.snackBarPrinter("Successful!", "Successfully created the user.");
     } catch (e) {
-      Get.snackbar("Failed!", "Failed to create the user.");
+      Helpers.snackBarPrinter("Failed!", "Failed to create the user.",
+          error: true);
       print('Error creating user with ID: $e');
     }
   }
@@ -67,9 +70,10 @@ class AuthController extends GetxController {
           .collection('users')
           .doc(userId)
           .update(updatedUser.toMap());
-      Get.snackbar("Successful!", "Successfully updated the user.");
+      Helpers.snackBarPrinter("Successful!", "Successfully updated the user.");
     } catch (e) {
-      Get.snackbar("Failed!", "Failed to update the user.");
+      Helpers.snackBarPrinter("Failed!", "Failed to update the user.",
+          error: true);
       print('Error updating user by ID: $e');
     }
   }
@@ -78,10 +82,99 @@ class AuthController extends GetxController {
   Future<void> deleteUserById(String userId) async {
     try {
       await FirebaseFirestore.instance.collection('users').doc(userId).delete();
-      Get.snackbar("Successful!", "Successfully deleted the user.");
+      Helpers.snackBarPrinter("Successful!", "Successfully deleted the user.");
     } catch (e) {
-      Get.snackbar("Failed!", "Failed to delete the user.");
+      Helpers.snackBarPrinter("Failed!", "Failed to delete the user.",
+          error: true);
       print('Error deleting user by ID: $e');
+    }
+  }
+
+  Future<dynamic> loadRolesAndShops() async {
+    try {
+      List<User> users = await getUsersList();
+      List<String> roles = [];
+      List<String> shops = [];
+      for (User user in users) {
+        if (user.role == Constants.Admin && !roles.contains(Constants.Admin)) {
+          roles.add(user.role);
+        }
+        if (user.role == Constants.Cashier &&
+            !roles.contains(Constants.Cashier)) {
+          roles.add(user.role);
+          if (user.shop != null && !shops.contains(user.shop)) {
+            shops.add(user.shop!);
+          }
+        }
+        if (user.role == Constants.Accountant &&
+            !roles.contains(Constants.Accountant)) {
+          roles.add(user.role);
+        }
+      }
+      return [roles, shops];
+    } catch (e) {
+      print('Error loading roles and shops: $e');
+      return [];
+    }
+  }
+
+  Future<bool> authenticateUser(String username, String password, String role,
+      {String? shop}) async {
+    try {
+      User? user = await getUserById(username);
+      if (user != null) {
+        if (user.password != Helpers.encryptPassword(password)) {
+          Helpers.snackBarPrinter("Failed!", "Incorrect password.",
+              error: true);
+          return false;
+        }
+
+        if (user.role != role) {
+          Helpers.snackBarPrinter("Failed!", "Incorrect role.", error: true);
+          return false;
+        }
+
+        if (user.role == Constants.Cashier && user.shop != shop) {
+          Helpers.snackBarPrinter("Failed!", "Incorrect shop.", error: true);
+          return false;
+        }
+
+        Helpers.snackBarPrinter("Successful!", "Successfully logged in.");
+        this.user.value = user;
+        return true;
+      } else {
+        Helpers.snackBarPrinter("Failed!", "User not found.", error: true);
+        return false;
+      }
+    } catch (e) {
+      Helpers.snackBarPrinter(
+          "Failed!", "Something is wrong. Please try again.",
+          error: true);
+      print('Error authenticating user: $e');
+      return false;
+    }
+  }
+
+  Future<void> logoutUser({bool snackBar = false}) async {
+    try {
+      this.user.value = User(
+        username: "",
+        role: "",
+        password: "",
+        address: "",
+        tel: "",
+        shop: "",
+      );
+      if (snackBar) {
+        Helpers.snackBarPrinter("Successful!", "Successfully logged out.");
+      }
+    } catch (e) {
+      if (snackBar) {
+        Helpers.snackBarPrinter(
+            "Failed!", "Something is wrong. Please try again.",
+            error: true);
+      }
+      print('Error logging out user: $e');
     }
   }
 }

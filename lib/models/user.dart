@@ -1,6 +1,6 @@
 class User {
   String username;
-  String role;
+  String role; // ADMIN, CASHIER, ACCCOUNTANT
   String password;
   String address;
   String tel;
