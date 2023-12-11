@@ -90,6 +90,7 @@ class AuthController extends GetxController {
     }
   }
 
+  // load roles and shops
   Future<dynamic> loadRolesAndShops() async {
     try {
       List<User> users = await getUsersList();
@@ -118,6 +119,7 @@ class AuthController extends GetxController {
     }
   }
 
+  // authenticate user
   Future<bool> authenticateUser(String username, String password, String role,
       {String? shop}) async {
     try {
@@ -155,6 +157,7 @@ class AuthController extends GetxController {
     }
   }
 
+  // logout user
   Future<void> logoutUser({bool snackBar = false}) async {
     try {
       this.user.value = User(
@@ -175,6 +178,25 @@ class AuthController extends GetxController {
             error: true);
       }
       print('Error logging out user: $e');
+    }
+  }
+
+  // load shops list
+  Future<List<String>> loadShopsList() async {
+    try {
+      List<User> users = await getUsersList();
+      List<String> shops = [];
+      for (User user in users) {
+        if (user.role == Constants.Cashier &&
+            user.shop != null &&
+            !shops.contains(user.shop)) {
+          shops.add(user.shop!);
+        }
+      }
+      return shops;
+    } catch (e) {
+      print('Error loading shops list: $e');
+      return [];
     }
   }
 }

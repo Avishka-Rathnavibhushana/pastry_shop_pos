@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.fontSize = 15,
     this.maxLength,
+    this.onSubmitted,
   });
 
   final TextEditingController controller;
@@ -17,11 +18,13 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final double? fontSize;
   final int? maxLength;
+  final void Function(String)? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      onSubmitted: onSubmitted,
       style: TextStyle(
         fontSize: fontSize,
       ),

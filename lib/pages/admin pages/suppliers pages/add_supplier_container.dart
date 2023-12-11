@@ -3,10 +3,18 @@ import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_dropdown.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
+import 'package:pastry_shop_pos/components/pill_box.dart';
+import 'package:pastry_shop_pos/controllers/auth_controller.dart';
+import 'package:pastry_shop_pos/helpers/helpers.dart';
+import 'package:pastry_shop_pos/models/Supplier.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
 class AddSupplierContainer extends StatefulWidget {
-  const AddSupplierContainer({super.key});
+  AddSupplierContainer({super.key, required this.submit});
+
+  Future<bool> Function(
+    Supplier supplier,
+  ) submit;
 
   @override
   State<AddSupplierContainer> createState() => _AddSupplierContainerState();
@@ -15,15 +23,58 @@ class AddSupplierContainer extends StatefulWidget {
 class _AddSupplierContainerState extends State<AddSupplierContainer> {
   List<DropdownMenuItem<String>> shopDropdownItems = [];
   String? shopSelectedValue = "Select a shop";
+  List<String> items = [];
+  TextEditingController supplierNameController = TextEditingController();
+  TextEditingController supplierAddressController = TextEditingController();
+  TextEditingController supplierTelController = TextEditingController();
+  TextEditingController itemController = TextEditingController();
 
-  void _populateDropdownItems() {
+  // add item to list
+  void addItemToList(String item) {
+    // check if item is already in list
+    if (items.contains(item)) {
+      Helpers.snackBarPrinter(
+        "Failed!",
+        "Item already exists in the list.",
+        error: true,
+      );
+      return;
+    } else if (item.isEmpty) {
+      Helpers.snackBarPrinter(
+        "Failed!",
+        "Item cannot be empty.",
+        error: true,
+      );
+      return;
+    } else {
+      items.add(item);
+      itemController.clear();
+    }
+
+    setState(() {});
+  }
+
+  Future<void> _populateDropdownItems() async {
+    // load shops from database
+    AuthController authController = AuthController();
+    List<DropdownMenuItem<String>> shops = [];
+
+    await authController.loadShopsList().then((value) {
+      value.forEach((element) {
+        shops.add(
+          DropdownMenuItem(
+            value: element,
+            child: Text(element),
+          ),
+        );
+      });
+    });
+
     shopDropdownItems.addAll(
       [
         const DropdownMenuItem(
             value: "Select a shop", child: Text("Select a shop")),
-        const DropdownMenuItem(value: "Shop 1", child: Text("Shop 1")),
-        const DropdownMenuItem(value: "Shop 2", child: Text("Shop 2")),
-        const DropdownMenuItem(value: "Shop 3", child: Text("Shop 3")),
+        ...shops,
       ],
     );
     setState(() {});
@@ -74,7 +125,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                 child: SizedBox(
                   width: 300,
                   child: CustomTextField(
-                    controller: TextEditingController(),
+                    controller: supplierNameController,
                     labelText: 'Supplier name',
                     hintText: 'Enter Supplier Name',
                   ),
@@ -88,7 +139,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                 child: SizedBox(
                   width: 300,
                   child: CustomTextField(
-                    controller: TextEditingController(),
+                    controller: supplierAddressController,
                     labelText: 'Supplier Address',
                     hintText: 'Enter Supplier Address',
                   ),
@@ -102,7 +153,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                 child: SizedBox(
                   width: 300,
                   child: CustomTextField(
-                    controller: TextEditingController(),
+                    controller: supplierTelController,
                     labelText: 'Supplier Tel.',
                     hintText: 'Enter Supplier Telephone number',
                   ),
@@ -126,19 +177,90 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 10,
+                ),
+                child: SizedBox(
+                  width: 300,
+                  child: CustomTextField(
+                    controller: itemController,
+                    labelText: 'Item',
+                    hintText: 'Enter item name',
+                    onSubmitted: (value) {
+                      addItemToList(value);
+                    },
+                  ),
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 10,
+                ),
+                child: Container(
+                  width: 300,
+                  child: Wrap(
+                    spacing: 8.0, // Adjust the spacing between pill boxes
+                    runSpacing:
+                        8.0, // Adjust the spacing between rows of pill boxes
+                    alignment: WrapAlignment.center,
+                    children: items.map((item) {
+                      return PillBox(
+                        text: item,
+                        onClose: () {
+                          // Implement close button functionality
+                          setState(() {
+                            items.remove(item);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              // PillBox(text: "text", onClose: () {}),
               const SizedBox(
                 height: 20,
               ),
               CustomButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => const AdminHomePage(
-                        shopName: "shopSelectedValue",
-                      ),
-                    ),
-                  );
+                onPressed: () async {
+                  // check if all fields are filled
+                  if (supplierNameController.text.isEmpty ||
+                      supplierAddressController.text.isEmpty ||
+                      supplierTelController.text.isEmpty ||
+                      shopSelectedValue == "Select a shop") {
+                    Helpers.snackBarPrinter(
+                      "Failed!",
+                      "Please fill all fields.",
+                      error: true,
+                    );
+                    return;
+                  } else {
+                    Supplier supplier = Supplier(
+                      name: supplierNameController.text,
+                      address: supplierAddressController.text,
+                      tel: supplierTelController.text,
+                      shop: shopSelectedValue!,
+                      items: items,
+                    );
+
+                    bool result = await widget.submit(supplier);
+
+                    if (result) {
+                      // clear fields
+                      supplierNameController.clear();
+                      supplierAddressController.clear();
+                      supplierTelController.clear();
+                      itemController.clear();
+                      shopSelectedValue = "Select a shop";
+                      items.clear();
+
+                      setState(() {});
+                    }
+                  }
                 },
                 text: "Submit",
               ),
