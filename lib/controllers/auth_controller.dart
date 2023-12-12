@@ -17,17 +17,19 @@ class AuthController extends GetxController {
   ).obs;
 
   // create user
-  Future<void> createUserWithId(String userId, User user) async {
+  Future<bool> createUserWithId(String userId, User user) async {
     try {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .set(user.toMap());
       Helpers.snackBarPrinter("Successful!", "Successfully created the user.");
+      return true;
     } catch (e) {
       Helpers.snackBarPrinter("Failed!", "Failed to create the user.",
           error: true);
       print('Error creating user with ID: $e');
+      return false;
     }
   }
 

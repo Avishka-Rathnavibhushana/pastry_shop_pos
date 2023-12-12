@@ -6,13 +6,13 @@ import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/pill_box.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
-import 'package:pastry_shop_pos/models/Supplier.dart';
+import 'package:pastry_shop_pos/models/supplier.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
 class AddSupplierContainer extends StatefulWidget {
-  AddSupplierContainer({super.key, required this.submit});
+  const AddSupplierContainer({super.key, required this.submit});
 
-  Future<bool> Function(
+  final Future<bool> Function(
     Supplier supplier,
   ) submit;
 

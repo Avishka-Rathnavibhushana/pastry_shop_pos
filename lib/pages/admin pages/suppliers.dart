@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
-import 'package:pastry_shop_pos/models/Supplier.dart';
+import 'package:pastry_shop_pos/models/supplier.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/add_supplier_container.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/suppliers_container.dart';
 
@@ -19,7 +20,18 @@ class _SuppliersPageState extends State<SuppliersPage> {
     Supplier supplier,
   ) async {
     SupplierController supplierController = Get.find<SupplierController>();
-    bool result = await supplierController.createSupplier(supplier);
+    bool result = false;
+    bool resultSupplier = await supplierController.createSupplier(supplier);
+
+    if (resultSupplier) {
+      ShopController shopController = Get.find<ShopController>();
+      bool resultShop = await shopController.addSupplierToShop(
+        supplier.shop.toString(),
+        supplier.name.toString(),
+      );
+
+      result = resultShop;
+    }
 
     if (result) {
       await loadData();

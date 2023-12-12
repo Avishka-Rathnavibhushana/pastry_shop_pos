@@ -2,16 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/helpers/helpers.dart';
+import 'package:pastry_shop_pos/models/shop.dart';
+import 'package:pastry_shop_pos/models/user.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
 class AddShopContainer extends StatefulWidget {
-  const AddShopContainer({super.key});
+  const AddShopContainer({super.key, required this.submit});
+
+  final Future<bool> Function(
+    Shop shop,
+    User user,
+  ) submit;
 
   @override
   State<AddShopContainer> createState() => _AddShopContainerState();
 }
 
 class _AddShopContainerState extends State<AddShopContainer> {
+  TextEditingController shopNameController = TextEditingController();
+  TextEditingController shopAddressController = TextEditingController();
+  TextEditingController shopTelController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +70,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                 child: SizedBox(
                   width: 300,
                   child: CustomTextField(
-                    controller: TextEditingController(),
+                    controller: shopNameController,
                     labelText: 'Shop name',
                     hintText: 'Enter Shop Name',
                   ),
@@ -70,7 +84,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                 child: SizedBox(
                   width: 300,
                   child: CustomTextField(
-                    controller: TextEditingController(),
+                    controller: shopAddressController,
                     labelText: 'Shop Address',
                     hintText: 'Enter Shop Address',
                   ),
@@ -84,7 +98,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                 child: SizedBox(
                   width: 300,
                   child: CustomTextField(
-                    controller: TextEditingController(),
+                    controller: shopTelController,
                     labelText: 'Shop Tel.',
                     hintText: 'Enter Shop Telephone number',
                   ),
@@ -98,7 +112,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                 child: SizedBox(
                   width: 300,
                   child: CustomTextField(
-                    controller: TextEditingController(),
+                    controller: passwordController,
                     labelText: 'Password',
                     hintText: 'Enter Password',
                     obscureText: true,
@@ -109,15 +123,48 @@ class _AddShopContainerState extends State<AddShopContainer> {
                 height: 20,
               ),
               CustomButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => const AdminHomePage(
-                        shopName: "shopSelectedValue",
-                      ),
-                    ),
-                  );
+                onPressed: () async {
+                  // check if all fields are filled
+                  if (shopNameController.text.isEmpty ||
+                      shopAddressController.text.isEmpty ||
+                      shopTelController.text.isEmpty ||
+                      passwordController.text.isEmpty) {
+                    Helpers.snackBarPrinter(
+                      "Failed!",
+                      "Please fill all fields.",
+                      error: true,
+                    );
+                    return;
+                  } else {
+                    Shop shop = Shop(
+                      name: shopNameController.text,
+                      address: shopAddressController.text,
+                      tel: shopTelController.text,
+                      suppliers: [],
+                    );
+
+                    User user = User(
+                      username: shopNameController.text,
+                      address: shopAddressController.text,
+                      tel: shopTelController.text,
+                      password:
+                          Helpers.encryptPassword(passwordController.text),
+                      role: Constants.Cashier,
+                      shop: shopNameController.text,
+                    );
+
+                    bool result = await widget.submit(shop, user);
+
+                    if (result) {
+                      // clear fields
+                      shopNameController.clear();
+                      shopAddressController.clear();
+                      shopTelController.clear();
+                      passwordController.clear();
+
+                      setState(() {});
+                    }
+                  }
                 },
                 text: "Submit",
               ),

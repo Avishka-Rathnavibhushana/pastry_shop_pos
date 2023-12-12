@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
-import 'package:pastry_shop_pos/models/Supplier.dart';
+import 'package:pastry_shop_pos/models/supplier.dart';
 
 class SupplierController extends GetxController {
-  var supplierAdded = false.obs;
-
   // create supplier
   Future<bool> createSupplier(Supplier supplier) async {
     try {
@@ -19,7 +17,8 @@ class SupplierController extends GetxController {
         // Supplier doesn't exist, so add it
         await FirebaseFirestore.instance
             .collection('suppliers')
-            .add(supplier.toMap());
+            .doc(supplier.name)
+            .set(supplier.toMap());
 
         Helpers.snackBarPrinter(
           "Successful!",

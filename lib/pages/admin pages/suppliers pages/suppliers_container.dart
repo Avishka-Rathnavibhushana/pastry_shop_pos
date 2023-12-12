@@ -3,33 +3,20 @@ import 'package:get/get.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
-import 'package:pastry_shop_pos/models/Supplier.dart';
+import 'package:pastry_shop_pos/models/supplier.dart';
 
-class SuppliersContainer extends StatefulWidget {
-  SuppliersContainer(
+class SuppliersContainer extends StatelessWidget {
+  const SuppliersContainer(
       {super.key, required this.onPressed, required this.suppliers});
 
   final void Function(String id) onPressed;
-  List<Supplier> suppliers;
-
-  @override
-  State<SuppliersContainer> createState() => _SuppliersContainerState();
-}
-
-class _SuppliersContainerState extends State<SuppliersContainer> {
-  List<DataRow> rows = [];
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
+  final List<Supplier> suppliers;
 
   @override
   Widget build(BuildContext context) {
-    rows = [];
+    List<DataRow> rows = [];
 
-    widget.suppliers.forEach((Supplier supplier) {
+    suppliers.forEach((Supplier supplier) {
       String name = supplier.name.toString();
       String address = supplier.address.toString();
       String tel = supplier.tel.toString();
@@ -45,7 +32,7 @@ class _SuppliersContainerState extends State<SuppliersContainer> {
             DataCell(
               CustomButton(
                 onPressed: () {
-                  widget.onPressed(name);
+                  onPressed(name);
                 },
                 isIcon: true,
                 isText: false,
