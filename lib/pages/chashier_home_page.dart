@@ -152,60 +152,63 @@ class _CashierHomePageState extends State<CashierHomePage> {
           horizontal: 20,
         ),
         containerColor: const Color(0xFF8EB6D9),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              key,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                key,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            DataTable(
-              columns: const [
-                DataColumn(
-                  label: Text(
-                    'ITEM',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+              DataTable(
+                columns: const [
+                  DataColumn(
+                    label: Text(
+                      'ITEM',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'QTY',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  DataColumn(
+                    label: Text(
+                      'QTY',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'SOLD',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  DataColumn(
+                    label: Text(
+                      'SOLD',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'SOLD AMOUNT',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  DataColumn(
+                    label: Text(
+                      'SOLD AMOUNT',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-              ],
-              rows: [
-                ...itemListWidget,
-              ],
-            ),
-          ],
+                ],
+                rows: [
+                  ...itemListWidget,
+                ],
+              ),
+            ],
+          ),
         ),
       );
 

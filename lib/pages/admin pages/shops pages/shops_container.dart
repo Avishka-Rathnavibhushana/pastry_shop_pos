@@ -149,55 +149,58 @@ class ShopsContainer extends StatelessWidget {
             horizontal: 0,
           ),
           containerColor: const Color(0xFFCDE8FF),
-          child: DataTable(
-            columns: const [
-              DataColumn(
-                label: Text(
-                  'Name',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: const [
+                DataColumn(
+                  label: Text(
+                    'Name',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Address',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    'Address',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Telephone',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    'Telephone',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Suppliers',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    'Suppliers',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  '',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    '',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-            ],
-            rows: rows,
+              ],
+              rows: rows,
+            ),
           ),
         ),
       ],

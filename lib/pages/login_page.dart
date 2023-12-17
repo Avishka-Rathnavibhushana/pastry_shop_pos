@@ -32,17 +32,6 @@ class _LoginPageState extends State<LoginPage> {
   AuthController authController = Get.find<AuthController>();
 
   Future<void> _populateDropdownItems() async {
-    // await authController.createUserWithId(
-    //   "user2",
-    //   User(
-    //     username: "user2",
-    //     role: "CASHIER",
-    //     password: "password",
-    //     address: "address",
-    //     shop: "shop1",
-    //     tel: "tel",
-    //   ),
-    // );
     authController.logoutUser();
 
     List<List<String>> rolesAndShops = await authController.loadRolesAndShops();
@@ -97,39 +86,330 @@ class _LoginPageState extends State<LoginPage> {
     _populateDropdownItems();
   }
 
-  // void _addOrRemoveAdminPanelItem() {
-  //   // Add a new item to the dropdown list
-  //   setState(() {
-  //     shopDropdownItems = [];
-  //   });
-  //   if (roleSelectedValue == "Admin") {
-  //     shopDropdownItems.addAll([
-  //       const DropdownMenuItem(
-  //           value: "Select a shop", child: Text("Select a shop")),
-  //       const DropdownMenuItem(
-  //           value: "Admin Panel", child: Text("Admin Panel")),
-  //     ]);
-  //   } else {
-  //     shopDropdownItems.addAll([
-  //       const DropdownMenuItem(
-  //           value: "Select a shop", child: Text("Select a shop")),
-  //       const DropdownMenuItem(value: "Shop 1", child: Text("Shop 1")),
-  //       const DropdownMenuItem(value: "Shop 2", child: Text("Shop 2")),
-  //       const DropdownMenuItem(value: "Shop 3", child: Text("Shop 3")),
-  //     ]);
-  //   }
-
-  //   shopSelectedValue = "Select a shop";
-
-  //   // Rebuild the widget to reflect the changes
-  //   setState(() {});
-  // }
-
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
 
-    double verticlePadding = (height * 0.5) / 2;
+    double padding = 0;
+
+    Widget content = Container();
+
+    if (width > Constants.MobileSize) {
+      padding = (height * 0.5) / 2;
+      content = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Image.asset(
+                  "assets/images/logo.png",
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                const Text(
+                  'Pastry Shop POS',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+            ),
+            child: VerticalDivider(
+              color: Colors.black38,
+              thickness: 2,
+              indent: padding,
+              endIndent: padding,
+            ),
+          ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 10,
+                  ),
+                  child: CustomTextField(
+                    controller: usernameController,
+                    labelText: 'Username',
+                    hintText: 'Enter Your Username',
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 10,
+                  ),
+                  child: CustomTextField(
+                    controller: passwordController,
+                    labelText: 'Password',
+                    hintText: 'Enter Password',
+                    obscureText: true,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 10,
+                  ),
+                  child: CustomDropdown(
+                    dropdownItems: roleDropdownItems,
+                    selectedValue: roleSelectedValue!,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        roleSelectedValue = newValue;
+                      });
+                      // _addOrRemoveAdminPanelItem();
+                    },
+                  ),
+                ),
+                roleSelectedValue == Constants.Cashier ||
+                        roleSelectedValue == Constants.Accountant
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 10,
+                        ),
+                        child: CustomDropdown(
+                          dropdownItems: shopDropdownItems,
+                          selectedValue: shopSelectedValue!,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              shopSelectedValue = newValue;
+                            });
+                          },
+                        ),
+                      )
+                    : Container(),
+                const SizedBox(
+                  height: 20,
+                ),
+                CustomButton(
+                  onPressed: () async {
+                    bool isSuccessful = await authController.authenticateUser(
+                      usernameController.text,
+                      passwordController.text,
+                      roleSelectedValue!,
+                      shop: shopSelectedValue,
+                    );
+
+                    if (!isSuccessful) {
+                      return;
+                    }
+
+                    if (roleSelectedValue == Constants.Admin) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              const AdminHomePage(
+                            shopName: "Admin Panel",
+                          ),
+                        ),
+                      );
+                    } else if (roleSelectedValue == Constants.Cashier) {
+                      if (shopSelectedValue != "Select a shop") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) => CashierHomePage(
+                              shopName: "${shopSelectedValue!}",
+                            ),
+                          ),
+                        );
+                      }
+                    } else if (roleSelectedValue == Constants.Accountant) {
+                      if (shopSelectedValue != "Select a shop") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) =>
+                                AccountantHomePage(
+                              shopName: "${shopSelectedValue!}",
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  text: "Sign in",
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    } else {
+      padding = (width * 0.5) / 2;
+      content = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Image.asset(
+                "assets/images/logo.png",
+                width: 50,
+                height: 50,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              const Text(
+                'Pastry Shop POS',
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 20,
+            ),
+            child: Divider(
+              color: Colors.black38,
+              thickness: 2,
+              indent: padding,
+              endIndent: padding,
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 10,
+                ),
+                child: CustomTextField(
+                  controller: usernameController,
+                  labelText: 'Username',
+                  hintText: 'Enter Your Username',
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 10,
+                ),
+                child: CustomTextField(
+                  controller: passwordController,
+                  labelText: 'Password',
+                  hintText: 'Enter Password',
+                  obscureText: true,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 10,
+                ),
+                child: CustomDropdown(
+                  dropdownItems: roleDropdownItems,
+                  selectedValue: roleSelectedValue!,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      roleSelectedValue = newValue;
+                    });
+                    // _addOrRemoveAdminPanelItem();
+                  },
+                ),
+              ),
+              roleSelectedValue == Constants.Cashier ||
+                      roleSelectedValue == Constants.Accountant
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 10,
+                      ),
+                      child: CustomDropdown(
+                        dropdownItems: shopDropdownItems,
+                        selectedValue: shopSelectedValue!,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            shopSelectedValue = newValue;
+                          });
+                        },
+                      ),
+                    )
+                  : Container(),
+              const SizedBox(
+                height: 20,
+              ),
+              CustomButton(
+                onPressed: () async {
+                  bool isSuccessful = await authController.authenticateUser(
+                    usernameController.text,
+                    passwordController.text,
+                    roleSelectedValue!,
+                    shop: shopSelectedValue,
+                  );
+
+                  if (!isSuccessful) {
+                    return;
+                  }
+
+                  if (roleSelectedValue == Constants.Admin) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) => const AdminHomePage(
+                          shopName: "Admin Panel",
+                        ),
+                      ),
+                    );
+                  } else if (roleSelectedValue == Constants.Cashier) {
+                    if (shopSelectedValue != "Select a shop") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) => CashierHomePage(
+                            shopName: "${shopSelectedValue!}",
+                          ),
+                        ),
+                      );
+                    }
+                  } else if (roleSelectedValue == Constants.Accountant) {
+                    if (shopSelectedValue != "Select a shop") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) => AccountantHomePage(
+                            shopName: "${shopSelectedValue!}",
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                },
+                text: "Sign in",
+              ),
+            ],
+          ),
+        ],
+      );
+    }
 
     return SafeArea(
       child: CustomContainer(
@@ -144,178 +424,7 @@ class _LoginPageState extends State<LoginPage> {
         containerColor: const Color(0xFFCDE8FF),
         child: Container(
           alignment: Alignment.center,
-          // decoration: BoxDecoration(
-          //   color: Color(0x542582CE),
-          //   borderRadius: BorderRadius.circular(10),
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: Colors.grey.withOpacity(0.5),
-          //       spreadRadius: 5,
-          //       blurRadius: 7,
-          //       offset: Offset(0, 3), // changes position of shadow
-          //     ),
-          //   ],
-          // ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Image.asset(
-                      "assets/images/logo.png",
-                      width: 50,
-                      height: 50,
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    const Text(
-                      'Pastry Shop POS',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                ),
-                child: VerticalDivider(
-                  color: Colors.black38,
-                  thickness: 2,
-                  indent: verticlePadding,
-                  endIndent: verticlePadding,
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 10,
-                      ),
-                      child: CustomTextField(
-                        controller: usernameController,
-                        labelText: 'Username',
-                        hintText: 'Enter Your Username',
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 10,
-                      ),
-                      child: CustomTextField(
-                        controller: passwordController,
-                        labelText: 'Password',
-                        hintText: 'Enter Password',
-                        obscureText: true,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 10,
-                      ),
-                      child: CustomDropdown(
-                        dropdownItems: roleDropdownItems,
-                        selectedValue: roleSelectedValue!,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            roleSelectedValue = newValue;
-                          });
-                          // _addOrRemoveAdminPanelItem();
-                        },
-                      ),
-                    ),
-                    roleSelectedValue == Constants.Cashier ||
-                            roleSelectedValue == Constants.Accountant
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 30,
-                              vertical: 10,
-                            ),
-                            child: CustomDropdown(
-                              dropdownItems: shopDropdownItems,
-                              selectedValue: shopSelectedValue!,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  shopSelectedValue = newValue;
-                                });
-                              },
-                            ),
-                          )
-                        : Container(),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    CustomButton(
-                      onPressed: () async {
-                        bool isSuccessful =
-                            await authController.authenticateUser(
-                          usernameController.text,
-                          passwordController.text,
-                          roleSelectedValue!,
-                          shop: shopSelectedValue,
-                        );
-
-                        if (!isSuccessful) {
-                          return;
-                        }
-
-                        if (roleSelectedValue == Constants.Admin) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (BuildContext context) =>
-                                  const AdminHomePage(
-                                shopName: "Admin Panel",
-                              ),
-                            ),
-                          );
-                        } else if (roleSelectedValue == Constants.Cashier) {
-                          if (shopSelectedValue != "Select a shop") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (BuildContext context) =>
-                                    CashierHomePage(
-                                  shopName: "${shopSelectedValue!}",
-                                ),
-                              ),
-                            );
-                          }
-                        } else if (roleSelectedValue == Constants.Accountant) {
-                          if (shopSelectedValue != "Select a shop") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (BuildContext context) =>
-                                    AccountantHomePage(
-                                  shopName: "${shopSelectedValue!}",
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      text: "Sign in",
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          child: content,
         ),
       ),
     );

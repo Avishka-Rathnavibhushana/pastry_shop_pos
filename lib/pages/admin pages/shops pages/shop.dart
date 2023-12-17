@@ -234,10 +234,10 @@ class _ShopPageState extends State<ShopPage> {
     return Center(
       child: Column(
         children: [
-          const Align(
+          Align(
             alignment: Alignment.topLeft,
             child: Text(
-              'Shop 1 Summary',
+              "${widget.shop ?? ""} Summary",
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: 24,
