@@ -12,6 +12,7 @@ class CustomButton extends StatelessWidget {
     this.isIcon = false,
     this.isText = true,
     this.icon,
+    this.enabled = true,
   });
 
   final void Function() onPressed;
@@ -23,6 +24,7 @@ class CustomButton extends StatelessWidget {
   final bool isIcon;
   final bool isText;
   final Icon? icon;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +32,13 @@ class CustomButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         padding:
             EdgeInsets.symmetric(vertical: 0, horizontal: styleFormPadding),
-        backgroundColor: backgroundColor,
+        backgroundColor: enabled ? backgroundColor : Colors.grey,
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      onPressed: onPressed,
+      onPressed: enabled ? onPressed : null,
       child: Padding(
           padding: EdgeInsets.all(padding),
           child: isText

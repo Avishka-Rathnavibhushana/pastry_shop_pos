@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
@@ -25,6 +26,7 @@ class _SupplierPageState extends State<SupplierPage> {
   List<SupplierItem> supplierItems = [];
   TextEditingController itemController = TextEditingController();
   List<String> items = [];
+  bool edit = false;
 
   // add item to list
   Future<void> addItemToList(String item) async {
@@ -101,7 +103,7 @@ class _SupplierPageState extends State<SupplierPage> {
         widget.supplier ?? " ",
         date,
       );
-      print(isItemsEqual);
+
       if (!isItemsEqual) {
         await supplierItemsController.getItemsFromSupplierAndAddToSupplierItem(
             widget.supplier ?? "", date);
@@ -124,18 +126,147 @@ class _SupplierPageState extends State<SupplierPage> {
     for (SupplierItem supplierItem in supplierItems) {
       String item = supplierItem.name;
       String qty = supplierItem.qty.toString();
+      TextEditingController qtyController = TextEditingController(text: qty);
       String sold = supplierItem.sold.toString();
+      TextEditingController soldController = TextEditingController(text: sold);
       String salePrice = supplierItem.salePrice.toString();
+      TextEditingController salePriceController =
+          TextEditingController(text: salePrice);
       String purchasePrice = supplierItem.purchasePrice.toString();
+      TextEditingController purchasePriceController =
+          TextEditingController(text: purchasePrice);
 
       rows.add(
         DataRow(
           cells: [
             DataCell(Text(item)),
-            DataCell(Text(qty)),
-            DataCell(Text(sold)),
-            DataCell(Text(salePrice)),
-            DataCell(Text(purchasePrice)),
+            DataCell(edit
+                ? SizedBox(
+                    width: 50,
+                    height: 30,
+                    child: CustomTextField(
+                      controller: qtyController,
+                      labelText: '',
+                      hintText: '',
+                      fontSize: 12,
+                      maxLength: 3,
+                    ),
+                  )
+                : Text(qty)),
+            DataCell(edit
+                ? SizedBox(
+                    width: 50,
+                    height: 30,
+                    child: CustomTextField(
+                      controller: soldController,
+                      labelText: '',
+                      hintText: '',
+                      fontSize: 12,
+                      maxLength: 3,
+                    ),
+                  )
+                : Text(sold)),
+            DataCell(edit
+                ? SizedBox(
+                    width: 50,
+                    height: 30,
+                    child: CustomTextField(
+                      controller: salePriceController,
+                      labelText: '',
+                      hintText: '',
+                      fontSize: 12,
+                      maxLength: 3,
+                    ),
+                  )
+                : Text(salePrice)),
+            DataCell(edit
+                ? SizedBox(
+                    width: 50,
+                    height: 30,
+                    child: CustomTextField(
+                      controller: purchasePriceController,
+                      labelText: '',
+                      hintText: '',
+                      fontSize: 12,
+                      maxLength: 3,
+                    ),
+                  )
+                : Text(purchasePrice)),
+            DataCell(
+              CustomButton(
+                onPressed: () async {
+                  if (edit) {
+                    SupplierItemController supplierItemsController =
+                        Get.find<SupplierItemController>();
+                    if (qtyController.text.isEmpty ||
+                        soldController.text.isEmpty ||
+                        salePriceController.text.isEmpty ||
+                        purchasePriceController.text.isEmpty) {
+                      Helpers.snackBarPrinter(
+                        "Failed!",
+                        "Fields cannot be empty.",
+                        error: true,
+                      );
+                      return;
+                    }
+                    // if (int.parse(qtyController.text) <
+                    //     int.parse(soldController.text)) {
+                    //   Helpers.snackBarPrinter(
+                    //     "Failed!",
+                    //     "Sold cannot be greater than qty.",
+                    //     error: true,
+                    //   );
+                    //   return;
+                    // }
+                    // if (double.parse(salePriceController.text) <
+                    //     double.parse(purchasePriceController.text)) {
+                    //   Helpers.snackBarPrinter(
+                    //     "Failed!",
+                    //     "Sale price cannot be less than purchase price.",
+                    //     error: true,
+                    //   );
+                    //   return;
+                    // }
+                    if (qtyController.text == qty &&
+                        soldController.text == sold &&
+                        salePriceController.text == salePrice &&
+                        purchasePriceController.text == purchasePrice) {
+                      Helpers.snackBarPrinter(
+                        "Failed!",
+                        "Item Values are same",
+                        error: true,
+                      );
+                      return;
+                    }
+
+                    // update item
+                    await supplierItemsController.updateItemInSupplierItem(
+                      widget.supplier ?? "",
+                      SupplierItem(
+                        name: item,
+                        date: supplierItem.date,
+                        sold: int.parse(soldController.text),
+                        salePrice: double.parse(salePriceController.text),
+                        purchasePrice:
+                            double.parse(purchasePriceController.text),
+                        qty: int.parse(qtyController.text),
+                      ),
+                      supplierItem.date,
+                    );
+                  }
+                },
+                isIcon: true,
+                isText: false,
+                icon: const Icon(
+                  Icons.save,
+                  color: Colors.white,
+                ),
+                fontSize: 12,
+                padding: 0,
+                styleFormPadding: 0,
+                enabled: edit,
+              ),
+            ),
           ],
         ),
       );
@@ -241,6 +372,7 @@ class _SupplierPageState extends State<SupplierPage> {
                     }
                   },
                   text: items.length == 1 ? 'Add New Item' : 'Add New Items',
+                  enabled: !edit,
                 ),
               ],
             ),
@@ -289,7 +421,48 @@ class _SupplierPageState extends State<SupplierPage> {
                 text: 'Select Date',
                 padding: 0,
                 styleFormPadding: 10,
+                enabled: !edit,
               ),
+              dateInput == DateFormat('yyyy-MM-dd').format(DateTime.now())
+                  ? const SizedBox(
+                      width: 20,
+                    )
+                  : Container(),
+              dateInput == DateFormat('yyyy-MM-dd').format(DateTime.now())
+                  ? CustomButton(
+                      onPressed: () async {
+                        // if (items.isEmpty) {
+                        //   Helpers.snackBarPrinter(
+                        //     "Failed!",
+                        //     "Item list cannot be empty.",
+                        //     error: true,
+                        //   );
+                        //   return;
+                        // }
+
+                        // bool result = await submit(items);
+                        // if (result) {
+                        //   // clear fields
+                        //   itemController.clear();
+                        //   items.clear();
+                        //   items = [];
+
+                        //   setState(() {});
+                        // }
+
+                        if (edit) {
+                          await loadData(dateInput);
+                        }
+
+                        setState(() {
+                          edit = !edit;
+                        });
+                      },
+                      text: edit ? 'Done' : 'Edit',
+                      padding: 0,
+                      styleFormPadding: 10,
+                    )
+                  : Container(),
             ],
           ),
           const SizedBox(
@@ -306,7 +479,7 @@ class _SupplierPageState extends State<SupplierPage> {
             ),
             containerColor: const Color(0xFFCDE8FF),
             child: DataTable(
-              columns: const [
+              columns: [
                 DataColumn(
                   label: Text(
                     'Item Name',
@@ -346,6 +519,15 @@ class _SupplierPageState extends State<SupplierPage> {
                 DataColumn(
                   label: Text(
                     'Purchase Price',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Update',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,

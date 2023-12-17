@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
+import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
 
@@ -296,6 +297,90 @@ class SupplierItemController extends GetxController {
       }
     } catch (e) {
       print('Error checking whether items are equal: $e');
+      return false;
+    }
+  }
+
+  // update item in supplier item for a specific date
+  Future<bool> updateItemInSupplierItem(
+      String supplierId, SupplierItem supplierItem, String date) async {
+    try {
+      // Fetch the specific item list document from the 'itemList' collection
+      DocumentSnapshot itemListSnapshot = await FirebaseFirestore.instance
+          .collection('supplierItems')
+          .doc(supplierId)
+          .collection('itemList')
+          .doc(date)
+          .get();
+
+      // Check if the item list document exists
+      if (itemListSnapshot.exists) {
+        // Retrieve the data from the item list document
+        Map<String, dynamic>? itemListData =
+            itemListSnapshot.data() as Map<String, dynamic>?;
+
+        if (itemListData != null) {
+          // If the data is present, create a list of SupplierItems
+          List<SupplierItem> items = [];
+
+          itemListData["items"].forEach((item) {
+            items.add(
+              SupplierItem.fromMapSubset(item as Map<String, dynamic>)
+                ..date = itemListData["date"],
+            );
+          });
+
+          // Check if the item already exists in the list
+          bool itemExists = false;
+          int index = 0;
+          for (SupplierItem item in items) {
+            if (item.name == supplierItem.name) {
+              itemExists = true;
+              break;
+            }
+            index++;
+          }
+
+          if (itemExists) {
+            // Item already exists in the list, so update it
+            items[index] = supplierItem;
+
+            // Update the item list document
+            await FirebaseFirestore.instance
+                .collection('supplierItems')
+                .doc(supplierId)
+                .collection('itemList')
+                .doc(supplierItem.date)
+                .update({
+              "items": items.map((item) => item.toMapSubset()).toList(),
+            });
+            Helpers.snackBarPrinter(
+                "Successful!", "Successfully updated the supplier item.");
+            return true;
+          } else {
+            print("Item doesn't exist in the list");
+            // Item doesn't exist in the list
+            Helpers.snackBarPrinter(
+                "Failed!", "Something is Wrong. Please try again.",
+                error: true);
+            return false;
+          }
+        } else {
+          print("Item list Data doesn't exist.");
+          Helpers.snackBarPrinter(
+              "Failed!", "Something is Wrong. Please try again.",
+              error: true);
+          return false;
+        }
+      } else {
+        print("Item list document doesn't exist.");
+        Helpers.snackBarPrinter(
+            "Failed!", "Something is Wrong. Please try again.",
+            error: true);
+        return false;
+      }
+    } catch (e) {
+      print('Error updating supplier item: $e');
       return false;
     }
   }

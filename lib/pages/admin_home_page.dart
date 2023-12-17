@@ -20,7 +20,7 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
-  int selectedPage = 2;
+  int selectedPage = 1;
 
   List<Widget> pages = [];
 

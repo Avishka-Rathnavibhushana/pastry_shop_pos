@@ -78,6 +78,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
         String item = itemData.name;
         String qty = itemData.qty.toString();
         String sold = itemData.sold.toString();
+        TextEditingController soldController = TextEditingController();
 
         itemListWidget.add(
           DataRow(cells: [
@@ -91,7 +92,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     width: 50,
                     height: 30,
                     child: CustomTextField(
-                      controller: TextEditingController(),
+                      controller: soldController,
                       labelText: '',
                       hintText: '',
                       fontSize: 12,
@@ -102,7 +103,35 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     width: 10,
                   ),
                   CustomButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      SupplierItemController supplierItemsController =
+                          Get.find<SupplierItemController>();
+
+                      int soldAmount =
+                          (int.parse(sold) + int.parse(soldController.text));
+                      // update item
+                      bool result = await supplierItemsController
+                          .updateItemInSupplierItem(
+                        key,
+                        SupplierItem(
+                          name: item,
+                          date: itemData.date,
+                          sold: soldAmount,
+                          qty: itemData.qty,
+                          purchasePrice: itemData.purchasePrice,
+                          salePrice: itemData.salePrice,
+                        ),
+                        itemData.date,
+                      );
+                      if (result) {
+                        int index = suppliersItems[key]!
+                            .indexWhere((element) => element.name == item);
+                        setState(() {
+                          suppliersItems[key]![index].sold = soldAmount;
+                        });
+                      }
+                      soldController.clear();
+                    },
                     text: "Submit",
                     fontSize: 12,
                     padding: 0,
