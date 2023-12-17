@@ -103,11 +103,11 @@ class _ShopPageState extends State<ShopPage> {
         String purchasePriceTotal =
             (itemData.qty * itemData.purchasePrice).toString();
         purchasePriceT += (itemData.qty * itemData.purchasePrice);
-        String cheap = ((itemData.qty * itemData.purchasePrice) -
-                (itemData.sold * itemData.salePrice))
+        String cheap = ((itemData.sold * itemData.salePrice) -
+                (itemData.qty * itemData.purchasePrice))
             .toString();
-        cheapT += ((itemData.qty * itemData.purchasePrice) -
-            (itemData.sold * itemData.salePrice));
+        cheapT += ((itemData.sold * itemData.salePrice) -
+            (itemData.qty * itemData.purchasePrice));
 
         itemListWidget.add(
           DataRow(cells: [
@@ -124,8 +124,8 @@ class _ShopPageState extends State<ShopPage> {
         );
       }
 
-      totalPrice += purchasePriceT;
-      totalPaid += salePriceT;
+      totalPrice += salePriceT;
+      totalPaid += purchasePriceT;
 
       Widget itemWidget = CustomContainer(
         outerPadding: const EdgeInsets.only(
@@ -379,7 +379,7 @@ class _ShopPageState extends State<ShopPage> {
                       width: 10,
                     ),
                     Text(
-                      (totalPaid - totalPrice).toString(),
+                      (totalPrice - totalPaid).toString(),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                         fontSize: 18,
