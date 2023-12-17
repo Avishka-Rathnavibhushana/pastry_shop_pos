@@ -257,6 +257,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                       itemController.clear();
                       shopSelectedValue = "Select a shop";
                       items.clear();
+                      items = [];
 
                       setState(() {});
                     }

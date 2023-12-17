@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/controllers/shop_controller.dart';
+import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
+import 'package:pastry_shop_pos/models/supplier_item.dart';
 
-class CashierHomePage2 extends StatefulWidget {
-  const CashierHomePage2({
+class AccountantHomePage extends StatefulWidget {
+  const AccountantHomePage({
     super.key,
     required this.shopName,
   });
@@ -13,138 +18,56 @@ class CashierHomePage2 extends StatefulWidget {
   final String? shopName;
 
   @override
-  State<CashierHomePage2> createState() => _CashierHomePage2State();
+  State<AccountantHomePage> createState() => _AccountantHomePageState();
 }
 
-class _CashierHomePage2State extends State<CashierHomePage2> {
+class _AccountantHomePageState extends State<AccountantHomePage> {
   String dateInput = "";
 
-  var data = {
-    "supplier 1": [
-      {
-        "item": "පාන්",
-        "qty": 12,
-        "sold": 12,
-      },
-      {
-        "item": "තැටි පාන්",
-        "qty": 7,
-        "sold": 7,
-      },
-      {
-        "item": "රෝස් පාන්",
-        "qty": 10,
-        "sold": 10,
-      },
-      {
-        "item": "බිත්තර බන්",
-        "qty": 3,
-        "sold": 1,
-      },
-      {
-        "item": "ජෑම් පාන්",
-        "qty": 3,
-        "sold": 2,
-      },
-    ],
-    "supplier 2": [
-      {
-        "item": "රෝස් පාන්",
-        "qty": 10,
-        "sold": 10,
-      },
-      {
-        "item": "බිත්තර බන්",
-        "qty": 3,
-        "sold": 1,
-      },
-      {
-        "item": "ජෑම් පාන්",
-        "qty": 3,
-        "sold": 2,
-      },
-    ],
-    "supplier 3": [
-      {
-        "item": "පාන්",
-        "qty": 12,
-        "sold": 12,
-      },
-    ],
-  };
-
-  var supplierData = {
-    "supplier 1": [
-      {
-        "2023-11-17": [
-          {
-            "item": "පාන්",
-            "sale price": 140,
-            "purchasePrice": 115,
-          },
-          {
-            "item": "තැටි පාන්",
-            "sale price": 120,
-            "purchasePrice": 100,
-          },
-          {
-            "item": "රෝස් පාන්",
-            "sale price": 40,
-            "purchasePrice": 30,
-          },
-          {
-            "item": "බිත්තර බන්",
-            "sale price": 60,
-            "purchasePrice": 40,
-          },
-          {
-            "item": "ජෑම් පාන්",
-            "sale price": 60,
-            "purchasePrice": 40,
-          },
-        ],
-      },
-    ],
-    "supplier 2": [
-      {
-        "2023-11-17": [
-          {
-            "item": "රෝස් පාන්",
-            "sale price": 40,
-            "purchasePrice": 30,
-          },
-          {
-            "item": "බිත්තර බන්",
-            "sale price": 60,
-            "purchasePrice": 40,
-          },
-          {
-            "item": "ජෑම් පාන්",
-            "sale price": 60,
-            "purchasePrice": 40,
-          },
-        ],
-      },
-    ],
-    "supplier 3": [
-      {
-        "2023-11-17": [
-          {
-            "item": "පාන්",
-            "sale price": 140,
-            "purchasePrice": 115,
-          },
-        ],
-      },
-    ],
-  };
+  Map<String, List<SupplierItem>> suppliersItems = {};
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
+
     setState(() {
       dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
     });
+    loadData(dateInput);
+  }
+
+  // load data from supplierItem
+  Future<void> loadData(String date) async {
+    ShopController shopController = Get.find<ShopController>();
+    List<String> supplierList =
+        await shopController.getSuppliersOfShop(widget.shopName ?? "");
+
+    SupplierItemController supplierItemsController =
+        Get.find<SupplierItemController>();
+
+    if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+      for (String supplier in supplierList) {
+        bool isItemsEqual = await supplierItemsController.isItemsEqual(
+          supplier,
+          date,
+        );
+        if (!isItemsEqual) {
+          await supplierItemsController
+              .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+        }
+      }
+    }
+
+    for (String supplier in supplierList) {
+      // load suppliers from database
+      List<SupplierItem> supplierItemList =
+          await supplierItemsController.getSupplierItems(supplier, date);
+
+      setState(() {
+        suppliersItems[supplier] = supplierItemList;
+      });
+    }
   }
 
   TextStyle tableColumnHeaderStyle = const TextStyle(
@@ -156,18 +79,36 @@ class _CashierHomePage2State extends State<CashierHomePage2> {
   Widget build(BuildContext context) {
     List<Widget> supplierContainerListWidget = [];
 
-    data.forEach((key, value) {
+    suppliersItems.forEach((key, value) {
       List<DataRow> itemListWidget = [];
+
+      int qtyT = 0;
+      int soldT = 0;
+      int balanceT = 0;
+      double salePriceT = 0;
+      double purchasePriceT = 0;
+      double cheapT = 0;
+
       for (var itemData in value) {
-        String item = itemData["item"].toString();
-        String qty = itemData["qty"].toString();
-        String sold = itemData["sold"].toString();
-        String balance = (0).toString();
-        String salePrice = (150).toString();
-        String salePriceTotal = (150 * 10).toString();
-        String purchasePrice = (200).toString();
-        String purchasePriceTotal = (200 * 10).toString();
-        String cheap = (200).toString();
+        String item = itemData.name;
+        String qty = itemData.qty.toString();
+        qtyT += itemData.qty;
+        String sold = itemData.sold.toString();
+        soldT += itemData.sold;
+        String balance = (itemData.qty - itemData.sold).toString();
+        balanceT += (itemData.qty - itemData.sold);
+        String salePrice = itemData.salePrice.toString();
+        String salePriceTotal = (itemData.sold * itemData.salePrice).toString();
+        salePriceT += (itemData.sold * itemData.salePrice);
+        String purchasePrice = itemData.purchasePrice.toString();
+        String purchasePriceTotal =
+            (itemData.qty * itemData.purchasePrice).toString();
+        purchasePriceT += (itemData.qty * itemData.purchasePrice);
+        String cheap = ((itemData.qty * itemData.purchasePrice) -
+                (itemData.sold * itemData.salePrice))
+            .toString();
+        cheapT += ((itemData.qty * itemData.purchasePrice) -
+            (itemData.sold * itemData.salePrice));
 
         itemListWidget.add(
           DataRow(cells: [
@@ -241,27 +182,19 @@ class _CashierHomePage2State extends State<CashierHomePage2> {
                   ...itemListWidget,
                   DataRow(cells: [
                     DataCell(Text(
-                      "",
+                      "Total",
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
-                      "10",
+                      qtyT.toString(),
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
-                      "8",
+                      soldT.toString(),
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
-                      "2",
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      "",
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      "6700",
+                      balanceT.toString(),
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
@@ -269,11 +202,19 @@ class _CashierHomePage2State extends State<CashierHomePage2> {
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
-                      "4500",
+                      salePriceT.toString(),
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
-                      "2200",
+                      "",
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      purchasePriceT.toString(),
+                      style: tableColumnHeaderStyle,
+                    )),
+                    DataCell(Text(
+                      cheapT.toString(),
                       style: tableColumnHeaderStyle,
                     )),
                   ]),
@@ -322,7 +263,9 @@ class _CashierHomePage2State extends State<CashierHomePage2> {
                 onPressed: () async {
                   DateTime? pickedDate = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: dateInput == ""
+                        ? DateTime.now()
+                        : DateTime.parse(dateInput),
                     firstDate: DateTime(1950),
                     //DateTime.now() - not to allow to choose before today.
                     lastDate: DateTime(2100),
@@ -337,6 +280,8 @@ class _CashierHomePage2State extends State<CashierHomePage2> {
                       dateInput =
                           formattedDate; //set output date to TextField value.
                     });
+
+                    loadData(dateInput);
                   }
                 },
                 text: 'Select Date',
@@ -359,7 +304,7 @@ class _CashierHomePage2State extends State<CashierHomePage2> {
         pageWidgets: [
           pageData,
         ],
-        shopName: widget.shopName,
+        shopName: "${Constants.Accountant} - ${widget.shopName!}",
       ),
     );
   }

@@ -105,13 +105,15 @@ class AuthController extends GetxController {
         if (user.role == Constants.Cashier &&
             !roles.contains(Constants.Cashier)) {
           roles.add(user.role);
-          if (user.shop != null && !shops.contains(user.shop)) {
-            shops.add(user.shop!);
-          }
         }
         if (user.role == Constants.Accountant &&
             !roles.contains(Constants.Accountant)) {
           roles.add(user.role);
+        }
+        if (user.role == Constants.Cashier &&
+            user.shop != null &&
+            !shops.contains(user.shop)) {
+          shops.add(user.shop!);
         }
       }
       return [roles, shops];

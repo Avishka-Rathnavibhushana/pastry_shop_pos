@@ -10,7 +10,7 @@ import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/models/user.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 import 'package:pastry_shop_pos/pages/chashier_home_page.dart';
-import 'package:pastry_shop_pos/pages/chashier_home_page_2.dart';
+import 'package:pastry_shop_pos/pages/accountant_home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -290,8 +290,7 @@ class _LoginPageState extends State<LoginPage> {
                               MaterialPageRoute<void>(
                                 builder: (BuildContext context) =>
                                     CashierHomePage(
-                                  shopName:
-                                      "${roleSelectedValue!} - ${shopSelectedValue!}",
+                                  shopName: "${shopSelectedValue!}",
                                 ),
                               ),
                             );
@@ -302,9 +301,8 @@ class _LoginPageState extends State<LoginPage> {
                               context,
                               MaterialPageRoute<void>(
                                 builder: (BuildContext context) =>
-                                    CashierHomePage2(
-                                  shopName:
-                                      "${roleSelectedValue!} - ${shopSelectedValue!}",
+                                    AccountantHomePage(
+                                  shopName: "${shopSelectedValue!}",
                                 ),
                               ),
                             );

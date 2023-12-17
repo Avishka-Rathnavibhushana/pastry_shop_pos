@@ -102,6 +102,25 @@ class SupplierController extends GetxController {
     }
   }
 
+  // add list of items to supplier
+  Future<bool> addItemsToSupplier(String supplierId, List<String> items) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('suppliers')
+          .doc(supplierId)
+          .update({'items': FieldValue.arrayUnion(items)});
+      Helpers.snackBarPrinter(
+          "Successful!", "Successfully added the items to the supplier.");
+      return true;
+    } catch (e) {
+      Helpers.snackBarPrinter(
+          "Failed!", "Failed to add the items to the supplier.",
+          error: true);
+      print('Error adding items to supplier: $e');
+      return false;
+    }
+  }
+
   // get suppliers list
   Future<List<Supplier>> getSuppliersList() async {
     try {
@@ -129,6 +148,24 @@ class SupplierController extends GetxController {
     } catch (e) {
       print('Error getting suppliers list: $e');
       return [];
+    }
+  }
+
+  // get supplier by id
+  Future<Supplier?> getSupplierById(String supplierId) async {
+    try {
+      DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
+          .collection('suppliers')
+          .doc(supplierId)
+          .get();
+      if (docSnapshot.exists) {
+        return Supplier.fromMap(docSnapshot.data() as Map<String, dynamic>);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error getting supplier by ID: $e');
+      return null;
     }
   }
 }

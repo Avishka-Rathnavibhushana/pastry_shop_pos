@@ -1,148 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/controllers/shop_controller.dart';
+import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
+import 'package:pastry_shop_pos/models/supplier_item.dart';
 
-// ignore: must_be_immutable
-class CashierHomePage extends StatelessWidget {
-  CashierHomePage({
+class CashierHomePage extends StatefulWidget {
+  const CashierHomePage({
     super.key,
     required this.shopName,
   });
 
   final String? shopName;
 
-  var data = {
-    "supplier 1": [
-      {
-        "item": "පාන්",
-        "qty": 12,
-        "sold": 12,
-      },
-      {
-        "item": "තැටි පාන්",
-        "qty": 7,
-        "sold": 7,
-      },
-      {
-        "item": "රෝස් පාන්",
-        "qty": 10,
-        "sold": 10,
-      },
-      {
-        "item": "බිත්තර බන්",
-        "qty": 3,
-        "sold": 1,
-      },
-      {
-        "item": "ජෑම් පාන්",
-        "qty": 3,
-        "sold": 2,
-      },
-    ],
-    "supplier 2": [
-      {
-        "item": "රෝස් පාන්",
-        "qty": 10,
-        "sold": 10,
-      },
-      {
-        "item": "බිත්තර බන්",
-        "qty": 3,
-        "sold": 1,
-      },
-      {
-        "item": "ජෑම් පාන්",
-        "qty": 3,
-        "sold": 2,
-      },
-    ],
-    "supplier 3": [
-      {
-        "item": "පාන්",
-        "qty": 12,
-        "sold": 12,
-      },
-    ],
-  };
+  @override
+  State<CashierHomePage> createState() => _CashierHomePageState();
+}
 
-  var supplierData = {
-    "supplier 1": [
-      {
-        "2023-11-17": [
-          {
-            "item": "පාන්",
-            "sale price": 140,
-            "purchasePrice": 115,
-          },
-          {
-            "item": "තැටි පාන්",
-            "sale price": 120,
-            "purchasePrice": 100,
-          },
-          {
-            "item": "රෝස් පාන්",
-            "sale price": 40,
-            "purchasePrice": 30,
-          },
-          {
-            "item": "බිත්තර බන්",
-            "sale price": 60,
-            "purchasePrice": 40,
-          },
-          {
-            "item": "ජෑම් පාන්",
-            "sale price": 60,
-            "purchasePrice": 40,
-          },
-        ],
-      },
-    ],
-    "supplier 2": [
-      {
-        "2023-11-17": [
-          {
-            "item": "රෝස් පාන්",
-            "sale price": 40,
-            "purchasePrice": 30,
-          },
-          {
-            "item": "බිත්තර බන්",
-            "sale price": 60,
-            "purchasePrice": 40,
-          },
-          {
-            "item": "ජෑම් පාන්",
-            "sale price": 60,
-            "purchasePrice": 40,
-          },
-        ],
-      },
-    ],
-    "supplier 3": [
-      {
-        "2023-11-17": [
-          {
-            "item": "පාන්",
-            "sale price": 140,
-            "purchasePrice": 115,
-          },
-        ],
-      },
-    ],
-  };
+class _CashierHomePageState extends State<CashierHomePage> {
+  Map<String, List<SupplierItem>> suppliersItems = {};
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    String dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    loadData(dateInput);
+  }
+
+  // load data from supplierItem
+  Future<void> loadData(String date) async {
+    ShopController shopController = Get.find<ShopController>();
+    List<String> supplierList =
+        await shopController.getSuppliersOfShop(widget.shopName ?? "");
+
+    SupplierItemController supplierItemsController =
+        Get.find<SupplierItemController>();
+
+    if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+      for (String supplier in supplierList) {
+        bool isItemsEqual = await supplierItemsController.isItemsEqual(
+          supplier,
+          date,
+        );
+        if (!isItemsEqual) {
+          await supplierItemsController
+              .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+        }
+      }
+    }
+
+    for (String supplier in supplierList) {
+      // load suppliers from database
+      List<SupplierItem> supplierItemList =
+          await supplierItemsController.getSupplierItems(supplier, date);
+
+      setState(() {
+        suppliersItems[supplier] = supplierItemList;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> supplierContainerListWidget = [];
 
-    data.forEach((key, value) {
+    suppliersItems.forEach((key, value) {
       List<DataRow> itemListWidget = [];
       for (var itemData in value) {
-        String item = itemData["item"].toString();
-        String qty = itemData["qty"].toString();
-        String sold = itemData["sold"].toString();
+        String item = itemData.name;
+        String qty = itemData.qty.toString();
+        String sold = itemData.sold.toString();
 
         itemListWidget.add(
           DataRow(cells: [
@@ -254,7 +189,7 @@ class CashierHomePage extends StatelessWidget {
         pageWidgets: [
           ...supplierContainerListWidget,
         ],
-        shopName: shopName,
+        shopName: "${Constants.Cashier} - ${widget.shopName!}",
       ),
     );
   }

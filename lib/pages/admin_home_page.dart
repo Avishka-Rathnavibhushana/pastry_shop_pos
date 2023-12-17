@@ -20,12 +20,15 @@ class AdminHomePage extends StatefulWidget {
 }
 
 class _AdminHomePageState extends State<AdminHomePage> {
-  int selectedPage = 0;
+  int selectedPage = 2;
 
   List<Widget> pages = [];
 
   bool showSupplier = false;
   bool showShop = false;
+
+  String? supplierName;
+  String? shopName;
 
   @override
   void initState() {
@@ -38,6 +41,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           onPressed: (String id) {
             setState(() {
               showSupplier = true;
+              supplierName = id;
             });
           },
         ),
@@ -45,6 +49,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           onPressed: (String id) {
             setState(() {
               showShop = true;
+              shopName = id;
             });
           },
         ),
@@ -91,9 +96,11 @@ class _AdminHomePageState extends State<AdminHomePage> {
             height: 20,
           ),
           showSupplier
-              ? const SupplierPage()
+              ? SupplierPage(supplier: supplierName)
               : showShop
-                  ? const ShopPage()
+                  ? ShopPage(
+                      shop: shopName,
+                    )
                   : pages[selectedPage],
           const SizedBox(
             height: 10,
