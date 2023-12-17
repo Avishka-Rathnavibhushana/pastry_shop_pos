@@ -234,7 +234,7 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
           const Align(
             alignment: Alignment.topLeft,
             child: Text(
-              'Shop 1',
+              "Shop Summary",
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: 24,
