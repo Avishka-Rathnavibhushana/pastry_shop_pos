@@ -20,7 +20,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController emailController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   List<DropdownMenuItem<String>> roleDropdownItems = [];
@@ -205,9 +205,9 @@ class _LoginPageState extends State<LoginPage> {
                         vertical: 10,
                       ),
                       child: CustomTextField(
-                        controller: emailController,
-                        labelText: 'Email',
-                        hintText: 'Enter Your Name',
+                        controller: usernameController,
+                        labelText: 'Username',
+                        hintText: 'Enter Your Username',
                       ),
                     ),
                     Padding(
@@ -263,7 +263,7 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () async {
                         bool isSuccessful =
                             await authController.authenticateUser(
-                          emailController.text,
+                          usernameController.text,
                           passwordController.text,
                           roleSelectedValue!,
                           shop: shopSelectedValue,
