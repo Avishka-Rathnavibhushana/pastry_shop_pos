@@ -140,7 +140,8 @@ class AuthController extends GetxController {
           return false;
         }
 
-        if (user.role == Constants.Cashier && user.shop != shop) {
+        if (user.role == Constants.Cashier ||
+            user.role == Constants.Accountant && user.shop != shop) {
           Helpers.snackBarPrinter("Failed!", "Incorrect shop.", error: true);
           return false;
         }
