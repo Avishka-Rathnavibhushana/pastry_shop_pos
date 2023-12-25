@@ -68,6 +68,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
     }
   }
 
+  List<bool> editList = [];
+
   @override
   Widget build(BuildContext context) {
     List<Widget> supplierContainerListWidget = [];
@@ -75,20 +77,40 @@ class _CashierHomePageState extends State<CashierHomePage> {
     suppliersItems.forEach((key, value) {
       List<DataRow> itemListWidget = [];
       for (var itemData in value) {
+        if (editList.length < value.length) {
+          setState(() {
+            editList.add(false);
+          });
+          print(suppliersItems[key]!
+              .indexWhere((element) => element.name == itemData.name));
+        }
         String item = itemData.name;
         String qty = itemData.qty.toString();
         String sold = itemData.sold.toString();
-        TextEditingController soldController = TextEditingController();
+        TextEditingController qtyController = TextEditingController(text: qty);
+        TextEditingController soldController =
+            TextEditingController(text: sold);
 
         itemListWidget.add(
           DataRow(cells: [
             DataCell(Text(item)),
-            DataCell(Text(qty)),
-            DataCell(Text(sold)),
-            DataCell(
-              Row(
-                children: [
-                  SizedBox(
+            DataCell(editList[suppliersItems[key]!
+                    .indexWhere((element) => element.name == itemData.name)]
+                ? SizedBox(
+                    width: 50,
+                    height: 30,
+                    child: CustomTextField(
+                      controller: qtyController,
+                      labelText: '',
+                      hintText: '',
+                      fontSize: 12,
+                      maxLength: 3,
+                    ),
+                  )
+                : Text(qty)),
+            DataCell(editList[suppliersItems[key]!
+                    .indexWhere((element) => element.name == itemData.name)]
+                ? SizedBox(
                     width: 50,
                     height: 30,
                     child: CustomTextField(
@@ -98,41 +120,56 @@ class _CashierHomePageState extends State<CashierHomePage> {
                       fontSize: 12,
                       maxLength: 3,
                     ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
+                  )
+                : Text(sold)),
+            DataCell(
+              Row(
+                children: [
                   CustomButton(
                     onPressed: () async {
-                      SupplierItemController supplierItemsController =
-                          Get.find<SupplierItemController>();
+                      if (editList[suppliersItems[key]!.indexWhere(
+                          (element) => element.name == itemData.name)]) {
+                        SupplierItemController supplierItemsController =
+                            Get.find<SupplierItemController>();
 
-                      int soldAmount =
-                          (int.parse(sold) + int.parse(soldController.text));
-                      // update item
-                      bool result = await supplierItemsController
-                          .updateItemInSupplierItem(
-                        key,
-                        SupplierItem(
-                          name: item,
-                          date: itemData.date,
-                          sold: soldAmount,
-                          qty: itemData.qty,
-                          purchasePrice: itemData.purchasePrice,
-                          salePrice: itemData.salePrice,
-                        ),
-                        itemData.date,
-                      );
-                      if (result) {
-                        int index = suppliersItems[key]!
-                            .indexWhere((element) => element.name == item);
-                        setState(() {
-                          suppliersItems[key]![index].sold = soldAmount;
-                        });
+                        // update item
+                        bool result = await supplierItemsController
+                            .updateItemInSupplierItem(
+                          key,
+                          SupplierItem(
+                            name: item,
+                            date: itemData.date,
+                            sold: int.parse(soldController.text),
+                            qty: int.parse(qtyController.text),
+                            purchasePrice: itemData.purchasePrice,
+                            salePrice: itemData.salePrice,
+                          ),
+                          itemData.date,
+                        );
+                        if (result) {
+                          int index = suppliersItems[key]!
+                              .indexWhere((element) => element.name == item);
+                          setState(() {
+                            suppliersItems[key]![index].sold =
+                                int.parse(soldController.text);
+                            suppliersItems[key]![index].qty =
+                                int.parse(qtyController.text);
+                          });
+                        }
+                        // qty = qtyController.text;
+                        // sold = soldController.text;
                       }
-                      soldController.clear();
+                      setState(() {
+                        editList[suppliersItems[key]!.indexWhere(
+                                (element) => element.name == itemData.name)] =
+                            !editList[suppliersItems[key]!.indexWhere(
+                                (element) => element.name == itemData.name)];
+                      });
                     },
-                    text: "Submit",
+                    text: editList[suppliersItems[key]!.indexWhere(
+                            (element) => element.name == itemData.name)]
+                        ? "Submit"
+                        : "Edit",
                     fontSize: 12,
                     padding: 0,
                     styleFormPadding: 0,
@@ -195,7 +232,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                   ),
                   DataColumn(
                     label: Text(
-                      'SOLD AMOUNT',
+                      'Edit',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
