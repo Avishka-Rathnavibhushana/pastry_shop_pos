@@ -81,8 +81,6 @@ class _CashierHomePageState extends State<CashierHomePage> {
           setState(() {
             editList.add(false);
           });
-          print(suppliersItems[key]!
-              .indexWhere((element) => element.name == itemData.name));
         }
         String item = itemData.name;
         String qty = itemData.qty.toString();
