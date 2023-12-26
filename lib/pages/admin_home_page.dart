@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pastry_shop_pos/components/custom_admin_navigation_bar.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/Accountants.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/dashboard.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/shop.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/supplier.dart';
@@ -53,6 +54,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
             });
           },
         ),
+        AccountantsPage(
+          onPressed: (String id) {},
+        ),
       ];
     });
   }
@@ -86,6 +90,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
               () {
                 setState(() {
                   selectedPage = 2;
+                  showSupplier = false;
+                  showShop = false;
+                });
+              },
+              () {
+                setState(() {
+                  selectedPage = 3;
                   showSupplier = false;
                   showShop = false;
                 });

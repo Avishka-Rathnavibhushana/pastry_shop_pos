@@ -1,61 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pastry_shop_pos/controllers/accountant_controller.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/shop.dart';
 import 'package:pastry_shop_pos/models/user.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/accountant%20pages/accountants_container.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/accountant%20pages/add_accountant_container.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/add_shop_container.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/shops_container.dart';
 
-class ShopsPage extends StatefulWidget {
-  const ShopsPage({super.key, required this.onPressed});
+class AccountantsPage extends StatefulWidget {
+  const AccountantsPage({super.key, required this.onPressed});
 
   final void Function(String id) onPressed;
 
   @override
-  State<ShopsPage> createState() => _ShopsPageState();
+  State<AccountantsPage> createState() => _AccountantsPageState();
 }
 
-class _ShopsPageState extends State<ShopsPage> {
-  Future<bool> submitShop(
-    Shop shop,
+class _AccountantsPageState extends State<AccountantsPage> {
+  Future<bool> submitAccountant(
     User user,
   ) async {
-    ShopController shopController = Get.find<ShopController>();
-    bool result = false;
-
     // check if user exists
     AuthController authController = Get.find<AuthController>();
     User? retrievedUser = await authController.getUserById(user.username);
+    bool result = false;
 
     if (retrievedUser != null) {
       Helpers.snackBarPrinter("Failed", "User already exists");
       return false;
     }
 
-    bool resultShop = await shopController.createShop(shop);
-
-    if (resultShop) {
-      AuthController authController = Get.find<AuthController>();
-      bool resultUser =
-          await authController.createUserWithId(user.username, user);
-      result = resultUser;
-      await loadData();
-    }
+    bool resultUser =
+        await authController.createUserWithId(user.username, user);
+    result = resultUser;
+    await loadData();
 
     return result;
   }
 
-  List<Shop> shops = [];
+  List<User> users = [];
 
   Future<void> loadData() async {
     // load suppliers from database
-    ShopController shopController = Get.find<ShopController>();
-    List<Shop> shopsList = await shopController.getShopsList();
+    AccountantController accountantController =
+        Get.find<AccountantController>();
+    List<User> accountantList = await accountantController.getAccountantsList();
 
     setState(() {
-      shops = shopsList;
+      users = accountantList;
     });
   }
 
@@ -72,13 +68,13 @@ class _ShopsPageState extends State<ShopsPage> {
     return Center(
       child: Column(
         children: [
-          AddShopContainer(submit: submitShop),
+          AddAccountantContainer(submit: submitAccountant),
           const SizedBox(
             height: 20,
           ),
-          ShopsContainer(
+          AccountantsContainer(
             onPressed: widget.onPressed,
-            shops: shops,
+            users: users,
           ),
         ],
       ),

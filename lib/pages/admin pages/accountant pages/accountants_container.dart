@@ -2,28 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/models/shop.dart';
+import 'package:pastry_shop_pos/models/user.dart';
 
 // ignore: must_be_immutable
-class ShopsContainer extends StatelessWidget {
-  const ShopsContainer(
-      {super.key, required this.onPressed, required this.shops});
+class AccountantsContainer extends StatelessWidget {
+  const AccountantsContainer(
+      {super.key, required this.onPressed, required this.users});
 
   final void Function(String id) onPressed;
-  final List<Shop> shops;
+  final List<User> users;
 
   @override
   Widget build(BuildContext context) {
     List<DataRow> rows = [];
 
-    shops.forEach((Shop shop) {
-      String name = shop.name.toString();
-      String address = shop.address.toString();
-      String tel = shop.tel.toString();
-      List<String> suppliersList = [];
-      if (shop.suppliers != null) {
-        suppliersList = shop.suppliers as List<String>;
-      }
-      String suppliers = "[ ${suppliersList.join(" ,")} ]";
+    users.forEach((User user) {
+      String name = user.username;
+      String address = user.address.toString();
+      String tel = user.tel.toString();
+
+      String shop = user.shop ?? "";
 
       rows.add(
         DataRow(
@@ -31,23 +29,23 @@ class ShopsContainer extends StatelessWidget {
             DataCell(Text(name)),
             DataCell(Text(address)),
             DataCell(Text(tel)),
-            DataCell(Text(suppliers)),
-            DataCell(
-              CustomButton(
-                onPressed: () {
-                  onPressed(name);
-                },
-                isIcon: true,
-                isText: false,
-                icon: const Icon(
-                  Icons.description,
-                  color: Colors.white,
-                ),
-                fontSize: 12,
-                padding: 0,
-                styleFormPadding: 0,
-              ),
-            ),
+            DataCell(Text(shop)),
+            // DataCell(
+            //   CustomButton(
+            //     onPressed: () {
+            //       onPressed(name);
+            //     },
+            //     isIcon: true,
+            //     isText: false,
+            //     icon: const Icon(
+            //       Icons.description,
+            //       color: Colors.white,
+            //     ),
+            //     fontSize: 12,
+            //     padding: 0,
+            //     styleFormPadding: 0,
+            //   ),
+            // ),
           ],
         ),
       );
@@ -59,7 +57,7 @@ class ShopsContainer extends StatelessWidget {
         const Align(
           alignment: Alignment.topLeft,
           child: Text(
-            'Shops',
+            'Accountants',
             textAlign: TextAlign.start,
             style: TextStyle(
               fontSize: 24,
@@ -113,22 +111,22 @@ class ShopsContainer extends StatelessWidget {
                 ),
                 DataColumn(
                   label: Text(
-                    'Suppliers',
+                    'Shop',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                DataColumn(
-                  label: Text(
-                    '',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                // DataColumn(
+                //   label: Text(
+                //     '',
+                //     style: TextStyle(
+                //       fontSize: 17,
+                //       fontWeight: FontWeight.bold,
+                //     ),
+                //   ),
+                // ),
               ],
               rows: rows,
             ),
