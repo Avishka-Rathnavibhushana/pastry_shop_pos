@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
@@ -82,9 +83,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void onSignIn() async {
-    setState(() {
-      loading = true;
-    });
+    authController.loading.value = true;
 
     try {
       await Future.delayed(Duration(seconds: 1));
@@ -134,9 +133,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       print(e);
     } finally {
-      setState(() {
-        loading = false;
-      });
+      authController.loading.value = false;
     }
   }
 
@@ -401,8 +398,10 @@ class _LoginPageState extends State<LoginPage> {
               child: content,
             ),
           ),
-          LoadingPage(
-            loading: loading,
+          Obx(
+            () => LoadingPage(
+              loading: authController.loading.value,
+            ),
           ),
         ],
       ),

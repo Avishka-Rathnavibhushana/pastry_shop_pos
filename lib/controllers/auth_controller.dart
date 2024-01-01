@@ -16,6 +16,8 @@ class AuthController extends GetxController {
     shop: "",
   ).obs;
 
+  var loading = false.obs;
+
   // create user
   Future<bool> createUserWithId(String userId, User user) async {
     try {
