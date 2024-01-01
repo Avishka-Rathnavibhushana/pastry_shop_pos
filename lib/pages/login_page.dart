@@ -11,6 +11,7 @@ import 'package:pastry_shop_pos/models/user.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 import 'package:pastry_shop_pos/pages/chashier_home_page.dart';
 import 'package:pastry_shop_pos/pages/accountant_home_page.dart';
+import 'package:pastry_shop_pos/pages/loadingPage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,6 +21,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool loading = false;
+
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -76,6 +79,65 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
     setState(() {});
+  }
+
+  void onSignIn() async {
+    setState(() {
+      loading = true;
+    });
+
+    try {
+      await Future.delayed(Duration(seconds: 1));
+      bool isSuccessful = await authController.authenticateUser(
+        usernameController.text,
+        passwordController.text,
+        roleSelectedValue!,
+        shop: shopSelectedValue,
+      );
+
+      if (!isSuccessful) {
+        return;
+      }
+
+      if (roleSelectedValue == Constants.Admin) {
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) => const AdminHomePage(
+              shopName: "Admin Panel",
+            ),
+          ),
+        );
+      } else if (roleSelectedValue == Constants.Cashier) {
+        if (shopSelectedValue != "Select a shop") {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => CashierHomePage(
+                shopName: "${shopSelectedValue!}",
+              ),
+            ),
+          );
+        }
+      } else if (roleSelectedValue == Constants.Accountant) {
+        if (shopSelectedValue != "Select a shop") {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => AccountantHomePage(
+                shopName: "${shopSelectedValue!}",
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
@@ -201,53 +263,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 20,
                 ),
                 CustomButton(
-                  onPressed: () async {
-                    bool isSuccessful = await authController.authenticateUser(
-                      usernameController.text,
-                      passwordController.text,
-                      roleSelectedValue!,
-                      shop: shopSelectedValue,
-                    );
-
-                    if (!isSuccessful) {
-                      return;
-                    }
-
-                    if (roleSelectedValue == Constants.Admin) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) =>
-                              const AdminHomePage(
-                            shopName: "Admin Panel",
-                          ),
-                        ),
-                      );
-                    } else if (roleSelectedValue == Constants.Cashier) {
-                      if (shopSelectedValue != "Select a shop") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => CashierHomePage(
-                              shopName: "${shopSelectedValue!}",
-                            ),
-                          ),
-                        );
-                      }
-                    } else if (roleSelectedValue == Constants.Accountant) {
-                      if (shopSelectedValue != "Select a shop") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) =>
-                                AccountantHomePage(
-                              shopName: "${shopSelectedValue!}",
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  },
+                  onPressed: onSignIn,
                   text: "Sign in",
                 ),
               ],
@@ -358,51 +374,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 20,
               ),
               CustomButton(
-                onPressed: () async {
-                  bool isSuccessful = await authController.authenticateUser(
-                    usernameController.text,
-                    passwordController.text,
-                    roleSelectedValue!,
-                    shop: shopSelectedValue,
-                  );
-
-                  if (!isSuccessful) {
-                    return;
-                  }
-
-                  if (roleSelectedValue == Constants.Admin) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (BuildContext context) => const AdminHomePage(
-                          shopName: "Admin Panel",
-                        ),
-                      ),
-                    );
-                  } else if (roleSelectedValue == Constants.Cashier) {
-                    if (shopSelectedValue != "Select a shop") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) => CashierHomePage(
-                            shopName: "${shopSelectedValue!}",
-                          ),
-                        ),
-                      );
-                    }
-                  } else if (roleSelectedValue == Constants.Accountant) {
-                    if (shopSelectedValue != "Select a shop") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) => AccountantHomePage(
-                            shopName: "${shopSelectedValue!}",
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                },
+                onPressed: onSignIn,
                 text: "Sign in",
               ),
             ],
@@ -412,20 +384,27 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     return SafeArea(
-      child: CustomContainer(
-        outerPadding: const EdgeInsets.symmetric(
-          vertical: 10,
-          horizontal: 10,
-        ),
-        innerPadding: const EdgeInsets.symmetric(
-          vertical: 0,
-          horizontal: 0,
-        ),
-        containerColor: const Color(0xFFCDE8FF),
-        child: Container(
-          alignment: Alignment.center,
-          child: content,
-        ),
+      child: Stack(
+        children: [
+          CustomContainer(
+            outerPadding: const EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 10,
+            ),
+            innerPadding: const EdgeInsets.symmetric(
+              vertical: 0,
+              horizontal: 0,
+            ),
+            containerColor: const Color(0xFFCDE8FF),
+            child: Container(
+              alignment: Alignment.center,
+              child: content,
+            ),
+          ),
+          LoadingPage(
+            loading: loading,
+          ),
+        ],
       ),
     );
   }
