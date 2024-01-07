@@ -10,15 +10,16 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: const FirebaseOptions(
-        apiKey: "AIzaSyAHfpKmCi9-K3bR3Aj0qdC8Bu4bK-pG_CY",
-        authDomain: "pastry-shop-pos.firebaseapp.com",
-        databaseURL:
-            "https://pastry-shop-pos-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "pastry-shop-pos",
-        storageBucket: "pastry-shop-pos.appspot.com",
-        messagingSenderId: "945867413250",
-        appId: "1:945867413250:web:d3a643673ac0859593d41b",
-        measurementId: "G-TWTEX6WY0V"),
+      apiKey: "AIzaSyDmFXRVjlesU_Ls4yJYTD0AqRioXX-JoDw",
+      authDomain: "pastry-shop-87211.firebaseapp.com",
+      projectId: "pastry-shop-87211",
+      storageBucket: "pastry-shop-87211.appspot.com",
+      messagingSenderId: "2874494797",
+      appId: "1:2874494797:web:7d1dcea0104409e009f104",
+      measurementId: "G-QW09QN6J3D",
+      // databaseURL:
+      //     "https://pastry-shop-pos-default-rtdb.asia-southeast1.firebasedatabase.app",
+    ),
   );
   runApp(const MyApp());
 }

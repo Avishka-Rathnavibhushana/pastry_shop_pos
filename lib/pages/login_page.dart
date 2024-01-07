@@ -22,8 +22,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool loading = false;
-
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -86,7 +84,6 @@ class _LoginPageState extends State<LoginPage> {
     authController.loading.value = true;
 
     try {
-      await Future.delayed(Duration(seconds: 1));
       bool isSuccessful = await authController.authenticateUser(
         usernameController.text,
         passwordController.text,
@@ -133,6 +130,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       print(e);
     } finally {
+      await Future.delayed(Duration(seconds: 1));
       authController.loading.value = false;
     }
   }
@@ -140,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-
+    authController.loading.value = false;
     // Populate the initial dropdown items
     _populateDropdownItems();
   }
@@ -380,30 +378,32 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    return SafeArea(
-      child: Stack(
-        children: [
-          CustomContainer(
-            outerPadding: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 10,
+    return Material(
+      child: SafeArea(
+        child: Stack(
+          children: [
+            CustomContainer(
+              outerPadding: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 10,
+              ),
+              innerPadding: const EdgeInsets.symmetric(
+                vertical: 0,
+                horizontal: 0,
+              ),
+              containerColor: const Color(0xFFCDE8FF),
+              child: Container(
+                alignment: Alignment.center,
+                child: content,
+              ),
             ),
-            innerPadding: const EdgeInsets.symmetric(
-              vertical: 0,
-              horizontal: 0,
+            Obx(
+              () => LoadingPage(
+                loading: authController.loading.value,
+              ),
             ),
-            containerColor: const Color(0xFFCDE8FF),
-            child: Container(
-              alignment: Alignment.center,
-              child: content,
-            ),
-          ),
-          Obx(
-            () => LoadingPage(
-              loading: authController.loading.value,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

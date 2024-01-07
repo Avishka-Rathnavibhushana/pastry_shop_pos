@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
+import 'package:pastry_shop_pos/pages/login_page.dart';
 
 class UserPageLayout extends StatelessWidget {
   const UserPageLayout({
@@ -67,7 +68,12 @@ class UserPageLayout extends StatelessWidget {
             onPressed: () {
               AuthController authController = Get.find<AuthController>();
               authController.logoutUser(snackBar: true);
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (BuildContext context) => const LoginPage(),
+                ),
+              );
             },
             icon: const Icon(
               Icons.logout,
@@ -123,7 +129,12 @@ class UserPageLayout extends StatelessWidget {
                 onPressed: () {
                   AuthController authController = Get.find<AuthController>();
                   authController.logoutUser(snackBar: true);
-                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) => const LoginPage(),
+                    ),
+                  );
                 },
                 icon: const Icon(
                   Icons.logout,

@@ -6,9 +6,11 @@ import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
+import 'package:pastry_shop_pos/pages/loadingPage.dart';
 
 class CashierHomePage extends StatefulWidget {
   const CashierHomePage({
@@ -25,6 +27,8 @@ class CashierHomePage extends StatefulWidget {
 class _CashierHomePageState extends State<CashierHomePage> {
   Map<String, List<SupplierItem>> suppliersItems = {};
 
+  AuthController authController = Get.find<AuthController>();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -37,34 +41,42 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
   // load data from supplierItem
   Future<void> loadData(String date) async {
-    ShopController shopController = Get.find<ShopController>();
-    List<String> supplierList =
-        await shopController.getSuppliersOfShop(widget.shopName ?? "");
+    authController.loading.value = true;
+    try {
+      ShopController shopController = Get.find<ShopController>();
+      List<String> supplierList =
+          await shopController.getSuppliersOfShop(widget.shopName ?? "");
 
-    SupplierItemController supplierItemsController =
-        Get.find<SupplierItemController>();
+      SupplierItemController supplierItemsController =
+          Get.find<SupplierItemController>();
 
-    if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
-      for (String supplier in supplierList) {
-        bool isItemsEqual = await supplierItemsController.isItemsEqual(
-          supplier,
-          date,
-        );
-        if (!isItemsEqual) {
-          await supplierItemsController
-              .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+      if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+        for (String supplier in supplierList) {
+          bool isItemsEqual = await supplierItemsController.isItemsEqual(
+            supplier,
+            date,
+          );
+          if (!isItemsEqual) {
+            await supplierItemsController
+                .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+          }
         }
       }
-    }
 
-    for (String supplier in supplierList) {
-      // load suppliers from database
-      List<SupplierItem> supplierItemList =
-          await supplierItemsController.getSupplierItems(supplier, date);
+      for (String supplier in supplierList) {
+        // load suppliers from database
+        List<SupplierItem> supplierItemList =
+            await supplierItemsController.getSupplierItems(supplier, date);
 
-      setState(() {
-        suppliersItems[supplier] = supplierItemList;
-      });
+        setState(() {
+          suppliersItems[supplier] = supplierItemList;
+        });
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      await Future.delayed(Duration(seconds: 1));
+      authController.loading.value = false;
     }
   }
 
@@ -125,44 +137,53 @@ class _CashierHomePageState extends State<CashierHomePage> {
                 children: [
                   CustomButton(
                     onPressed: () async {
-                      if (editList[suppliersItems[key]!.indexWhere(
-                          (element) => element.name == itemData.name)]) {
-                        SupplierItemController supplierItemsController =
-                            Get.find<SupplierItemController>();
+                      authController.loading.value = true;
 
-                        // update item
-                        bool result = await supplierItemsController
-                            .updateItemInSupplierItem(
-                          key,
-                          SupplierItem(
-                            name: item,
-                            date: itemData.date,
-                            sold: int.parse(soldController.text),
-                            qty: int.parse(qtyController.text),
-                            purchasePrice: itemData.purchasePrice,
-                            salePrice: itemData.salePrice,
-                          ),
-                          itemData.date,
-                        );
-                        if (result) {
-                          int index = suppliersItems[key]!
-                              .indexWhere((element) => element.name == item);
-                          setState(() {
-                            suppliersItems[key]![index].sold =
-                                int.parse(soldController.text);
-                            suppliersItems[key]![index].qty =
-                                int.parse(qtyController.text);
-                          });
+                      try {
+                        if (editList[suppliersItems[key]!.indexWhere(
+                            (element) => element.name == itemData.name)]) {
+                          SupplierItemController supplierItemsController =
+                              Get.find<SupplierItemController>();
+
+                          // update item
+                          bool result = await supplierItemsController
+                              .updateItemInSupplierItem(
+                            key,
+                            SupplierItem(
+                              name: item,
+                              date: itemData.date,
+                              sold: int.parse(soldController.text),
+                              qty: int.parse(qtyController.text),
+                              purchasePrice: itemData.purchasePrice,
+                              salePrice: itemData.salePrice,
+                            ),
+                            itemData.date,
+                          );
+                          if (result) {
+                            int index = suppliersItems[key]!
+                                .indexWhere((element) => element.name == item);
+                            setState(() {
+                              suppliersItems[key]![index].sold =
+                                  int.parse(soldController.text);
+                              suppliersItems[key]![index].qty =
+                                  int.parse(qtyController.text);
+                            });
+                          }
+                          // qty = qtyController.text;
+                          // sold = soldController.text;
                         }
-                        // qty = qtyController.text;
-                        // sold = soldController.text;
+                        setState(() {
+                          editList[suppliersItems[key]!.indexWhere(
+                                  (element) => element.name == itemData.name)] =
+                              !editList[suppliersItems[key]!.indexWhere(
+                                  (element) => element.name == itemData.name)];
+                        });
+                      } catch (e) {
+                        print(e);
+                      } finally {
+                        await Future.delayed(Duration(seconds: 1));
+                        authController.loading.value = false;
                       }
-                      setState(() {
-                        editList[suppliersItems[key]!.indexWhere(
-                                (element) => element.name == itemData.name)] =
-                            !editList[suppliersItems[key]!.indexWhere(
-                                (element) => element.name == itemData.name)];
-                      });
                     },
                     text: editList[suppliersItems[key]!.indexWhere(
                             (element) => element.name == itemData.name)]
@@ -252,11 +273,20 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
     return Container(
       alignment: Alignment.center,
-      child: UserPageLayout(
-        pageWidgets: [
-          ...supplierContainerListWidget,
+      child: Stack(
+        children: [
+          UserPageLayout(
+            pageWidgets: [
+              ...supplierContainerListWidget,
+            ],
+            shopName: "${Constants.Cashier} - ${widget.shopName!}",
+          ),
+          Obx(
+            () => LoadingPage(
+              loading: authController.loading.value,
+            ),
+          ),
         ],
-        shopName: "${Constants.Cashier} - ${widget.shopName!}",
       ),
     );
   }
