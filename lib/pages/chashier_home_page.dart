@@ -31,14 +31,12 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
   AuthController authController = Get.find<AuthController>();
 
-  String todayDate = "";
-  late String _timestring;
+  
 
   @override
   void initState() {
-    setState(() {
-      todayDate = _formatdatetime(DateTime.now());
-    });
+
+    authController.todayDate.value = _formatdatetime(DateTime.now());
 
     Timer.periodic(Duration(seconds: 1), (Timer t) => _gettime());
     super.initState();
@@ -51,9 +49,9 @@ class _CashierHomePageState extends State<CashierHomePage> {
   void _gettime() {
     final DateTime now = DateTime.now();
     final String formatteddatetime = _formatdatetime(now);
-    setState(() {
-      todayDate = formatteddatetime;
-    });
+
+    authController.todayDate.value = formatteddatetime;
+
   }
 
   String _formatdatetime(DateTime datetime) {
@@ -313,14 +311,16 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     //     // fontStyle: FontStyle.italic,
                     //   ),
                     // ),
-                    Text(
-                      "$todayDate",
+                    Obx(
+                      () => Text(
+                        authController.todayDate.value,
                       style: const TextStyle(
                         fontSize: 25,
                         // fontWeight: FontWeight.bold,
                         fontStyle: FontStyle.italic,
                       ),
                       textAlign: TextAlign.center,
+                      ),
                     ),
                   ],
                 ),
