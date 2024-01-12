@@ -33,7 +33,7 @@ class UserPageLayout extends StatelessWidget {
             child: Row(
               children: [
                 Image.asset(
-                  "assets/images/logo.png",
+                  "assets/images/logo.jpeg",
                   width: 50,
                   height: 50,
                 ),
@@ -89,7 +89,7 @@ class UserPageLayout extends StatelessWidget {
           Row(
             children: [
               Image.asset(
-                "assets/images/logo.png",
+                "assets/images/logo.jpeg",
                 width: 50,
                 height: 50,
               ),

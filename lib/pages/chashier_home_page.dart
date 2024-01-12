@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -29,14 +31,33 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
   AuthController authController = Get.find<AuthController>();
 
+  String todayDate = "";
+  late String _timestring;
+
   @override
   void initState() {
-    // TODO: implement initState
+    setState(() {
+      todayDate = _formatdatetime(DateTime.now());
+    });
+
+    Timer.periodic(Duration(seconds: 1), (Timer t) => _gettime());
     super.initState();
 
     String dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     loadData(dateInput);
+  }
+
+  void _gettime() {
+    final DateTime now = DateTime.now();
+    final String formatteddatetime = _formatdatetime(now);
+    setState(() {
+      todayDate = formatteddatetime;
+    });
+  }
+
+  String _formatdatetime(DateTime datetime) {
+    return DateFormat('EEEE, MMMM d, y \n H:mm:s').format(datetime);
   }
 
   // load data from supplierItem
@@ -277,6 +298,33 @@ class _CashierHomePageState extends State<CashierHomePage> {
         children: [
           UserPageLayout(
             pageWidgets: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Text(
+                    //   "Date : ",
+                    //   style: const TextStyle(
+                    //     fontSize: 25,
+                    //     fontWeight: FontWeight.bold,
+                    //     // fontStyle: FontStyle.italic,
+                    //   ),
+                    // ),
+                    Text(
+                      "$todayDate",
+                      style: const TextStyle(
+                        fontSize: 25,
+                        // fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
               ...supplierContainerListWidget,
             ],
             shopName: "${Constants.Cashier} - ${widget.shopName!}",

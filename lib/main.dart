@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
       home: Material(
         child: LoginPage(),
         //     CashierHomePage(
-        //   shopName: "test",
+        //   shopName: "shop1",
         // ),
         //     AdminHomePage(
         //   shopName: "Admin Panel",
