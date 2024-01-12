@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "pastry-shop-pos"
-  }
+    "default": "pastry-shop-87211",
+    "staging": "pastry-shop-87211"
+  },
+  "targets": {},
+  "etags": {}
 }
