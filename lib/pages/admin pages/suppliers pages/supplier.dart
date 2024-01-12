@@ -149,7 +149,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       labelText: '',
                       hintText: '',
                       fontSize: 12,
-                      maxLength: 3,
+                      maxLength: 10,
+                      keyboardType: TextInputType.number,
                     ),
                   )
                 : Text(qty)),
@@ -162,7 +163,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       labelText: '',
                       hintText: '',
                       fontSize: 12,
-                      maxLength: 3,
+                      maxLength: 10,
+                      keyboardType: TextInputType.number,
                     ),
                   )
                 : Text(sold)),
@@ -175,7 +177,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       labelText: '',
                       hintText: '',
                       fontSize: 12,
-                      maxLength: 3,
+                      maxLength: 10,
+                      keyboardType: TextInputType.number,
                     ),
                   )
                 : Text(salePrice)),
@@ -188,7 +191,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       labelText: '',
                       hintText: '',
                       fontSize: 12,
-                      maxLength: 3,
+                      maxLength: 10,
+                      keyboardType: TextInputType.number,
                     ),
                   )
                 : Text(purchasePrice)),

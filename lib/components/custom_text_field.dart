@@ -10,6 +10,7 @@ class CustomTextField extends StatelessWidget {
     this.fontSize = 15,
     this.maxLength,
     this.onSubmitted,
+    this.keyboardType = TextInputType.text,
   });
 
   final TextEditingController controller;
@@ -19,6 +20,7 @@ class CustomTextField extends StatelessWidget {
   final double? fontSize;
   final int? maxLength;
   final void Function(String)? onSubmitted;
+  final TextInputType keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,9 @@ class CustomTextField extends StatelessWidget {
         fontSize: fontSize,
       ),
       maxLength: maxLength,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
+        
         counterText: "",
         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
         border: OutlineInputBorder(

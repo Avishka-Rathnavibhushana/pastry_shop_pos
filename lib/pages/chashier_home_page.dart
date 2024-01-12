@@ -133,7 +133,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
                       labelText: '',
                       hintText: '',
                       fontSize: 12,
-                      maxLength: 3,
+                      maxLength: 10,
+                      keyboardType: TextInputType.number,
                     ),
                   )
                 : Text(qty)),
@@ -147,7 +148,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
                       labelText: '',
                       hintText: '',
                       fontSize: 12,
-                      maxLength: 3,
+                      maxLength: 10,
+                      keyboardType: TextInputType.number,
                     ),
                   )
                 : Text(sold)),
