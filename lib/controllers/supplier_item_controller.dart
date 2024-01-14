@@ -303,7 +303,8 @@ class SupplierItemController extends GetxController {
 
   // update item in supplier item for a specific date
   Future<bool> updateItemInSupplierItem(
-      String supplierId, SupplierItem supplierItem, String date) async {
+      String supplierId, SupplierItem supplierItem, String date,
+      {bool printSnack = true}) async {
     try {
       // Fetch the specific item list document from the 'itemList' collection
       DocumentSnapshot itemListSnapshot = await FirebaseFirestore.instance
@@ -354,29 +355,41 @@ class SupplierItemController extends GetxController {
                 .update({
               "items": items.map((item) => item.toMapSubset()).toList(),
             });
-            Helpers.snackBarPrinter(
-                "Successful!", "Successfully updated the supplier item.");
+            if (printSnack) {
+              Helpers.snackBarPrinter(
+                  "Successful!", "Successfully updated the supplier item.");
+            }
+
             return true;
           } else {
             print("Item doesn't exist in the list");
             // Item doesn't exist in the list
-            Helpers.snackBarPrinter(
-                "Failed!", "Something is Wrong. Please try again.",
-                error: true);
+            if (printSnack) {
+              Helpers.snackBarPrinter(
+                  "Failed!", "Something is Wrong. Please try again.",
+                  error: true);
+            }
+
             return false;
           }
         } else {
           print("Item list Data doesn't exist.");
-          Helpers.snackBarPrinter(
-              "Failed!", "Something is Wrong. Please try again.",
-              error: true);
+          if (printSnack) {
+            Helpers.snackBarPrinter(
+                "Failed!", "Something is Wrong. Please try again.",
+                error: true);
+          }
+
           return false;
         }
       } else {
         print("Item list document doesn't exist.");
-        Helpers.snackBarPrinter(
-            "Failed!", "Something is Wrong. Please try again.",
-            error: true);
+        if (printSnack) {
+          Helpers.snackBarPrinter(
+              "Failed!", "Something is Wrong. Please try again.",
+              error: true);
+        }
+
         return false;
       }
     } catch (e) {

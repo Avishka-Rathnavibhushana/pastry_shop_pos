@@ -202,6 +202,23 @@ class _SupplierPageState extends State<SupplierPage> {
                   if (edit) {
                     SupplierItemController supplierItemsController =
                         Get.find<SupplierItemController>();
+
+                    qtyController.text = qty == "0" && qtyController.text == ""
+                        ? "0"
+                        : qtyController.text;
+                    soldController.text =
+                        sold == "0" && soldController.text == ""
+                            ? "0"
+                            : soldController.text;
+                    salePriceController.text =
+                        salePrice == "0" && salePriceController.text == ""
+                            ? "0"
+                            : salePriceController.text;
+                    purchasePriceController.text = purchasePrice == "0" &&
+                            purchasePriceController.text == ""
+                        ? "0"
+                        : purchasePriceController.text;
+
                     if (qtyController.text.isEmpty ||
                         soldController.text.isEmpty ||
                         salePriceController.text.isEmpty ||
@@ -213,24 +230,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       );
                       return;
                     }
-                    // if (int.parse(qtyController.text) <
-                    //     int.parse(soldController.text)) {
-                    //   Helpers.snackBarPrinter(
-                    //     "Failed!",
-                    //     "Sold cannot be greater than qty.",
-                    //     error: true,
-                    //   );
-                    //   return;
-                    // }
-                    // if (double.parse(salePriceController.text) <
-                    //     double.parse(purchasePriceController.text)) {
-                    //   Helpers.snackBarPrinter(
-                    //     "Failed!",
-                    //     "Sale price cannot be less than purchase price.",
-                    //     error: true,
-                    //   );
-                    //   return;
-                    // }
+
                     if (qtyController.text == qty &&
                         soldController.text == sold &&
                         salePriceController.text == salePrice &&

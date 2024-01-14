@@ -24,8 +24,12 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.text = controller.text == "0" ? "" : controller.text;
+
     return TextField(
       controller: controller,
+      onTap: () => controller.selection = TextSelection(
+          baseOffset: 0, extentOffset: controller.value.text.length),
       onSubmitted: onSubmitted,
       style: TextStyle(
         fontSize: fontSize,
@@ -33,7 +37,6 @@ class CustomTextField extends StatelessWidget {
       maxLength: maxLength,
       keyboardType: keyboardType,
       decoration: InputDecoration(
-        
         counterText: "",
         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
         border: OutlineInputBorder(

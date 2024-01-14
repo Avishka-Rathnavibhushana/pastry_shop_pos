@@ -11,6 +11,7 @@ import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
+import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
 import 'package:pastry_shop_pos/pages/loadingPage.dart';
 
@@ -31,11 +32,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
   AuthController authController = Get.find<AuthController>();
 
-  
-
   @override
   void initState() {
-
     authController.todayDate.value = _formatdatetime(DateTime.now());
 
     Timer.periodic(Duration(seconds: 1), (Timer t) => _gettime());
@@ -51,7 +49,6 @@ class _CashierHomePageState extends State<CashierHomePage> {
     final String formatteddatetime = _formatdatetime(now);
 
     authController.todayDate.value = formatteddatetime;
-
   }
 
   String _formatdatetime(DateTime datetime) {
@@ -99,7 +96,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
     }
   }
 
-  List<bool> editList = [];
+  String editShop = "";
 
   @override
   Widget build(BuildContext context) {
@@ -107,24 +104,25 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
     suppliersItems.forEach((key, value) {
       List<DataRow> itemListWidget = [];
+      Map<String, List<TextEditingController>> textEditingControllerMapList =
+          {};
       for (var itemData in value) {
-        if (editList.length < value.length) {
-          setState(() {
-            editList.add(false);
-          });
-        }
         String item = itemData.name;
         String qty = itemData.qty.toString();
         String sold = itemData.sold.toString();
-        TextEditingController qtyController = TextEditingController(text: qty);
+        TextEditingController qtyController =
+            TextEditingController(text: qty == "0" ? "" : qty);
         TextEditingController soldController =
-            TextEditingController(text: sold);
+            TextEditingController(text: sold == "0" ? "" : sold);
+        textEditingControllerMapList[item] = [
+          qtyController,
+          soldController,
+        ];
 
         itemListWidget.add(
           DataRow(cells: [
             DataCell(Text(item)),
-            DataCell(editList[suppliersItems[key]!
-                    .indexWhere((element) => element.name == itemData.name)]
+            DataCell(key == editShop
                 ? SizedBox(
                     width: 50,
                     height: 30,
@@ -138,8 +136,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     ),
                   )
                 : Text(qty)),
-            DataCell(editList[suppliersItems[key]!
-                    .indexWhere((element) => element.name == itemData.name)]
+            DataCell(key == editShop
                 ? SizedBox(
                     width: 50,
                     height: 30,
@@ -153,73 +150,10 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     ),
                   )
                 : Text(sold)),
-            DataCell(
-              Row(
-                children: [
-                  CustomButton(
-                    onPressed: () async {
-                      authController.loading.value = true;
-
-                      try {
-                        if (editList[suppliersItems[key]!.indexWhere(
-                            (element) => element.name == itemData.name)]) {
-                          SupplierItemController supplierItemsController =
-                              Get.find<SupplierItemController>();
-
-                          // update item
-                          bool result = await supplierItemsController
-                              .updateItemInSupplierItem(
-                            key,
-                            SupplierItem(
-                              name: item,
-                              date: itemData.date,
-                              sold: int.parse(soldController.text),
-                              qty: int.parse(qtyController.text),
-                              purchasePrice: itemData.purchasePrice,
-                              salePrice: itemData.salePrice,
-                            ),
-                            itemData.date,
-                          );
-                          if (result) {
-                            int index = suppliersItems[key]!
-                                .indexWhere((element) => element.name == item);
-                            setState(() {
-                              suppliersItems[key]![index].sold =
-                                  int.parse(soldController.text);
-                              suppliersItems[key]![index].qty =
-                                  int.parse(qtyController.text);
-                            });
-                          }
-                          // qty = qtyController.text;
-                          // sold = soldController.text;
-                        }
-                        setState(() {
-                          editList[suppliersItems[key]!.indexWhere(
-                                  (element) => element.name == itemData.name)] =
-                              !editList[suppliersItems[key]!.indexWhere(
-                                  (element) => element.name == itemData.name)];
-                        });
-                      } catch (e) {
-                        print(e);
-                      } finally {
-                        await Future.delayed(Duration(seconds: 1));
-                        authController.loading.value = false;
-                      }
-                    },
-                    text: editList[suppliersItems[key]!.indexWhere(
-                            (element) => element.name == itemData.name)]
-                        ? "Submit"
-                        : "Edit",
-                    fontSize: 12,
-                    padding: 0,
-                    styleFormPadding: 0,
-                  ),
-                ],
-              ),
-            ),
           ]),
         );
       }
+
       Widget itemWidget = CustomContainer(
         outerPadding: const EdgeInsets.only(
           bottom: 20,
@@ -270,19 +204,112 @@ class _CashierHomePageState extends State<CashierHomePage> {
                       ),
                     ),
                   ),
-                  DataColumn(
-                    label: Text(
-                      'Edit',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  // DataColumn(
+                  //   label: Text(
+                  //     'Edit',
+                  //     style: TextStyle(
+                  //       fontSize: 17,
+                  //       fontWeight: FontWeight.bold,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
                 rows: [
                   ...itemListWidget,
                 ],
+              ),
+              CustomButton(
+                onPressed: () async {
+                  if (key != editShop) {
+                    setState(() {
+                      editShop = key;
+                    });
+                    return;
+                  }
+
+                  authController.loading.value = true;
+
+                  try {
+                    for (var itemData in value) {
+                      if (textEditingControllerMapList[itemData.name]![0]
+                              .text ==
+                          "") {
+                        textEditingControllerMapList[itemData.name]![0].text =
+                            itemData.qty.toString();
+                      }
+                      if (textEditingControllerMapList[itemData.name]![1]
+                              .text ==
+                          "") {
+                        textEditingControllerMapList[itemData.name]![1].text =
+                            itemData.sold.toString();
+                      }
+
+                      if (itemData.qty ==
+                              textEditingControllerMapList[itemData.name]![0]
+                                  .text &&
+                          itemData.sold ==
+                              textEditingControllerMapList[itemData.name]![1]
+                                  .text) {
+                      } else {
+                        SupplierItemController supplierItemsController =
+                            Get.find<SupplierItemController>();
+
+                        // update item
+                        bool result = await supplierItemsController
+                            .updateItemInSupplierItem(
+                          key,
+                          SupplierItem(
+                            name: itemData.name,
+                            date: itemData.date,
+                            sold: int.parse(
+                                textEditingControllerMapList[itemData.name]![1]
+                                    .text),
+                            qty: int.parse(
+                                textEditingControllerMapList[itemData.name]![0]
+                                    .text),
+                            purchasePrice: itemData.purchasePrice,
+                            salePrice: itemData.salePrice,
+                          ),
+                          itemData.date,
+                          printSnack: false,
+                        );
+
+                        if (result) {
+                          int index = suppliersItems[key]!.indexWhere(
+                              (element) => element.name == itemData.name);
+
+                          suppliersItems[key]![index].sold = int.parse(
+                              textEditingControllerMapList[itemData.name]![1]
+                                  .text);
+                          suppliersItems[key]![index].qty = int.parse(
+                              textEditingControllerMapList[itemData.name]![0]
+                                  .text);
+                        }
+                      }
+                    }
+
+                    Helpers.snackBarPrinter(
+                        "Successful!", "Successfully updated.");
+                  } catch (e) {
+                    Helpers.snackBarPrinter(
+                      "Failed!",
+                      "Something is wrong. Please try again.",
+                      error: true,
+                    );
+                    print(e);
+                  } finally {
+                    await Future.delayed(Duration(seconds: 1));
+                    authController.loading.value = false;
+                    setState(() {
+                      editShop = "";
+                    });
+                  }
+                },
+                text: key == editShop ? "Submit" : "Edit",
+                fontSize: 12,
+                padding: 0,
+                styleFormPadding: 0,
+                enabled: key == editShop || editShop == "",
               ),
             ],
           ),
@@ -316,12 +343,12 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     Obx(
                       () => Text(
                         authController.todayDate.value,
-                      style: const TextStyle(
-                        fontSize: 25,
-                        // fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
-                      ),
-                      textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 25,
+                          // fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
