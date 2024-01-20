@@ -18,6 +18,7 @@ dependencies:
   get: ^4.6.5
   crypto: ^3.0.3
   flutter_spinkit: ^5.2.0
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
