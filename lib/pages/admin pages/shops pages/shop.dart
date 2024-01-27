@@ -3,10 +3,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
+import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
+import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
+import 'package:pastry_shop_pos/pages/loadingPage.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key, required this.shop});
@@ -24,9 +27,15 @@ class _ShopPageState extends State<ShopPage> {
   double totalPrice = 0.0;
   double totalPaid = 0.0;
 
+  AuthController authController = Get.find<AuthController>();
+
+  bool loading = true;
+
   @override
   void initState() {
     super.initState();
+
+    authController.loading.value = true;
 
     setState(() {
       dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -37,35 +46,53 @@ class _ShopPageState extends State<ShopPage> {
 
   // load data from supplierItem
   Future<void> loadData(String date) async {
-    ShopController shopController = Get.find<ShopController>();
-    List<String> supplierList =
-        await shopController.getSuppliersOfShop(widget.shop ?? "");
+    setState(() {
+      totalPrice = 0.0;
+      totalPaid = 0.0;
+      loading = true;
+    });
+    try {
+      ShopController shopController = Get.find<ShopController>();
+      List<String> supplierList =
+          await shopController.getSuppliersOfShop(widget.shop ?? "");
 
-    SupplierItemController supplierItemsController =
-        Get.find<SupplierItemController>();
+      SupplierItemController supplierItemsController =
+          Get.find<SupplierItemController>();
 
-    if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
-      for (String supplier in supplierList) {
-        bool isItemsEqual = await supplierItemsController.isItemsEqual(
-          supplier,
-          date,
-        );
+      if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+        for (String supplier in supplierList) {
+          bool isItemsEqual = await supplierItemsController.isItemsEqual(
+            supplier,
+            date,
+          );
 
-        if (!isItemsEqual) {
-          await supplierItemsController
-              .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+          if (!isItemsEqual) {
+            await supplierItemsController
+                .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+          }
         }
       }
-    }
 
-    for (String supplier in supplierList) {
-      // load suppliers from database
-      List<SupplierItem> supplierItemList =
-          await supplierItemsController.getSupplierItems(supplier, date);
+      Map<String, List<SupplierItem>> suppliersItemsTemp = {};
+
+      for (String supplier in supplierList) {
+        // load suppliers from database
+        List<SupplierItem> supplierItemList =
+            await supplierItemsController.getSupplierItems(supplier, date);
+
+        suppliersItemsTemp[supplier] = supplierItemList;
+      }
 
       setState(() {
-        suppliersItems[supplier] = supplierItemList;
+        suppliersItems = suppliersItemsTemp;
+        loading = false;
       });
+    } catch (e) {
+      setState(() {
+        loading = false;
+      });
+    } finally {
+      authController.loading.value = true;
     }
   }
 
@@ -76,6 +103,12 @@ class _ShopPageState extends State<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (loading) {
+      return LoadingPage(
+        loading: loading,
+      );
+    }
+
     List<Widget> supplierContainerListWidget = [];
 
     suppliersItems.forEach((key, value) {
@@ -96,16 +129,18 @@ class _ShopPageState extends State<ShopPage> {
         soldT += itemData.sold;
         String balance = (itemData.qty - itemData.sold).toString();
         balanceT += (itemData.qty - itemData.sold);
-        String salePrice = itemData.salePrice.toString();
-        String salePriceTotal = (itemData.sold * itemData.salePrice).toString();
+        String salePrice = Helpers.numberToStringConverter(itemData.salePrice);
+        String salePriceTotal =
+            Helpers.numberToStringConverter(itemData.sold * itemData.salePrice);
         salePriceT += (itemData.sold * itemData.salePrice);
-        String purchasePrice = itemData.purchasePrice.toString();
-        String purchasePriceTotal =
-            (itemData.qty * itemData.purchasePrice).toString();
+        String purchasePrice =
+            Helpers.numberToStringConverter(itemData.purchasePrice);
+        String purchasePriceTotal = Helpers.numberToStringConverter(
+            (itemData.qty * itemData.purchasePrice));
         purchasePriceT += (itemData.qty * itemData.purchasePrice);
-        String cheap = ((itemData.sold * itemData.salePrice) -
-                (itemData.qty * itemData.purchasePrice))
-            .toString();
+        String cheap = Helpers.numberToStringConverter(
+            ((itemData.sold * itemData.salePrice) -
+                (itemData.qty * itemData.purchasePrice)));
         cheapT += ((itemData.sold * itemData.salePrice) -
             (itemData.qty * itemData.purchasePrice));
 
@@ -205,7 +240,7 @@ class _ShopPageState extends State<ShopPage> {
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
-                      salePriceT.toString(),
+                      Helpers.numberToStringConverter(salePriceT),
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
@@ -213,11 +248,11 @@ class _ShopPageState extends State<ShopPage> {
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
-                      purchasePriceT.toString(),
+                      Helpers.numberToStringConverter(purchasePriceT),
                       style: tableColumnHeaderStyle,
                     )),
                     DataCell(Text(
-                      cheapT.toString(),
+                      Helpers.numberToStringConverter(cheapT),
                       style: tableColumnHeaderStyle,
                     )),
                   ]),
@@ -323,7 +358,7 @@ class _ShopPageState extends State<ShopPage> {
                       width: 10,
                     ),
                     Text(
-                      totalPrice.toString(),
+                      Helpers.numberToStringConverter(totalPrice),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                         fontSize: 18,
@@ -351,7 +386,7 @@ class _ShopPageState extends State<ShopPage> {
                       width: 10,
                     ),
                     Text(
-                      totalPaid.toString(),
+                      Helpers.numberToStringConverter(totalPaid),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                         fontSize: 18,
@@ -379,7 +414,7 @@ class _ShopPageState extends State<ShopPage> {
                       width: 10,
                     ),
                     Text(
-                      (totalPrice - totalPaid).toString(),
+                      Helpers.numberToStringConverter((totalPrice - totalPaid)),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                         fontSize: 18,

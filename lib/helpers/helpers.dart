@@ -19,4 +19,12 @@ class Helpers {
       backgroundColor: error ? Color(0xFFB05959) : Color(0xFF9BC39E),
     );
   }
+
+  static String numberToStringConverter(double number) {
+    String numberString = number.toStringAsFixed(2);
+    String numberPart = numberString.split(".")[0];
+    String decimalPart = numberString.split(".")[1];
+
+    return int.parse(decimalPart) > 0 ? numberString : numberPart;
+  }
 }

@@ -129,10 +129,12 @@ class _SupplierPageState extends State<SupplierPage> {
       TextEditingController qtyController = TextEditingController(text: qty);
       String sold = supplierItem.sold.toString();
       TextEditingController soldController = TextEditingController(text: sold);
-      String salePrice = supplierItem.salePrice.toString();
+      String salePrice =
+          Helpers.numberToStringConverter(supplierItem.salePrice);
       TextEditingController salePriceController =
           TextEditingController(text: salePrice);
-      String purchasePrice = supplierItem.purchasePrice.toString();
+      String purchasePrice =
+          Helpers.numberToStringConverter(supplierItem.purchasePrice);
       TextEditingController purchasePriceController =
           TextEditingController(text: purchasePrice);
 
@@ -150,7 +152,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       hintText: '',
                       fontSize: 12,
                       maxLength: 10,
-                      keyboardType: TextInputType.number,
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
                     ),
                   )
                 : Text(qty)),
@@ -164,7 +167,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       hintText: '',
                       fontSize: 12,
                       maxLength: 10,
-                      keyboardType: TextInputType.number,
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
                     ),
                   )
                 : Text(sold)),
@@ -178,7 +182,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       hintText: '',
                       fontSize: 12,
                       maxLength: 10,
-                      keyboardType: TextInputType.number,
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
                     ),
                   )
                 : Text(salePrice)),
@@ -192,7 +197,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       hintText: '',
                       fontSize: 12,
                       maxLength: 10,
-                      keyboardType: TextInputType.number,
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
                     ),
                   )
                 : Text(purchasePrice)),

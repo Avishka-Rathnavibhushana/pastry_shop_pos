@@ -7,6 +7,7 @@ import 'package:pastry_shop_pos/components/user_page_layout.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
+import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
 
 class AccountantHomePage extends StatefulWidget {
@@ -93,8 +94,8 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
       supplierContainerListWidgetRows.add(
         DataRow(cells: [
           DataCell(Text(key)),
-          DataCell(Text(salePriceT.toString())),
-          DataCell(Text(purchasePriceT.toString())),
+          DataCell(Text(Helpers.numberToStringConverter(salePriceT))),
+          DataCell(Text(Helpers.numberToStringConverter(purchasePriceT))),
         ]),
       );
     });
