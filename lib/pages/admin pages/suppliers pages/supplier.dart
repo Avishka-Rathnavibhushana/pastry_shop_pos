@@ -279,10 +279,10 @@ class _SupplierPageState extends State<SupplierPage> {
     return Center(
       child: Column(
         children: [
-          const Align(
+          Align(
             alignment: Alignment.topLeft,
             child: Text(
-              'Supplier 1',
+              widget.supplier ?? "",
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: 24,
