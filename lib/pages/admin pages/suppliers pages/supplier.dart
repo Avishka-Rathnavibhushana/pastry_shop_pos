@@ -7,6 +7,7 @@ import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/pill_box.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
@@ -32,6 +33,49 @@ class _SupplierPageState extends State<SupplierPage> {
   TextEditingController itemController = TextEditingController();
   List<String> items = [];
   bool edit = false;
+
+  List<DropdownMenuItem<String>> shopDropdownItems = [];
+  String? shopSelectedValue = "Select a shop";
+  List<String> shops = [];
+
+  // add shop to list
+  void addShopToShopList(String shop) {
+    if (shop == "Select a shop") {
+      return;
+    }
+    // check if shop is already in list
+    if (shops.contains(shop)) {
+      Helpers.snackBarPrinter(
+        "Failed!",
+        "Shop already exists in the list.",
+        error: true,
+      );
+      return;
+    } else if (shop.isEmpty) {
+      Helpers.snackBarPrinter(
+        "Failed!",
+        "Shops cannot be empty.",
+        error: true,
+      );
+      return;
+    } else {
+      if (supplierItems.keys.contains(shop)) {
+        Helpers.snackBarPrinter(
+          "Failed!",
+          "Shop already added to supplier.",
+          error: true,
+        );
+        return;
+      }
+
+      shops.add(shop);
+      setState(() {
+        shopSelectedValue = "Select a shop";
+      });
+    }
+
+    setState(() {});
+  }
 
   // add item to list
   Future<void> addItemToList(String item) async {
@@ -88,12 +132,58 @@ class _SupplierPageState extends State<SupplierPage> {
     return result;
   }
 
+  Future<bool> submitShops(
+    List<String> shops,
+  ) async {
+    SupplierController supplierController = Get.find<SupplierController>();
+    bool result = false;
+    bool resultSupplier = await supplierController.addShopsToSupplier(
+      widget.supplier ?? "",
+      shops,
+    );
+
+    if (resultSupplier) {
+      await loadData(dateInput);
+      result = true;
+    }
+
+    return result;
+  }
+
+  Future<void> _populateDropdownItems() async {
+    // load shops from database
+    AuthController authController = AuthController();
+    List<DropdownMenuItem<String>> shops = [];
+
+    await authController.loadShopsList().then((value) {
+      value.forEach((element) {
+        shops.add(
+          DropdownMenuItem(
+            value: element,
+            child: Text(element),
+          ),
+        );
+      });
+    });
+
+    shopDropdownItems.addAll(
+      [
+        const DropdownMenuItem(
+            value: "Select a shop", child: Text("Select a shop")),
+        ...shops,
+      ],
+    );
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     setState(() {
       dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
     });
+
+    _populateDropdownItems();
 
     loadData(dateInput);
   }
@@ -506,6 +596,98 @@ class _SupplierPageState extends State<SupplierPage> {
                     }
                   },
                   text: items.length == 1 ? 'Add New Item' : 'Add New Items',
+                  enabled: !edit,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          CustomContainer(
+            outerPadding: const EdgeInsets.symmetric(
+              vertical: 0,
+              horizontal: 0,
+            ),
+            innerPadding: const EdgeInsets.symmetric(
+              vertical: 30,
+              horizontal: 0,
+            ),
+            containerColor: const Color(0xFFCDE8FF),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 10,
+                  ),
+                  child: SizedBox(
+                    width: 300,
+                    child: CustomDropdown(
+                      dropdownItems: shopDropdownItems,
+                      selectedValue: shopSelectedValue!,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          shopSelectedValue = newValue;
+                        });
+                        addShopToShopList(newValue!);
+                      },
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 10,
+                  ),
+                  child: Container(
+                    width: 300,
+                    child: Wrap(
+                      spacing: 8.0, // Adjust the spacing between pill boxes
+                      runSpacing:
+                          8.0, // Adjust the spacing between rows of pill boxes
+                      alignment: WrapAlignment.center,
+                      children: shops.map((shop) {
+                        return PillBox(
+                          text: shop,
+                          onClose: () {
+                            // Implement close button functionality
+                            setState(() {
+                              shops.remove(shop);
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                // PillBox(text: "text", onClose: () {}),
+                const SizedBox(
+                  height: 20,
+                ),
+                CustomButton(
+                  onPressed: () async {
+                    if (shops.isEmpty) {
+                      Helpers.snackBarPrinter(
+                        "Failed!",
+                        "Shop list cannot be empty.",
+                        error: true,
+                      );
+                      return;
+                    }
+
+                    bool result = await submitShops(shops);
+                    if (result) {
+                      // clear fields
+                      shopSelectedValue = "Select a shop";
+                      shops.clear();
+                      shops = [];
+
+                      setState(() {});
+                    }
+                  },
+                  text: shops.length == 1 ? 'Add Shop' : 'Add Shops',
                   enabled: !edit,
                 ),
               ],

@@ -121,6 +121,25 @@ class SupplierController extends GetxController {
     }
   }
 
+  // add list of shops to supplier
+  Future<bool> addShopsToSupplier(String supplierId, List<String> shops) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('suppliers')
+          .doc(supplierId)
+          .update({'shops': FieldValue.arrayUnion(shops)});
+      Helpers.snackBarPrinter(
+          "Successful!", "Successfully added the shops to the supplier.");
+      return true;
+    } catch (e) {
+      Helpers.snackBarPrinter(
+          "Failed!", "Failed to add the shops to the supplier.",
+          error: true);
+      print('Error adding items to supplier: $e');
+      return false;
+    }
+  }
+
   // get suppliers list
   Future<List<Supplier>> getSuppliersList() async {
     try {
