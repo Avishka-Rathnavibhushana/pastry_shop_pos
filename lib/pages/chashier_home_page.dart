@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
+import 'package:pastry_shop_pos/components/custom_dropdown.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
@@ -31,6 +32,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
   Map<String, List<SupplierItem>> suppliersItems = {};
 
   AuthController authController = Get.find<AuthController>();
+  String session = Constants.Sessions[0];
 
   @override
   void initState() {
@@ -58,36 +60,46 @@ class _CashierHomePageState extends State<CashierHomePage> {
   // load data from supplierItem
   Future<void> loadData(String date) async {
     authController.loading.value = true;
+    Map<String, List<SupplierItem>> suppliersItemsTemp = {};
+
     try {
-      ShopController shopController = Get.find<ShopController>();
-      List<String> supplierList =
-          await shopController.getSuppliersOfShop(widget.shopName ?? "");
+      if (widget.shopName != null) {
+        ShopController shopController = Get.find<ShopController>();
+        List<String> supplierList =
+            await shopController.getSuppliersOfShop(widget.shopName ?? "");
 
-      SupplierItemController supplierItemsController =
-          Get.find<SupplierItemController>();
+        SupplierItemController supplierItemsController =
+            Get.find<SupplierItemController>();
 
-      if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
-        for (String supplier in supplierList) {
-          bool isItemsEqual = await supplierItemsController.isItemsEqual(
-            supplier,
-            date,
-          );
-          if (!isItemsEqual) {
-            await supplierItemsController
-                .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+        if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+          for (String supplier in supplierList) {
+            bool isItemsEqual = await supplierItemsController.isItemsEqual(
+              supplier,
+              date,
+              widget.shopName ?? "",
+              session,
+            );
+            if (!isItemsEqual) {
+              await supplierItemsController
+                  .getItemsFromSupplierAndAddToSupplierItem(
+                      supplier, date, widget.shopName ?? "", session);
+            }
           }
+        }
+
+        for (String supplier in supplierList) {
+          // load suppliers from database
+          List<SupplierItem> supplierItemList =
+              await supplierItemsController.getSupplierItemsByShopByTime(
+                  supplier, date, widget.shopName ?? "", session);
+
+          suppliersItemsTemp[supplier] = supplierItemList;
         }
       }
 
-      for (String supplier in supplierList) {
-        // load suppliers from database
-        List<SupplierItem> supplierItemList =
-            await supplierItemsController.getSupplierItems(supplier, date);
-
-        setState(() {
-          suppliersItems[supplier] = supplierItemList;
-        });
-      }
+      setState(() {
+        suppliersItems = suppliersItemsTemp;
+      });
     } catch (e) {
       print(e);
     } finally {
@@ -272,6 +284,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
                           ),
                           itemData.date,
                           printSnack: false,
+                          widget.shopName ?? "",
+                          session,
                         );
 
                         if (result) {
@@ -353,6 +367,36 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     ),
                   ],
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 10,
+                ),
+                child: SizedBox(
+                  width: 300,
+                  child: CustomDropdown(
+                    dropdownItems: Constants.Sessions.map(
+                        (item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(item),
+                            )).toList(),
+                    selectedValue: session,
+                    onChanged: (String? newValue) async {
+                      setState(() {
+                        session = newValue!;
+                      });
+
+                      String dateInput =
+                          DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+                      await loadData(dateInput);
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
               ),
               ...supplierContainerListWidget,
             ],

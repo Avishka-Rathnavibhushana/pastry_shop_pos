@@ -10,6 +10,8 @@ import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
 
+import '../components/custom_dropdown.dart';
+
 class AccountantHomePage extends StatefulWidget {
   const AccountantHomePage({
     super.key,
@@ -24,6 +26,7 @@ class AccountantHomePage extends StatefulWidget {
 
 class _AccountantHomePageState extends State<AccountantHomePage> {
   String dateInput = "";
+  String session = Constants.Sessions[0];
 
   Map<String, List<SupplierItem>> suppliersItems = {};
 
@@ -40,33 +43,39 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
 
   // load data from supplierItem
   Future<void> loadData(String date) async {
-    ShopController shopController = Get.find<ShopController>();
-    List<String> supplierList =
-        await shopController.getSuppliersOfShop(widget.shopName ?? "");
+    Map<String, List<SupplierItem>> suppliersItemsTemp = {};
 
-    SupplierItemController supplierItemsController =
-        Get.find<SupplierItemController>();
+    if (widget.shopName != null) {
+      ShopController shopController = Get.find<ShopController>();
+      List<String> supplierList =
+          await shopController.getSuppliersOfShop(widget.shopName ?? "");
 
-    // if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
-    //   for (String supplier in supplierList) {
-    //     bool isItemsEqual = await supplierItemsController.isItemsEqual(
-    //       supplier,
-    //       date,
-    //     );
-    //     if (!isItemsEqual) {
-    //       await supplierItemsController
-    //           .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
-    //     }
-    //   }
-    // }
+      SupplierItemController supplierItemsController =
+          Get.find<SupplierItemController>();
 
-    for (String supplier in supplierList) {
-      // load suppliers from database
-      List<SupplierItem> supplierItemList =
-          await supplierItemsController.getSupplierItems(supplier, date);
+      // if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+      //   for (String supplier in supplierList) {
+      //     bool isItemsEqual = await supplierItemsController.isItemsEqual(
+      //       supplier,
+      //       date,
+      //     );
+      //     if (!isItemsEqual) {
+      //       await supplierItemsController
+      //           .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+      //     }
+      //   }
+      // }
 
+      for (String supplier in supplierList) {
+        // load suppliers from database
+        List<SupplierItem> supplierItemList =
+            await supplierItemsController.getSupplierItemsByShopByTime(
+                supplier, date, widget.shopName ?? "", session);
+
+        suppliersItemsTemp[supplier] = supplierItemList;
+      }
       setState(() {
-        suppliersItems[supplier] = supplierItemList;
+        suppliersItems = suppliersItemsTemp;
       });
     }
   }
@@ -161,6 +170,33 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
                 styleFormPadding: 10,
               ),
             ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: 10,
+            ),
+            child: SizedBox(
+              width: 300,
+              child: CustomDropdown(
+                dropdownItems:
+                    Constants.Sessions.map((item) => DropdownMenuItem<String>(
+                          value: item,
+                          child: Text(item),
+                        )).toList(),
+                selectedValue: session,
+                onChanged: (String? newValue) async {
+                  setState(() {
+                    session = newValue!;
+                  });
+
+                  await loadData(dateInput);
+                },
+              ),
+            ),
           ),
           const SizedBox(
             height: 20,

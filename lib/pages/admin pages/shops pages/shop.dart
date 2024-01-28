@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
@@ -10,6 +11,8 @@ import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
 import 'package:pastry_shop_pos/pages/loadingPage.dart';
+
+import '../../../components/custom_dropdown.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key, required this.shop});
@@ -22,6 +25,7 @@ class ShopPage extends StatefulWidget {
 
 class _ShopPageState extends State<ShopPage> {
   String dateInput = "";
+  String session = Constants.Sessions[0];
   Map<String, List<SupplierItem>> suppliersItems = {};
 
   double totalPrice = 0.0;
@@ -51,36 +55,43 @@ class _ShopPageState extends State<ShopPage> {
       totalPaid = 0.0;
       loading = true;
     });
+
+    Map<String, List<SupplierItem>> suppliersItemsTemp = {};
+
     try {
-      ShopController shopController = Get.find<ShopController>();
-      List<String> supplierList =
-          await shopController.getSuppliersOfShop(widget.shop ?? "");
+      if (widget.shop != null) {
+        ShopController shopController = Get.find<ShopController>();
+        List<String> supplierList =
+            await shopController.getSuppliersOfShop(widget.shop ?? "");
 
-      SupplierItemController supplierItemsController =
-          Get.find<SupplierItemController>();
+        SupplierItemController supplierItemsController =
+            Get.find<SupplierItemController>();
 
-      if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
-        for (String supplier in supplierList) {
-          bool isItemsEqual = await supplierItemsController.isItemsEqual(
-            supplier,
-            date,
-          );
+        if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+          for (String supplier in supplierList) {
+            bool isItemsEqual = await supplierItemsController.isItemsEqual(
+              supplier,
+              date,
+              widget.shop ?? "",
+              session,
+            );
 
-          if (!isItemsEqual) {
-            await supplierItemsController
-                .getItemsFromSupplierAndAddToSupplierItem(supplier, date);
+            if (!isItemsEqual) {
+              await supplierItemsController
+                  .getItemsFromSupplierAndAddToSupplierItem(
+                      supplier, date, widget.shop ?? "", session);
+            }
           }
         }
-      }
 
-      Map<String, List<SupplierItem>> suppliersItemsTemp = {};
+        for (String supplier in supplierList) {
+          // load suppliers from database
+          List<SupplierItem> supplierItemList =
+              await supplierItemsController.getSupplierItemsByShopByTime(
+                  supplier, date, widget.shop ?? "", session);
 
-      for (String supplier in supplierList) {
-        // load suppliers from database
-        List<SupplierItem> supplierItemList =
-            await supplierItemsController.getSupplierItems(supplier, date);
-
-        suppliersItemsTemp[supplier] = supplierItemList;
+          suppliersItemsTemp[supplier] = supplierItemList;
+        }
       }
 
       setState(() {
@@ -326,6 +337,33 @@ class _ShopPageState extends State<ShopPage> {
                 styleFormPadding: 10,
               ),
             ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: 10,
+            ),
+            child: SizedBox(
+              width: 300,
+              child: CustomDropdown(
+                dropdownItems:
+                    Constants.Sessions.map((item) => DropdownMenuItem<String>(
+                          value: item,
+                          child: Text(item),
+                        )).toList(),
+                selectedValue: session,
+                onChanged: (String? newValue) async {
+                  setState(() {
+                    session = newValue!;
+                  });
+
+                  await loadData(dateInput);
+                },
+              ),
+            ),
           ),
           const SizedBox(
             height: 20,

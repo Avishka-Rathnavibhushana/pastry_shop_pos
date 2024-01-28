@@ -23,6 +23,7 @@ class AddSupplierContainer extends StatefulWidget {
 class _AddSupplierContainerState extends State<AddSupplierContainer> {
   List<DropdownMenuItem<String>> shopDropdownItems = [];
   String? shopSelectedValue = "Select a shop";
+  List<String> shops = [];
   List<String> items = [];
   TextEditingController supplierNameController = TextEditingController();
   TextEditingController supplierAddressController = TextEditingController();
@@ -49,6 +50,36 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
     } else {
       items.add(item);
       itemController.clear();
+    }
+
+    setState(() {});
+  }
+
+  // add shop to list
+  void addItemToShopList(String shop) {
+    if (shop == "Select a shop") {
+      return;
+    }
+    // check if shop is already in list
+    if (shops.contains(shop)) {
+      Helpers.snackBarPrinter(
+        "Failed!",
+        "Item already exists in the list.",
+        error: true,
+      );
+      return;
+    } else if (shop.isEmpty) {
+      Helpers.snackBarPrinter(
+        "Failed!",
+        "Item cannot be empty.",
+        error: true,
+      );
+      return;
+    } else {
+      shops.add(shop);
+      setState(() {
+        shopSelectedValue = "Select a shop";
+      });
     }
 
     setState(() {});
@@ -173,10 +204,39 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                       setState(() {
                         shopSelectedValue = newValue;
                       });
+                      addItemToShopList(newValue!);
                     },
                   ),
                 ),
               ),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 10,
+                ),
+                child: Container(
+                  width: 300,
+                  child: Wrap(
+                    spacing: 8.0, // Adjust the spacing between pill boxes
+                    runSpacing:
+                        8.0, // Adjust the spacing between rows of pill boxes
+                    alignment: WrapAlignment.center,
+                    children: shops.map((shop) {
+                      return PillBox(
+                        text: shop,
+                        onClose: () {
+                          // Implement close button functionality
+                          setState(() {
+                            shops.remove(shop);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 30,
@@ -231,7 +291,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                   if (supplierNameController.text.isEmpty ||
                       supplierAddressController.text.isEmpty ||
                       supplierTelController.text.isEmpty ||
-                      shopSelectedValue == "Select a shop") {
+                      shops.isEmpty) {
                     Helpers.snackBarPrinter(
                       "Failed!",
                       "Please fill all fields.",
@@ -243,7 +303,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                       name: supplierNameController.text,
                       address: supplierAddressController.text,
                       tel: supplierTelController.text,
-                      shop: shopSelectedValue!,
+                      shops: shops,
                       items: items,
                     );
 
@@ -256,6 +316,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                       supplierTelController.clear();
                       itemController.clear();
                       shopSelectedValue = "Select a shop";
+                      shops = [];
                       items.clear();
                       items = [];
 

@@ -20,7 +20,12 @@ class SuppliersContainer extends StatelessWidget {
       String name = supplier.name.toString();
       String address = supplier.address.toString();
       String tel = supplier.tel.toString();
-      String shop = supplier.shop.toString();
+
+      List<String> shopList = [];
+      if (supplier.shops != null) {
+        shopList = supplier.shops as List<String>;
+      }
+      String suppliers = "[ ${shopList.join(" ,")} ]";
 
       rows.add(
         DataRow(
@@ -28,7 +33,7 @@ class SuppliersContainer extends StatelessWidget {
             DataCell(Text(name)),
             DataCell(Text(address)),
             DataCell(Text(tel)),
-            DataCell(Text(shop)),
+            DataCell(Text(suppliers)),
             DataCell(
               CustomButton(
                 onPressed: () {

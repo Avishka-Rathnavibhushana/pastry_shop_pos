@@ -6,11 +6,14 @@ import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/pill_box.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
+
+import '../../../components/custom_dropdown.dart';
 
 class SupplierPage extends StatefulWidget {
   const SupplierPage({super.key, this.supplier});
@@ -23,7 +26,9 @@ class SupplierPage extends StatefulWidget {
 
 class _SupplierPageState extends State<SupplierPage> {
   String dateInput = "";
-  List<SupplierItem> supplierItems = [];
+  String session = Constants.Sessions[0];
+  String shop = "";
+  Map<String, List<SupplierItem>> supplierItems = {};
   TextEditingController itemController = TextEditingController();
   List<String> items = [];
   bool edit = false;
@@ -95,192 +100,310 @@ class _SupplierPageState extends State<SupplierPage> {
 
   // load data from supplierItem
   Future<void> loadData(String date) async {
-    SupplierItemController supplierItemsController =
-        Get.find<SupplierItemController>();
+    Map<String, List<SupplierItem>> supplierItemList = {};
 
-    if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
-      bool isItemsEqual = await supplierItemsController.isItemsEqual(
-        widget.supplier ?? " ",
-        date,
-      );
+    if (widget.supplier != null) {
+      SupplierController supplierController = Get.find<SupplierController>();
+      Supplier? supplier =
+          await supplierController.getSupplierById(widget.supplier ?? "");
 
-      if (!isItemsEqual) {
-        await supplierItemsController.getItemsFromSupplierAndAddToSupplierItem(
-            widget.supplier ?? "", date);
+      Map<String, List<SupplierItem>> supplierItemListTemp = {};
+
+      for (String item in supplier!.shops) {
+        SupplierItemController supplierItemsController =
+            Get.find<SupplierItemController>();
+
+        if (date == DateFormat('yyyy-MM-dd').format(DateTime.now())) {
+          bool isItemsEqual = await supplierItemsController.isItemsEqual(
+            widget.supplier ?? "",
+            date,
+            item,
+            session,
+          );
+
+          if (!isItemsEqual) {
+            await supplierItemsController
+                .getItemsFromSupplierAndAddToSupplierItem(
+                    widget.supplier ?? "", date, item, session);
+          }
+        }
+
+        // load suppliers from database
+        List<SupplierItem> supplierItemListSingle =
+            await supplierItemsController.getSupplierItemsByShopByTime(
+                widget.supplier ?? "", date, item, session);
+
+        supplierItemListTemp[item] = supplierItemListSingle;
       }
+
+      setState(() {
+        supplierItems = supplierItemListTemp;
+      });
     }
-
-    // load suppliers from database
-    List<SupplierItem> supplierItemList = await supplierItemsController
-        .getSupplierItems(widget.supplier ?? " ", date);
-
-    setState(() {
-      supplierItems = supplierItemList;
-    });
   }
+
+  TextStyle tableColumnHeaderStyle = const TextStyle(
+    fontSize: 17,
+    fontWeight: FontWeight.bold,
+  );
 
   @override
   Widget build(BuildContext context) {
-    List<DataRow> rows = [];
+    List<Widget> supplierContainerListWidget = [];
 
-    for (SupplierItem supplierItem in supplierItems) {
-      String item = supplierItem.name;
-      String qty = supplierItem.qty.toString();
-      TextEditingController qtyController = TextEditingController(text: qty);
-      String sold = supplierItem.sold.toString();
-      TextEditingController soldController = TextEditingController(text: sold);
-      String salePrice =
-          Helpers.numberToStringConverter(supplierItem.salePrice);
-      TextEditingController salePriceController =
-          TextEditingController(text: salePrice);
-      String purchasePrice =
-          Helpers.numberToStringConverter(supplierItem.purchasePrice);
-      TextEditingController purchasePriceController =
-          TextEditingController(text: purchasePrice);
+    supplierItems.forEach((key, value) {
+      List<DataRow> rows = [];
 
-      rows.add(
-        DataRow(
-          cells: [
-            DataCell(Text(item)),
-            DataCell(edit
-                ? SizedBox(
-                    width: 50,
-                    height: 30,
-                    child: CustomTextField(
-                      controller: qtyController,
-                      labelText: '',
-                      hintText: '',
-                      fontSize: 12,
-                      maxLength: 10,
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
-                    ),
-                  )
-                : Text(qty)),
-            DataCell(edit
-                ? SizedBox(
-                    width: 50,
-                    height: 30,
-                    child: CustomTextField(
-                      controller: soldController,
-                      labelText: '',
-                      hintText: '',
-                      fontSize: 12,
-                      maxLength: 10,
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
-                    ),
-                  )
-                : Text(sold)),
-            DataCell(edit
-                ? SizedBox(
-                    width: 50,
-                    height: 30,
-                    child: CustomTextField(
-                      controller: salePriceController,
-                      labelText: '',
-                      hintText: '',
-                      fontSize: 12,
-                      maxLength: 10,
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
-                    ),
-                  )
-                : Text(salePrice)),
-            DataCell(edit
-                ? SizedBox(
-                    width: 50,
-                    height: 30,
-                    child: CustomTextField(
-                      controller: purchasePriceController,
-                      labelText: '',
-                      hintText: '',
-                      fontSize: 12,
-                      maxLength: 10,
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
-                    ),
-                  )
-                : Text(purchasePrice)),
-            DataCell(
-              CustomButton(
-                onPressed: () async {
-                  if (edit) {
-                    SupplierItemController supplierItemsController =
-                        Get.find<SupplierItemController>();
+      for (SupplierItem supplierItem in value) {
+        String item = supplierItem.name;
+        String qty = supplierItem.qty.toString();
+        TextEditingController qtyController = TextEditingController(text: qty);
+        String sold = supplierItem.sold.toString();
+        TextEditingController soldController =
+            TextEditingController(text: sold);
+        String salePrice =
+            Helpers.numberToStringConverter(supplierItem.salePrice);
+        TextEditingController salePriceController =
+            TextEditingController(text: salePrice);
+        String purchasePrice =
+            Helpers.numberToStringConverter(supplierItem.purchasePrice);
+        TextEditingController purchasePriceController =
+            TextEditingController(text: purchasePrice);
 
-                    qtyController.text = qty == "0" && qtyController.text == ""
-                        ? "0"
-                        : qtyController.text;
-                    soldController.text =
-                        sold == "0" && soldController.text == ""
-                            ? "0"
-                            : soldController.text;
-                    salePriceController.text =
-                        salePrice == "0" && salePriceController.text == ""
-                            ? "0"
-                            : salePriceController.text;
-                    purchasePriceController.text = purchasePrice == "0" &&
-                            purchasePriceController.text == ""
-                        ? "0"
-                        : purchasePriceController.text;
-
-                    if (qtyController.text.isEmpty ||
-                        soldController.text.isEmpty ||
-                        salePriceController.text.isEmpty ||
-                        purchasePriceController.text.isEmpty) {
-                      Helpers.snackBarPrinter(
-                        "Failed!",
-                        "Fields cannot be empty.",
-                        error: true,
-                      );
-                      return;
-                    }
-
-                    if (qtyController.text == qty &&
-                        soldController.text == sold &&
-                        salePriceController.text == salePrice &&
-                        purchasePriceController.text == purchasePrice) {
-                      Helpers.snackBarPrinter(
-                        "Failed!",
-                        "Item Values are same",
-                        error: true,
-                      );
-                      return;
-                    }
-
-                    // update item
-                    await supplierItemsController.updateItemInSupplierItem(
-                      widget.supplier ?? "",
-                      SupplierItem(
-                        name: item,
-                        date: supplierItem.date,
-                        sold: int.parse(soldController.text),
-                        salePrice: double.parse(salePriceController.text),
-                        purchasePrice:
-                            double.parse(purchasePriceController.text),
-                        qty: int.parse(qtyController.text),
+        rows.add(
+          DataRow(
+            cells: [
+              DataCell(Text(item)),
+              DataCell(edit
+                  ? SizedBox(
+                      width: 50,
+                      height: 30,
+                      child: CustomTextField(
+                        controller: qtyController,
+                        labelText: '',
+                        hintText: '',
+                        fontSize: 12,
+                        maxLength: 10,
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
                       ),
-                      supplierItem.date,
-                    );
-                  }
-                },
-                isIcon: true,
-                isText: false,
-                icon: const Icon(
-                  Icons.save,
-                  color: Colors.white,
+                    )
+                  : Text(qty)),
+              DataCell(edit
+                  ? SizedBox(
+                      width: 50,
+                      height: 30,
+                      child: CustomTextField(
+                        controller: soldController,
+                        labelText: '',
+                        hintText: '',
+                        fontSize: 12,
+                        maxLength: 10,
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
+                      ),
+                    )
+                  : Text(sold)),
+              DataCell(edit
+                  ? SizedBox(
+                      width: 50,
+                      height: 30,
+                      child: CustomTextField(
+                        controller: salePriceController,
+                        labelText: '',
+                        hintText: '',
+                        fontSize: 12,
+                        maxLength: 10,
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
+                      ),
+                    )
+                  : Text(salePrice)),
+              DataCell(edit
+                  ? SizedBox(
+                      width: 50,
+                      height: 30,
+                      child: CustomTextField(
+                        controller: purchasePriceController,
+                        labelText: '',
+                        hintText: '',
+                        fontSize: 12,
+                        maxLength: 10,
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
+                      ),
+                    )
+                  : Text(purchasePrice)),
+              DataCell(
+                CustomButton(
+                  onPressed: () async {
+                    if (edit) {
+                      SupplierItemController supplierItemsController =
+                          Get.find<SupplierItemController>();
+
+                      qtyController.text =
+                          qty == "0" && qtyController.text == ""
+                              ? "0"
+                              : qtyController.text;
+                      soldController.text =
+                          sold == "0" && soldController.text == ""
+                              ? "0"
+                              : soldController.text;
+                      salePriceController.text =
+                          salePrice == "0" && salePriceController.text == ""
+                              ? "0"
+                              : salePriceController.text;
+                      purchasePriceController.text = purchasePrice == "0" &&
+                              purchasePriceController.text == ""
+                          ? "0"
+                          : purchasePriceController.text;
+
+                      if (qtyController.text.isEmpty ||
+                          soldController.text.isEmpty ||
+                          salePriceController.text.isEmpty ||
+                          purchasePriceController.text.isEmpty) {
+                        Helpers.snackBarPrinter(
+                          "Failed!",
+                          "Fields cannot be empty.",
+                          error: true,
+                        );
+                        return;
+                      }
+
+                      if (qtyController.text == qty &&
+                          soldController.text == sold &&
+                          salePriceController.text == salePrice &&
+                          purchasePriceController.text == purchasePrice) {
+                        Helpers.snackBarPrinter(
+                          "Failed!",
+                          "Item Values are same",
+                          error: true,
+                        );
+                        return;
+                      }
+
+                      // update item
+                      await supplierItemsController.updateItemInSupplierItem(
+                        widget.supplier ?? "",
+                        SupplierItem(
+                          name: item,
+                          date: supplierItem.date,
+                          sold: int.parse(soldController.text),
+                          salePrice: double.parse(salePriceController.text),
+                          purchasePrice:
+                              double.parse(purchasePriceController.text),
+                          qty: int.parse(qtyController.text),
+                        ),
+                        supplierItem.date,
+                        key,
+                        session,
+                      );
+                    }
+                  },
+                  isIcon: true,
+                  isText: false,
+                  icon: const Icon(
+                    Icons.save,
+                    color: Colors.white,
+                  ),
+                  fontSize: 12,
+                  padding: 0,
+                  styleFormPadding: 0,
+                  enabled: edit,
                 ),
-                fontSize: 12,
-                padding: 0,
-                styleFormPadding: 0,
-                enabled: edit,
               ),
-            ),
-          ],
+            ],
+          ),
+        );
+      }
+
+      Widget itemWidget = CustomContainer(
+        outerPadding: const EdgeInsets.only(
+          bottom: 20,
+        ),
+        innerPadding: const EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 20,
+        ),
+        containerColor: const Color(0xFFCDE8FF),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                key,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              DataTable(
+                columns: const [
+                  DataColumn(
+                    label: Text(
+                      'Item Name',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'QTY',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Sold',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Sale Price',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Purchase Price',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Update',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+                rows: rows,
+              ),
+            ],
+          ),
         ),
       );
-    }
+
+      supplierContainerListWidget.add(itemWidget);
+    });
 
     return Center(
       child: Column(
@@ -478,79 +601,37 @@ class _SupplierPageState extends State<SupplierPage> {
           const SizedBox(
             height: 20,
           ),
-          CustomContainer(
-            outerPadding: const EdgeInsets.symmetric(
-              vertical: 0,
-              horizontal: 0,
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: 10,
             ),
-            innerPadding: const EdgeInsets.symmetric(
-              vertical: 30,
-              horizontal: 0,
-            ),
-            containerColor: const Color(0xFFCDE8FF),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: [
-                  DataColumn(
-                    label: Text(
-                      'Item Name',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'QTY',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Sold',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Sale Price',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Purchase Price',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Update',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-                rows: rows,
+            child: SizedBox(
+              width: 300,
+              child: IgnorePointer(
+                ignoring: edit,
+                child: CustomDropdown(
+                  dropdownItems:
+                      Constants.Sessions.map((item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(item),
+                          )).toList(),
+                  selectedValue: session,
+                  onChanged: (String? newValue) async {
+                    setState(() {
+                      session = newValue!;
+                    });
+
+                    await loadData(dateInput);
+                  },
+                ),
               ),
             ),
           ),
+          const SizedBox(
+            height: 20,
+          ),
+          ...supplierContainerListWidget,
         ],
       ),
     );

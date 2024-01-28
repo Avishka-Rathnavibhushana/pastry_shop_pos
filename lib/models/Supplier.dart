@@ -2,14 +2,14 @@ class Supplier {
   String name;
   String address;
   String tel;
-  String shop;
+  List<String> shops;
   List<String> items;
 
   Supplier({
     required this.name,
     required this.address,
     required this.tel,
-    required this.shop,
+    required this.shops,
     required this.items,
   });
 
@@ -19,7 +19,7 @@ class Supplier {
       name: map['name'] ?? '',
       address: map['address'] ?? '',
       tel: map['tel'] ?? '',
-      shop: map['shop'] ?? '',
+      shops: List<String>.from(map['shops'] ?? []),
       items: List<String>.from(map['items'] ?? []),
     );
   }
@@ -30,7 +30,7 @@ class Supplier {
       'name': name,
       'address': address,
       'tel': tel,
-      'shop': shop,
+      'shops': shops,
       'items': items,
     };
   }

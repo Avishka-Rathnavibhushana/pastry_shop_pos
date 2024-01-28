@@ -25,12 +25,14 @@ class _SuppliersPageState extends State<SuppliersPage> {
 
     if (resultSupplier) {
       ShopController shopController = Get.find<ShopController>();
-      bool resultShop = await shopController.addSupplierToShop(
-        supplier.shop.toString(),
-        supplier.name.toString(),
-      );
+      for (int i = 0; i < supplier.shops.length; i++) {
+        bool resultShop = await shopController.addSupplierToShop(
+          supplier.shops[i].toString(),
+          supplier.name.toString(),
+        );
 
-      result = resultShop;
+        result = resultShop;
+      }
     }
 
     if (result) {

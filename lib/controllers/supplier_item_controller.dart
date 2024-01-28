@@ -7,14 +7,14 @@ import 'package:pastry_shop_pos/models/supplier_item.dart';
 
 class SupplierItemController extends GetxController {
   // get supplier items for a specific date like 2023-12-12
-  Future<List<SupplierItem>> getSupplierItems(
-      String supplierId, String date) async {
+  Future<List<SupplierItem>> getSupplierItemsByShopByTime(
+      String supplierId, String date, String shop, String session) async {
     try {
       // Fetch the specific item list document from the 'itemList' collection
       DocumentSnapshot itemListSnapshot = await FirebaseFirestore.instance
           .collection('supplierItems')
           .doc(supplierId)
-          .collection('itemList')
+          .collection(shop + " " + session)
           .doc(date)
           .get();
 
@@ -34,7 +34,6 @@ class SupplierItemController extends GetxController {
                 ..date = itemListData["date"],
             );
           });
-
           return items;
         } else {
           return [];
@@ -130,13 +129,17 @@ class SupplierItemController extends GetxController {
 
   // add a list of supplier items for a specific supplier and date
   Future<bool> addSupplierItems(
-      String supplierId, List<SupplierItem> supplierItems, String date) async {
+      String supplierId,
+      List<SupplierItem> supplierItems,
+      String date,
+      String shop,
+      String session) async {
     try {
       // Fetch the specific item list document from the 'itemList' collection
       DocumentSnapshot itemListSnapshot = await FirebaseFirestore.instance
           .collection('supplierItems')
           .doc(supplierId)
-          .collection('itemList')
+          .collection(shop + " " + session)
           .doc(date)
           .get();
 
@@ -184,7 +187,7 @@ class SupplierItemController extends GetxController {
             await FirebaseFirestore.instance
                 .collection('supplierItems')
                 .doc(supplierId)
-                .collection('itemList')
+                .collection(shop + " " + session)
                 .doc(date)
                 .update({
               "items": items.map((item) => item.toMapSubset()).toList(),
@@ -200,7 +203,7 @@ class SupplierItemController extends GetxController {
         await FirebaseFirestore.instance
             .collection('supplierItems')
             .doc(supplierId)
-            .collection('itemList')
+            .collection(shop + " " + session)
             .doc(date)
             .set({
           "date": date,
@@ -217,7 +220,7 @@ class SupplierItemController extends GetxController {
 
   // get items from supplier and add to supplier item
   Future<bool> getItemsFromSupplierAndAddToSupplierItem(
-      String supplierId, String date) async {
+      String supplierId, String date, String shop, String session) async {
     try {
       // fetch items from the supplier
       SupplierController supplierController = Get.find<SupplierController>();
@@ -240,7 +243,8 @@ class SupplierItemController extends GetxController {
         });
 
         // add the supplier items to the supplier item list
-        bool result = await addSupplierItems(supplierId, supplierItems, date);
+        bool result = await addSupplierItems(
+            supplierId, supplierItems, date, shop, session);
 
         return result;
       } else {
@@ -254,7 +258,8 @@ class SupplierItemController extends GetxController {
   }
 
   // check whether item list in supplier is equal to item list in supplier item
-  Future<bool> isItemsEqual(String supplierId, String date) async {
+  Future<bool> isItemsEqual(
+      String supplierId, String date, String shop, String session) async {
     try {
       // fetch items from the supplier
       SupplierController supplierController = Get.find<SupplierController>();
@@ -278,7 +283,7 @@ class SupplierItemController extends GetxController {
 
         // fetch items from the supplier item
         List<SupplierItem> supplierItemsFromSupplierItem =
-            await getSupplierItems(supplierId, date);
+            await getSupplierItemsByShopByTime(supplierId, date, shop, session);
 
         // check whether the two lists are equal
         if (supplierItems.length == supplierItemsFromSupplierItem.length) {
@@ -302,15 +307,15 @@ class SupplierItemController extends GetxController {
   }
 
   // update item in supplier item for a specific date
-  Future<bool> updateItemInSupplierItem(
-      String supplierId, SupplierItem supplierItem, String date,
+  Future<bool> updateItemInSupplierItem(String supplierId,
+      SupplierItem supplierItem, String date, String shop, String session,
       {bool printSnack = true}) async {
     try {
       // Fetch the specific item list document from the 'itemList' collection
       DocumentSnapshot itemListSnapshot = await FirebaseFirestore.instance
           .collection('supplierItems')
           .doc(supplierId)
-          .collection('itemList')
+          .collection(shop + " " + session)
           .doc(date)
           .get();
 
@@ -350,7 +355,7 @@ class SupplierItemController extends GetxController {
             await FirebaseFirestore.instance
                 .collection('supplierItems')
                 .doc(supplierId)
-                .collection('itemList')
+                .collection(shop + " " + session)
                 .doc(supplierItem.date)
                 .update({
               "items": items.map((item) => item.toMapSubset()).toList(),

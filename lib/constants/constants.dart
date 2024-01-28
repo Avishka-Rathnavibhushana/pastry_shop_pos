@@ -4,4 +4,6 @@ class Constants {
   static String Accountant = "ACCOUNTANT";
   static int MobileSize = 600;
   static int MobileSizeMini = 400;
+  // session variables
+  static List<String> Sessions = ["Morning", "Evening"];
 }
