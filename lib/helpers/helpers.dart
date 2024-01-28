@@ -27,4 +27,10 @@ class Helpers {
 
     return int.parse(decimalPart) > 0 ? numberString : numberPart;
   }
+
+  static String getPreviousDate(String date) {
+    DateTime dateTime = DateTime.parse(date);
+    DateTime previousDate = dateTime.subtract(Duration(days: 1));
+    return previousDate.toString().split(" ")[0];
+  }
 }

@@ -226,17 +226,38 @@ class SupplierItemController extends GetxController {
       SupplierController supplierController = Get.find<SupplierController>();
       Supplier? supplier = await supplierController.getSupplierById(supplierId);
 
+      //if previous dat's prices are available load them from supplierItem and add to today supplierItem
+      List<SupplierItem> supplierItemsPreviousDay =
+          await getSupplierItemsByShopByTime(
+        supplierId,
+        Helpers.getPreviousDate(date),
+        shop,
+        session,
+      );
+
       if (supplier != null) {
         // create a list of supplier items
         List<SupplierItem> supplierItems = [];
         supplier.items.forEach((item) {
+          double salePrice = 0;
+          double purchasePrice = 0;
+          if (supplierItemsPreviousDay.length > 0) {
+            salePrice = supplierItemsPreviousDay
+                .firstWhere((element) => element.name == item)
+                .salePrice;
+            purchasePrice = supplierItemsPreviousDay
+                .firstWhere(
+                  (element) => element.name == item,
+                )
+                .purchasePrice;
+          }
           supplierItems.add(
             SupplierItem(
               name: item,
               qty: 0,
               sold: 0,
-              salePrice: 0,
-              purchasePrice: 0,
+              salePrice: salePrice,
+              purchasePrice: purchasePrice,
               date: date,
             ),
           );

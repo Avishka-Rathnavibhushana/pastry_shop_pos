@@ -8,6 +8,7 @@ import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/components/pill_box.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
+import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
@@ -141,6 +142,16 @@ class _SupplierPageState extends State<SupplierPage> {
       widget.supplier ?? "",
       shops,
     );
+
+    if (resultSupplier) {
+      ShopController shopController = Get.find<ShopController>();
+      for (var shopTemp in shops) {
+        await shopController.addSupplierToShop(
+          shopTemp,
+          widget.supplier ?? "",
+        );
+      }
+    }
 
     if (resultSupplier) {
       await loadData(dateInput);
