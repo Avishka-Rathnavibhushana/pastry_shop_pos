@@ -121,14 +121,14 @@ class _CashierHomePageState extends State<CashierHomePage> {
       for (var itemData in value) {
         String item = itemData.name;
         String qty = itemData.qty.toString();
-        String sold = itemData.sold.toString();
+        String remaining = (itemData.qty - itemData.sold).toString();
         TextEditingController qtyController =
             TextEditingController(text: qty == "0" ? "" : qty);
-        TextEditingController soldController =
-            TextEditingController(text: sold == "0" ? "" : sold);
+        TextEditingController remainingController =
+            TextEditingController(text: remaining == "0" ? "" : remaining);
         textEditingControllerMapList[item] = [
           qtyController,
-          soldController,
+          remainingController,
         ];
 
         itemListWidget.add(
@@ -153,7 +153,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     width: 50,
                     height: 30,
                     child: CustomTextField(
-                      controller: soldController,
+                      controller: remainingController,
                       labelText: '',
                       hintText: '',
                       fontSize: 12,
@@ -161,7 +161,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                       keyboardType: TextInputType.number,
                     ),
                   )
-                : Text(sold)),
+                : Text(remaining)),
           ]),
         );
       }
@@ -209,7 +209,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                   ),
                   DataColumn(
                     label: Text(
-                      'SOLD',
+                      'REMAINING',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
@@ -253,13 +253,13 @@ class _CashierHomePageState extends State<CashierHomePage> {
                               .text ==
                           "") {
                         textEditingControllerMapList[itemData.name]![1].text =
-                            itemData.sold.toString();
+                            (itemData.qty - itemData.sold).toString();
                       }
 
                       if (itemData.qty ==
                               textEditingControllerMapList[itemData.name]![0]
                                   .text &&
-                          itemData.sold ==
+                          (itemData.qty - itemData.sold) ==
                               textEditingControllerMapList[itemData.name]![1]
                                   .text) {
                       } else {
@@ -274,8 +274,12 @@ class _CashierHomePageState extends State<CashierHomePage> {
                             name: itemData.name,
                             date: itemData.date,
                             sold: int.parse(
-                                textEditingControllerMapList[itemData.name]![1]
-                                    .text),
+                              (itemData.qty -
+                                      int.parse(textEditingControllerMapList[
+                                              itemData.name]![1]
+                                          .text))
+                                  .toString(),
+                            ),
                             qty: int.parse(
                                 textEditingControllerMapList[itemData.name]![0]
                                     .text),
@@ -292,8 +296,9 @@ class _CashierHomePageState extends State<CashierHomePage> {
                           int index = suppliersItems[key]!.indexWhere(
                               (element) => element.name == itemData.name);
 
-                          suppliersItems[key]![index].sold = int.parse(
-                              textEditingControllerMapList[itemData.name]![1]
+                          suppliersItems[key]![index].sold = itemData.qty -
+                              int.parse(textEditingControllerMapList[
+                                      itemData.name]![1]
                                   .text);
                           suppliersItems[key]![index].qty = int.parse(
                               textEditingControllerMapList[itemData.name]![0]

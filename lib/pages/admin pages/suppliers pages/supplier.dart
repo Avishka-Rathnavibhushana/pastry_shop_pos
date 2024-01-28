@@ -158,9 +158,9 @@ class _SupplierPageState extends State<SupplierPage> {
         String item = supplierItem.name;
         String qty = supplierItem.qty.toString();
         TextEditingController qtyController = TextEditingController(text: qty);
-        String sold = supplierItem.sold.toString();
-        TextEditingController soldController =
-            TextEditingController(text: sold);
+        String remaining = (supplierItem.qty - supplierItem.sold).toString();
+        TextEditingController remainingController =
+            TextEditingController(text: remaining);
         String salePrice =
             Helpers.numberToStringConverter(supplierItem.salePrice);
         TextEditingController salePriceController =
@@ -194,7 +194,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       width: 50,
                       height: 30,
                       child: CustomTextField(
-                        controller: soldController,
+                        controller: remainingController,
                         labelText: '',
                         hintText: '',
                         fontSize: 12,
@@ -203,7 +203,7 @@ class _SupplierPageState extends State<SupplierPage> {
                             TextInputType.numberWithOptions(decimal: true),
                       ),
                     )
-                  : Text(sold)),
+                  : Text(remaining)),
               DataCell(edit
                   ? SizedBox(
                       width: 50,
@@ -245,10 +245,10 @@ class _SupplierPageState extends State<SupplierPage> {
                           qty == "0" && qtyController.text == ""
                               ? "0"
                               : qtyController.text;
-                      soldController.text =
-                          sold == "0" && soldController.text == ""
+                      remainingController.text =
+                          remaining == "0" && remainingController.text == ""
                               ? "0"
-                              : soldController.text;
+                              : remainingController.text;
                       salePriceController.text =
                           salePrice == "0" && salePriceController.text == ""
                               ? "0"
@@ -259,7 +259,7 @@ class _SupplierPageState extends State<SupplierPage> {
                           : purchasePriceController.text;
 
                       if (qtyController.text.isEmpty ||
-                          soldController.text.isEmpty ||
+                          remainingController.text.isEmpty ||
                           salePriceController.text.isEmpty ||
                           purchasePriceController.text.isEmpty) {
                         Helpers.snackBarPrinter(
@@ -271,7 +271,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       }
 
                       if (qtyController.text == qty &&
-                          soldController.text == sold &&
+                          remainingController.text == remaining &&
                           salePriceController.text == salePrice &&
                           purchasePriceController.text == purchasePrice) {
                         Helpers.snackBarPrinter(
@@ -288,7 +288,8 @@ class _SupplierPageState extends State<SupplierPage> {
                         SupplierItem(
                           name: item,
                           date: supplierItem.date,
-                          sold: int.parse(soldController.text),
+                          sold: (supplierItem.qty -
+                              int.parse(remainingController.text)),
                           salePrice: double.parse(salePriceController.text),
                           purchasePrice:
                               double.parse(purchasePriceController.text),
@@ -360,7 +361,7 @@ class _SupplierPageState extends State<SupplierPage> {
                   ),
                   DataColumn(
                     label: Text(
-                      'Sold',
+                      'Remaining',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
