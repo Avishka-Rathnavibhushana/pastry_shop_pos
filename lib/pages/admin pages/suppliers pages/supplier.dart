@@ -270,6 +270,8 @@ class _SupplierPageState extends State<SupplierPage> {
             Helpers.numberToStringConverter(supplierItem.purchasePrice);
         TextEditingController purchasePriceController =
             TextEditingController(text: purchasePrice);
+        bool activated =
+            supplierItem.activated != null ? supplierItem.activated! : false;
 
         rows.add(
           DataRow(
@@ -336,6 +338,27 @@ class _SupplierPageState extends State<SupplierPage> {
                     )
                   : Text(purchasePrice)),
               DataCell(
+                edit
+                    ? SizedBox(
+                        width: 90,
+                        height: 35,
+                        child: CustomDropdown(
+                          dropdownItems: ["Yes", "No"]
+                              .map((item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Text(item),
+                                  ))
+                              .toList(),
+                          selectedValue: activated ? "Yes" : "No",
+                          onChanged: (String? newValue) {
+                            activated = newValue == "Yes" ? true : false;
+                          },
+                          borderAvailable: false,
+                        ),
+                      )
+                    : Text(activated ? "Yes" : "No"),
+              ),
+              DataCell(
                 CustomButton(
                   onPressed: () async {
                     if (edit) {
@@ -374,7 +397,8 @@ class _SupplierPageState extends State<SupplierPage> {
                       if (qtyController.text == qty &&
                           remainingController.text == remaining &&
                           salePriceController.text == salePrice &&
-                          purchasePriceController.text == purchasePrice) {
+                          purchasePriceController.text == purchasePrice &&
+                          activated == supplierItem.activated) {
                         Helpers.snackBarPrinter(
                           "Failed!",
                           "Item Values are same",
@@ -395,6 +419,7 @@ class _SupplierPageState extends State<SupplierPage> {
                           purchasePrice:
                               double.parse(purchasePriceController.text),
                           qty: int.parse(qtyController.text),
+                          activated: activated,
                         ),
                         supplierItem.date,
                         key,
@@ -481,6 +506,15 @@ class _SupplierPageState extends State<SupplierPage> {
                   DataColumn(
                     label: Text(
                       'Purchase Price',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Show',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,

@@ -9,6 +9,7 @@ class SupplierItem {
   double? salePriceTotal;
   double? purchasePriceTotal;
   double? cheap;
+  bool? activated;
 
   SupplierItem({
     required this.name,
@@ -17,6 +18,7 @@ class SupplierItem {
     required this.salePrice,
     required this.purchasePrice,
     required this.qty,
+    required this.activated,
     this.balance,
     this.salePriceTotal,
     this.purchasePriceTotal,
@@ -36,6 +38,7 @@ class SupplierItem {
       salePriceTotal: (map['salePriceTotal'] ?? 0.0).toDouble(),
       purchasePriceTotal: (map['purchasePriceTotal'] ?? 0.0).toDouble(),
       cheap: (map['cheap'] ?? 0.0).toDouble(),
+      activated: map['activated'] ?? false,
     );
   }
 
@@ -52,6 +55,7 @@ class SupplierItem {
       'salePriceTotal': salePriceTotal,
       'purchasePriceTotal': purchasePriceTotal,
       'cheap': cheap,
+      'activated': activated,
     };
   }
 
@@ -64,6 +68,7 @@ class SupplierItem {
       'qty': qty,
       'salePrice': salePrice,
       'purchasePrice': purchasePrice,
+      'activated': activated,
     };
   }
 
@@ -76,6 +81,7 @@ class SupplierItem {
       qty: map['qty'] ?? 0,
       salePrice: (map['salePrice'] ?? 0.0).toDouble(),
       purchasePrice: (map['purchasePrice'] ?? 0.0).toDouble(),
+      activated: map['activated'] ?? false,
     );
   }
 }

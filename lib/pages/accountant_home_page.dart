@@ -96,6 +96,9 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
       double purchasePriceT = 0;
 
       for (var itemData in value) {
+        if (itemData.activated == false) {
+          continue;
+        }
         salePriceT += (itemData.sold * itemData.salePrice);
         purchasePriceT += (itemData.qty * itemData.purchasePrice);
       }

@@ -259,6 +259,7 @@ class SupplierItemController extends GetxController {
               salePrice: salePrice,
               purchasePrice: purchasePrice,
               date: date,
+              activated: true,
             ),
           );
         });
@@ -298,6 +299,7 @@ class SupplierItemController extends GetxController {
               salePrice: 0,
               purchasePrice: 0,
               date: date,
+              activated: true,
             ),
           );
         });

@@ -119,6 +119,9 @@ class _CashierHomePageState extends State<CashierHomePage> {
       Map<String, List<TextEditingController>> textEditingControllerMapList =
           {};
       for (var itemData in value) {
+        if (itemData.activated == false) {
+          continue;
+        }
         String item = itemData.name;
         String qty = itemData.qty.toString();
         String remaining = (itemData.qty - itemData.sold).toString();
@@ -285,6 +288,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                                     .text),
                             purchasePrice: itemData.purchasePrice,
                             salePrice: itemData.salePrice,
+                            activated: itemData.activated,
                           ),
                           itemData.date,
                           printSnack: false,

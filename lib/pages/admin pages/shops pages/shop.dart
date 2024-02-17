@@ -133,6 +133,9 @@ class _ShopPageState extends State<ShopPage> {
       double cheapT = 0;
 
       for (SupplierItem itemData in value) {
+        if (itemData.activated == false) {
+          continue;
+        }
         String item = itemData.name;
         String qty = itemData.qty.toString();
         qtyT += itemData.qty;
