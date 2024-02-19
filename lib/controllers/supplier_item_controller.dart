@@ -226,14 +226,25 @@ class SupplierItemController extends GetxController {
       SupplierController supplierController = Get.find<SupplierController>();
       Supplier? supplier = await supplierController.getSupplierById(supplierId);
 
-      //if previous dat's prices are available load them from supplierItem and add to today supplierItem
-      List<SupplierItem> supplierItemsPreviousDay =
-          await getSupplierItemsByShopByTime(
-        supplierId,
-        Helpers.getPreviousDate(date),
-        shop,
-        session,
-      );
+      List<SupplierItem> supplierItemsPreviousDay = [];
+
+      //if previous date's prices are available up to 30 days, load them from supplierItem and add to today supplierItem
+      for (int i = 1; i < 31; i++) {
+        DateTime dateTime = DateTime.parse(date);
+        DateTime previousDate = dateTime.subtract(Duration(days: i));
+        String previousDateStr = previousDate.toString().split(" ")[0];
+
+        supplierItemsPreviousDay = await getSupplierItemsByShopByTime(
+          supplierId,
+          Helpers.getPreviousDate(previousDateStr),
+          shop,
+          session,
+        );
+
+        if (supplierItemsPreviousDay.length > 0) {
+          break;
+        }
+      }
 
       if (supplier != null) {
         // create a list of supplier items
@@ -241,6 +252,7 @@ class SupplierItemController extends GetxController {
         supplier.items.forEach((item) {
           double salePrice = 0;
           double purchasePrice = 0;
+          bool previousDayActivation = true;
           if (supplierItemsPreviousDay.length > 0) {
             salePrice = supplierItemsPreviousDay
                 .firstWhere((element) => element.name == item)
@@ -250,6 +262,12 @@ class SupplierItemController extends GetxController {
                   (element) => element.name == item,
                 )
                 .purchasePrice;
+
+            previousDayActivation = supplierItemsPreviousDay
+                .firstWhere(
+                  (element) => element.name == item,
+                )
+                .activated!;
           }
           supplierItems.add(
             SupplierItem(
@@ -259,7 +277,7 @@ class SupplierItemController extends GetxController {
               salePrice: salePrice,
               purchasePrice: purchasePrice,
               date: date,
-              activated: true,
+              activated: previousDayActivation,
             ),
           );
         });
