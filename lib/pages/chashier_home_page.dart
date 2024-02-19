@@ -34,6 +34,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
   AuthController authController = Get.find<AuthController>();
   String session = Constants.Sessions[0];
 
+  double totalPrice = 0.0;
+
   @override
   void initState() {
     authController.todayDate.value = _formatdatetime(DateTime.now());
@@ -59,6 +61,10 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
   // load data from supplierItem
   Future<void> loadData(String date) async {
+    setState(() {
+      totalPrice = 0.0;
+    });
+
     authController.loading.value = true;
     Map<String, List<SupplierItem>> suppliersItemsTemp = {};
 
@@ -114,10 +120,14 @@ class _CashierHomePageState extends State<CashierHomePage> {
   Widget build(BuildContext context) {
     List<Widget> supplierContainerListWidget = [];
 
+    totalPrice = 0.0;
+
     suppliersItems.forEach((key, value) {
       List<DataRow> itemListWidget = [];
       Map<String, List<TextEditingController>> textEditingControllerMapList =
           {};
+
+      double salePriceT = 0;
       for (var itemData in value) {
         if (itemData.activated == false) {
           continue;
@@ -133,6 +143,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
           qtyController,
           remainingController,
         ];
+        salePriceT += (itemData.sold * itemData.salePrice);
 
         itemListWidget.add(
           DataRow(cells: [
@@ -168,6 +179,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
           ]),
         );
       }
+
+      totalPrice += salePriceT;
 
       Widget itemWidget = CustomContainer(
         outerPadding: const EdgeInsets.only(
@@ -297,6 +310,13 @@ class _CashierHomePageState extends State<CashierHomePage> {
                         );
 
                         if (result) {
+                          totalPrice = totalPrice -
+                              (itemData.sold * itemData.salePrice) +
+                              ((itemData.qty -
+                                      int.parse(textEditingControllerMapList[
+                                              itemData.name]![1]
+                                          .text)) *
+                                  itemData.salePrice);
                           int index = suppliersItems[key]!.indexWhere(
                               (element) => element.name == itemData.name);
 
@@ -402,6 +422,49 @@ class _CashierHomePageState extends State<CashierHomePage> {
                       await loadData(dateInput);
                     },
                   ),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              CustomContainer(
+                outerPadding: EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 0,
+                ),
+                innerPadding: EdgeInsets.symmetric(
+                  vertical: 30,
+                  horizontal: 30,
+                ),
+                containerColor: Color(0xFFCDE8FF),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Total Price :',
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          Helpers.numberToStringConverter(totalPrice),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(
