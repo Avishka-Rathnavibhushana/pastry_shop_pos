@@ -7,9 +7,13 @@ import 'package:pastry_shop_pos/models/supplier.dart';
 
 class SuppliersContainer extends StatelessWidget {
   const SuppliersContainer(
-      {super.key, required this.onPressed, required this.suppliers});
+      {super.key,
+      required this.onPressed,
+      required this.suppliers,
+      required this.deleteSupplier});
 
   final void Function(String id) onPressed;
+  final void Function(String id) deleteSupplier;
   final List<Supplier> suppliers;
 
   @override
@@ -44,6 +48,22 @@ class SuppliersContainer extends StatelessWidget {
                 icon: const Icon(
                   Icons.edit,
                   color: Colors.white,
+                ),
+                fontSize: 12,
+                padding: 0,
+                styleFormPadding: 0,
+              ),
+            ),
+            DataCell(
+              CustomButton(
+                onPressed: () {
+                  deleteSupplier(name);
+                },
+                isIcon: true,
+                isText: false,
+                icon: const Icon(
+                  Icons.delete,
+                  color: Color(0xFFEB7169),
                 ),
                 fontSize: 12,
                 padding: 0,
@@ -123,7 +143,16 @@ class SuppliersContainer extends StatelessWidget {
                 ),
                 DataColumn(
                   label: Text(
-                    '',
+                    'Preview',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Delete',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,

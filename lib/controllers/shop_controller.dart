@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/shop.dart';
 
@@ -131,6 +132,59 @@ class ShopController extends GetxController {
           "Failed!", "Failed to add the supplier to the shop.",
           error: true);
       print('Error adding supplier to shop: $e');
+      return false;
+    }
+  }
+
+  // delete shop and spplier items from shop
+  Future<bool> deleteShop(String id) async {
+    try {
+      // get shop details
+      DocumentSnapshot docSnapshot =
+          await FirebaseFirestore.instance.collection('shops').doc(id).get();
+      Shop shop = Shop.fromMap(docSnapshot.data() as Map<String, dynamic>);
+      // get suppliers of shop
+      List<String> suppliers = shop.suppliers;
+
+      // delete shopc from supplierItems
+      for (int i = 0; i < suppliers.length; i++) {
+        for (String session in Constants.Sessions) {
+          // delete collections in supplierItems
+          await FirebaseFirestore.instance
+              .collection('supplierItems')
+              .doc(suppliers[i])
+              .collection(id + " " + session)
+              .get()
+              .then((snapshot) {
+            for (DocumentSnapshot ds in snapshot.docs) {
+              ds.reference.delete();
+            }
+          });
+        }
+      }
+
+      // remove shop from suppliers
+      for (int i = 0; i < suppliers.length; i++) {
+        await FirebaseFirestore.instance
+            .collection('suppliers')
+            .doc(suppliers[i])
+            .update({
+          'shops': FieldValue.arrayRemove([id])
+        });
+      }
+
+      // delete shop
+      await FirebaseFirestore.instance.collection('shops').doc(id).delete();
+
+      // delete shop from users
+      await FirebaseFirestore.instance.collection('users').doc(id).delete();
+
+      Helpers.snackBarPrinter("Successful!", "Successfully deleted the shop.");
+      return true;
+    } catch (e) {
+      Helpers.snackBarPrinter("Failed!", "Failed to delete the shop.",
+          error: true);
+      print('Error deleting shop: $e');
       return false;
     }
   }

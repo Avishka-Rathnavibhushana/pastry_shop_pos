@@ -1,3 +1,5 @@
+import 'dart:js_util';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
@@ -42,6 +44,43 @@ class _SuppliersPageState extends State<SuppliersPage> {
     return result;
   }
 
+  Future<void> deleteSupplier(String id, BuildContext context) async {
+    AlertDialog alert = AlertDialog(
+      title: const Text("Delete Supplier"),
+      content: const Text("Are you sure you want to delete this supplier?"),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () async {
+            SupplierController supplierController =
+                Get.find<SupplierController>();
+            bool result = await supplierController.deleteSupplier(id);
+
+            if (result) {
+              await loadData();
+            }
+
+            Navigator.of(context).pop();
+          },
+          child: const Text("Delete"),
+        ),
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   List<Supplier> suppliers = [];
 
   Future<void> loadData() async {
@@ -74,6 +113,9 @@ class _SuppliersPageState extends State<SuppliersPage> {
           SuppliersContainer(
             onPressed: widget.onPressed,
             suppliers: suppliers,
+            deleteSupplier: (id) {
+              deleteSupplier(id, context);
+            },
           ),
         ],
       ),

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier.dart';
 
@@ -185,6 +187,60 @@ class SupplierController extends GetxController {
     } catch (e) {
       print('Error getting supplier by ID: $e');
       return null;
+    }
+  }
+
+  // delete supplier
+  Future<bool> deleteSupplier(String supplierId) async {
+    try {
+      // get supplier by id
+      Supplier? supplier = await getSupplierById(supplierId);
+      if (supplier == null) {
+        Helpers.snackBarPrinter("Failed!", "The supplier doesn't exist.",
+            error: true);
+        return false;
+      }
+      // get shops of the supplier
+      List<String> shops = supplier.shops;
+
+      for (int i = 0; i < shops.length; i++) {
+        // remove the supplier from the shops
+        await FirebaseFirestore.instance
+            .collection('shops')
+            .doc(shops[i])
+            .update({
+          'suppliers': FieldValue.arrayRemove([supplierId])
+        });
+
+        // delete the supplierItems for the supplier
+        for (String session in Constants.Sessions) {
+          // delete collections in supplierItems
+          await FirebaseFirestore.instance
+              .collection('supplierItems')
+              .doc(supplierId)
+              .collection(shops[i] + " " + session)
+              .get()
+              .then((snapshot) {
+            for (DocumentSnapshot ds in snapshot.docs) {
+              ds.reference.delete();
+            }
+          });
+        }
+      }
+
+      await FirebaseFirestore.instance
+          .collection('suppliers')
+          .doc(supplierId)
+          .delete();
+
+      Helpers.snackBarPrinter(
+          "Successful!", "Successfully deleted the supplier.");
+      return true;
+    } catch (e) {
+      Helpers.snackBarPrinter("Failed!", "Failed to delete the supplier.",
+          error: true);
+      print('Error deleting supplier: $e');
+      return false;
     }
   }
 }

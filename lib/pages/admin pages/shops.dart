@@ -47,6 +47,41 @@ class _ShopsPageState extends State<ShopsPage> {
     return result;
   }
 
+  Future<void> deleteShop(String id, BuildContext context) async {
+    AlertDialog alert = AlertDialog(
+      title: const Text("Delete Shop"),
+      content: const Text("Are you sure you want to delete this shop?"),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () async {
+            ShopController shopController = Get.find<ShopController>();
+            bool result = await shopController.deleteShop(id);
+
+            if (result) {
+              await loadData();
+            }
+
+            Navigator.of(context).pop();
+          },
+          child: const Text("Delete"),
+        ),
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   List<Shop> shops = [];
 
   Future<void> loadData() async {
@@ -79,6 +114,9 @@ class _ShopsPageState extends State<ShopsPage> {
           ShopsContainer(
             onPressed: widget.onPressed,
             shops: shops,
+            deleteShop: (id) {
+              deleteShop(id, context);
+            },
           ),
         ],
       ),

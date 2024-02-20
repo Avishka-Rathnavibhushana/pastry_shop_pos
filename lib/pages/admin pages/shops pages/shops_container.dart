@@ -6,9 +6,13 @@ import 'package:pastry_shop_pos/models/shop.dart';
 // ignore: must_be_immutable
 class ShopsContainer extends StatelessWidget {
   const ShopsContainer(
-      {super.key, required this.onPressed, required this.shops});
+      {super.key,
+      required this.onPressed,
+      required this.shops,
+      required this.deleteShop});
 
   final void Function(String id) onPressed;
+  final void Function(String id) deleteShop;
   final List<Shop> shops;
 
   @override
@@ -42,6 +46,22 @@ class ShopsContainer extends StatelessWidget {
                 icon: const Icon(
                   Icons.description,
                   color: Colors.white,
+                ),
+                fontSize: 12,
+                padding: 0,
+                styleFormPadding: 0,
+              ),
+            ),
+            DataCell(
+              CustomButton(
+                onPressed: () {
+                  deleteShop(name);
+                },
+                isIcon: true,
+                isText: false,
+                icon: const Icon(
+                  Icons.delete,
+                  color: Color(0xFFEB7169),
                 ),
                 fontSize: 12,
                 padding: 0,
@@ -122,7 +142,16 @@ class ShopsContainer extends StatelessWidget {
                 ),
                 DataColumn(
                   label: Text(
-                    '',
+                    'Preview',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Delete',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
