@@ -96,6 +96,8 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       if (roleSelectedValue == Constants.Admin) {
+        await Future.delayed(Duration(seconds: 1));
+        authController.loading.value = false;
         Navigator.push(
           context,
           MaterialPageRoute<void>(
@@ -106,6 +108,8 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else if (roleSelectedValue == Constants.Cashier) {
         if (shopSelectedValue != "Select a shop") {
+          await Future.delayed(Duration(seconds: 1));
+          authController.loading.value = false;
           Navigator.push(
             context,
             MaterialPageRoute<void>(
@@ -117,6 +121,8 @@ class _LoginPageState extends State<LoginPage> {
         }
       } else if (roleSelectedValue == Constants.Accountant) {
         if (shopSelectedValue != "Select a shop") {
+          await Future.delayed(Duration(seconds: 1));
+          authController.loading.value = false;
           Navigator.push(
             context,
             MaterialPageRoute<void>(
@@ -130,7 +136,6 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       print(e);
     } finally {
-      await Future.delayed(Duration(seconds: 1));
       authController.loading.value = false;
     }
   }
