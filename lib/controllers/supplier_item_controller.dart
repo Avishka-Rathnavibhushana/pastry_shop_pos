@@ -236,7 +236,7 @@ class SupplierItemController extends GetxController {
 
         supplierItemsPreviousDay = await getSupplierItemsByShopByTime(
           supplierId,
-          Helpers.getPreviousDate(previousDateStr),
+          previousDateStr,
           shop,
           session,
         );
@@ -249,25 +249,34 @@ class SupplierItemController extends GetxController {
       if (supplier != null) {
         // create a list of supplier items
         List<SupplierItem> supplierItems = [];
+        print(supplier.items.length);
         supplier.items.forEach((item) {
           double salePrice = 0;
           double purchasePrice = 0;
           bool previousDayActivation = true;
           if (supplierItemsPreviousDay.length > 0) {
-            salePrice = supplierItemsPreviousDay
-                .firstWhere((element) => element.name == item)
-                .salePrice;
-            purchasePrice = supplierItemsPreviousDay
-                .firstWhere(
-                  (element) => element.name == item,
-                )
-                .purchasePrice;
+            if (supplierItemsPreviousDay
+                .where((element) => element.name == item)
+                .isEmpty) {
+              salePrice = 0;
+              purchasePrice = 0;
+              previousDayActivation = true;
+            } else {
+              salePrice = supplierItemsPreviousDay
+                  .firstWhere((element) => element.name == item)
+                  .salePrice;
+              purchasePrice = supplierItemsPreviousDay
+                  .firstWhere(
+                    (element) => element.name == item,
+                  )
+                  .purchasePrice;
 
-            previousDayActivation = supplierItemsPreviousDay
-                .firstWhere(
-                  (element) => element.name == item,
-                )
-                .activated!;
+              previousDayActivation = supplierItemsPreviousDay
+                  .firstWhere(
+                    (element) => element.name == item,
+                  )
+                  .activated!;
+            }
           }
           supplierItems.add(
             SupplierItem(
