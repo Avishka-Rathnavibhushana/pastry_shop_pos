@@ -182,6 +182,10 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
       totalPrice += salePriceT;
 
+      if (itemListWidget.length == 0) {
+        return;
+      }
+
       Widget itemWidget = CustomContainer(
         outerPadding: const EdgeInsets.only(
           bottom: 20,
