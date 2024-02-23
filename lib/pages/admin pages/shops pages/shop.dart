@@ -114,11 +114,11 @@ class _ShopPageState extends State<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return LoadingPage(
-        loading: loading,
-      );
-    }
+    // if (loading) {
+    //   return LoadingPage(
+    //     loading: loading,
+    //   );
+    // }
 
     List<Widget> supplierContainerListWidget = [];
 

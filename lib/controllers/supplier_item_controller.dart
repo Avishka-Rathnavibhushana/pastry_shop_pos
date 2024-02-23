@@ -249,7 +249,6 @@ class SupplierItemController extends GetxController {
       if (supplier != null) {
         // create a list of supplier items
         List<SupplierItem> supplierItems = [];
-        print(supplier.items.length);
         supplier.items.forEach((item) {
           double salePrice = 0;
           double purchasePrice = 0;
