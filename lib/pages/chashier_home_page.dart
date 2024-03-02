@@ -182,10 +182,6 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
       totalPrice += salePriceT;
 
-      if (itemListWidget.length == 0) {
-        return;
-      }
-
       Widget itemWidget = CustomContainer(
         outerPadding: const EdgeInsets.only(
           bottom: 20,
@@ -263,6 +259,9 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
                   try {
                     for (var itemData in value) {
+                      if (itemData.activated == false) {
+                        continue;
+                      }
                       if (textEditingControllerMapList[itemData.name]![0]
                               .text ==
                           "") {
@@ -276,16 +275,16 @@ class _CashierHomePageState extends State<CashierHomePage> {
                             (itemData.qty - itemData.sold).toString();
                       }
 
-                      if (itemData.qty ==
+                      if (itemData.qty.toString() ==
                               textEditingControllerMapList[itemData.name]![0]
                                   .text &&
-                          (itemData.qty - itemData.sold) ==
+                          (itemData.qty - itemData.sold).toString() ==
                               textEditingControllerMapList[itemData.name]![1]
                                   .text) {
                       } else {
                         SupplierItemController supplierItemsController =
                             Get.find<SupplierItemController>();
-
+                        
                         // update item
                         bool result = await supplierItemsController
                             .updateItemInSupplierItem(
@@ -293,13 +292,12 @@ class _CashierHomePageState extends State<CashierHomePage> {
                           SupplierItem(
                             name: itemData.name,
                             date: itemData.date,
-                            sold: int.parse(
-                              (itemData.qty -
-                                      int.parse(textEditingControllerMapList[
-                                              itemData.name]![1]
-                                          .text))
-                                  .toString(),
-                            ),
+                            sold: int.parse(textEditingControllerMapList[
+                                        itemData.name]![0]
+                                    .text) -
+                                int.parse(textEditingControllerMapList[
+                                        itemData.name]![1]
+                                    .text),
                             qty: int.parse(
                                 textEditingControllerMapList[itemData.name]![0]
                                     .text),
@@ -313,25 +311,25 @@ class _CashierHomePageState extends State<CashierHomePage> {
                           session,
                         );
 
-                        if (result) {
-                          totalPrice = totalPrice -
-                              (itemData.sold * itemData.salePrice) +
-                              ((itemData.qty -
-                                      int.parse(textEditingControllerMapList[
-                                              itemData.name]![1]
-                                          .text)) *
-                                  itemData.salePrice);
-                          int index = suppliersItems[key]!.indexWhere(
-                              (element) => element.name == itemData.name);
+                        // if (result) {
+                        //   totalPrice = totalPrice -
+                        //       (itemData.sold * itemData.salePrice) +
+                        //       ((itemData.qty -
+                        //               int.parse(textEditingControllerMapList[
+                        //                       itemData.name]![1]
+                        //                   .text)) *
+                        //           itemData.salePrice);
+                        //   int index = suppliersItems[key]!.indexWhere(
+                        //       (element) => element.name == itemData.name);
 
-                          suppliersItems[key]![index].sold = itemData.qty -
-                              int.parse(textEditingControllerMapList[
-                                      itemData.name]![1]
-                                  .text);
-                          suppliersItems[key]![index].qty = int.parse(
-                              textEditingControllerMapList[itemData.name]![0]
-                                  .text);
-                        }
+                        //   suppliersItems[key]![index].sold = itemData.qty -
+                        //       int.parse(textEditingControllerMapList[
+                        //               itemData.name]![1]
+                        //           .text);
+                        //   suppliersItems[key]![index].qty = int.parse(
+                        //       textEditingControllerMapList[itemData.name]![0]
+                        //           .text);
+                        // }
                       }
                     }
 
@@ -350,6 +348,11 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     setState(() {
                       editShop = "";
                     });
+
+                    String dateInput =
+                        DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+                    loadData(dateInput);
                   }
                 },
                 text: key == editShop ? "Submit" : "Edit",
@@ -362,6 +365,10 @@ class _CashierHomePageState extends State<CashierHomePage> {
           ),
         ),
       );
+
+      if (itemListWidget.length == 0) {
+        itemWidget = Container();
+      }
 
       supplierContainerListWidget.add(itemWidget);
     });
