@@ -34,6 +34,7 @@ class CustomTextField extends StatelessWidget {
       style: TextStyle(
         fontSize: fontSize,
       ),
+      textInputAction: TextInputAction.next,
       maxLength: maxLength,
       keyboardType: keyboardType,
       decoration: InputDecoration(
