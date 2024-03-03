@@ -150,13 +150,13 @@ class _ShopPageState extends State<ShopPage> {
         String purchasePrice =
             Helpers.numberToStringConverter(itemData.purchasePrice);
         String purchasePriceTotal = Helpers.numberToStringConverter(
-            (itemData.qty * itemData.purchasePrice));
-        purchasePriceT += (itemData.qty * itemData.purchasePrice);
+            (itemData.sold * itemData.purchasePrice));
+        purchasePriceT += (itemData.sold * itemData.purchasePrice);
         String cheap = Helpers.numberToStringConverter(
             ((itemData.sold * itemData.salePrice) -
-                (itemData.qty * itemData.purchasePrice)));
+                (itemData.sold * itemData.purchasePrice)));
         cheapT += ((itemData.sold * itemData.salePrice) -
-            (itemData.qty * itemData.purchasePrice));
+            (itemData.sold * itemData.purchasePrice));
 
         itemListWidget.add(
           DataRow(cells: [

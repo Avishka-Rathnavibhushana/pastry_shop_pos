@@ -100,7 +100,7 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
           continue;
         }
         salePriceT += (itemData.sold * itemData.salePrice);
-        purchasePriceT += (itemData.qty * itemData.purchasePrice);
+        purchasePriceT += (itemData.sold * itemData.purchasePrice);
       }
 
       supplierContainerListWidgetRows.add(
