@@ -188,4 +188,70 @@ class ShopController extends GetxController {
       return false;
     }
   }
+
+  // get shops collection-> shopid -> extra[date] value
+  Future<double> getShopExtra(String shopId, String date) async {
+    try {
+      DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
+          .collection('shops')
+          .doc(shopId)
+          .get();
+      if (docSnapshot.exists) {
+        // get extra value map and return value if date exists
+        Map<String, dynamic> extra = docSnapshot.data() as Map<String, dynamic>;
+        if (extra.containsKey(date)) {
+          return extra[date];
+        } else {
+          return 0.0;
+        }
+      } else {
+        return 0.0;
+      }
+    } catch (e) {
+      print('Error getting shop extra: $e');
+      return 0.0;
+    }
+  }
+  
+  // update extra value map if date exists or add new date and value
+  Future<bool> updateShopExtra(String shopId, String date, double value) async {
+    try {
+      DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
+          .collection('shops')
+          .doc(shopId)
+          .get();
+      if (docSnapshot.exists) {
+        // get extra value map
+        Map<String, dynamic> extra = docSnapshot.data() as Map<String, dynamic>;
+        // update value if date exists
+        if (extra.containsKey(date)) {
+          extra[date] = value;
+        } else {
+          // add new date and value
+          extra.addAll({date: value});
+        }
+        // update extra value map
+        await FirebaseFirestore.instance
+            .collection('shops')
+            .doc(shopId)
+            .update(extra);
+        Helpers.snackBarPrinter(
+          "Successful!",
+          "Successfully updated the extra value.",
+        );
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      Helpers.snackBarPrinter(
+        "Failed!",
+        "Failed to update the extra value.",
+        error: true,
+      );
+      print('Error updating shop extra: $e');
+      return false;
+    }
+  }
+
 }
