@@ -50,6 +50,7 @@ class _ShopPageState extends State<ShopPage> {
 
   // load data from supplierItem
   Future<void> loadData(String date) async {
+    authController.loading.value = true;
     setState(() {
       totalPrice = 0.0;
       totalPaid = 0.0;
@@ -103,7 +104,7 @@ class _ShopPageState extends State<ShopPage> {
         loading = false;
       });
     } finally {
-      authController.loading.value = true;
+      authController.loading.value = false;
     }
   }
 
@@ -114,11 +115,11 @@ class _ShopPageState extends State<ShopPage> {
 
   @override
   Widget build(BuildContext context) {
-    // if (loading) {
-    //   return LoadingPage(
-    //     loading: loading,
-    //   );
-    // }
+    if (authController.loading.value) {
+      return Obx(() => LoadingPage(
+            loading: authController.loading.value,
+          ));
+    }
 
     List<Widget> supplierContainerListWidget = [];
 
@@ -328,7 +329,7 @@ class _ShopPageState extends State<ShopPage> {
                     String formattedDate =
                         DateFormat('yyyy-MM-dd').format(pickedDate);
                     //formatted date output using intl package =>  2021-03-16
-                    loadData(formattedDate);
+                    await loadData(formattedDate);
                     setState(() {
                       dateInput =
                           formattedDate; //set output date to TextField value.
