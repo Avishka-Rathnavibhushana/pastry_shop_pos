@@ -33,8 +33,6 @@ class _ShopPageState extends State<ShopPage> {
 
   AuthController authController = Get.find<AuthController>();
 
-  bool loading = true;
-
   @override
   void initState() {
     super.initState();
@@ -45,7 +43,9 @@ class _ShopPageState extends State<ShopPage> {
       dateInput = DateFormat('yyyy-MM-dd').format(DateTime.now());
     });
 
-    loadData(dateInput);
+    Future.delayed(Duration.zero, () {
+      loadData(dateInput);
+    });
   }
 
   // load data from supplierItem
@@ -54,7 +54,6 @@ class _ShopPageState extends State<ShopPage> {
     setState(() {
       totalPrice = 0.0;
       totalPaid = 0.0;
-      loading = true;
     });
 
     Map<String, List<SupplierItem>> suppliersItemsTemp = {};
@@ -97,12 +96,8 @@ class _ShopPageState extends State<ShopPage> {
 
       setState(() {
         suppliersItems = suppliersItemsTemp;
-        loading = false;
       });
     } catch (e) {
-      setState(() {
-        loading = false;
-      });
     } finally {
       authController.loading.value = false;
     }
@@ -112,6 +107,12 @@ class _ShopPageState extends State<ShopPage> {
     fontSize: 17,
     fontWeight: FontWeight.bold,
   );
+
+  @override
+  void dispose() {
+    authController.loading.value = false;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

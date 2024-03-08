@@ -5,10 +5,12 @@ import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
 import 'package:pastry_shop_pos/components/user_page_layout.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
+import 'package:pastry_shop_pos/pages/loadingPage.dart';
 
 import '../components/custom_dropdown.dart';
 
@@ -26,9 +28,11 @@ class AccountantHomePage extends StatefulWidget {
 
 class _AccountantHomePageState extends State<AccountantHomePage> {
   String dateInput = "";
-  String session = Constants.Sessions[0];
 
-  Map<String, List<SupplierItem>> suppliersItems = {};
+  Map<String, List<SupplierItem>> suppliersItemsMorning = {};
+  Map<String, List<SupplierItem>> suppliersItemsEvening = {};
+
+  AuthController authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -41,8 +45,31 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
     loadData(dateInput);
   }
 
-  // load data from supplierItem
   Future<void> loadData(String date) async {
+    authController.loading.value = true;
+
+    try {
+      Map<String, List<SupplierItem>> suppliersItemsMorningTemp =
+          await loadDataForSession(date, Constants.Sessions[0]);
+      Map<String, List<SupplierItem>> suppliersItemsEveningTemp =
+          await loadDataForSession(date, Constants.Sessions[1]);
+
+      setState(() {
+        suppliersItemsMorning = suppliersItemsMorningTemp;
+        suppliersItemsEvening = suppliersItemsEveningTemp;
+      });
+    } catch (e) {
+      authController.loading.value = false;
+
+      print(e);
+    } finally {
+      authController.loading.value = false;
+    }
+  }
+
+  // load data from supplierItem for a session
+  Future<Map<String, List<SupplierItem>>> loadDataForSession(
+      String date, String session) async {
     Map<String, List<SupplierItem>> suppliersItemsTemp = {};
 
     if (widget.shopName != null) {
@@ -74,10 +101,11 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
 
         suppliersItemsTemp[supplier] = supplierItemList;
       }
-      setState(() {
-        suppliersItems = suppliersItemsTemp;
-      });
+
+      return suppliersItemsTemp;
     }
+
+    return {};
   }
 
   TextStyle tableColumnHeaderStyle = const TextStyle(
@@ -86,10 +114,22 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
   );
 
   @override
-  Widget build(BuildContext context) {
-    List<DataRow> supplierContainerListWidgetRows = [];
+  void dispose() {
+    authController.loading.value = false;
+    super.dispose();
+  }
 
-    suppliersItems.forEach((key, value) {
+  @override
+  Widget build(BuildContext context) {
+    if (authController.loading.value) {
+      return Obx(() => LoadingPage(
+            loading: authController.loading.value,
+          ));
+    }
+
+    List<DataRow> supplierContainerListWidgetRowsMorning = [];
+
+    suppliersItemsMorning.forEach((key, value) {
       List<DataRow> itemListWidget = [];
 
       double salePriceT = 0;
@@ -103,7 +143,32 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
         purchasePriceT += (itemData.sold * itemData.purchasePrice);
       }
 
-      supplierContainerListWidgetRows.add(
+      supplierContainerListWidgetRowsMorning.add(
+        DataRow(cells: [
+          DataCell(Text(key)),
+          DataCell(Text(Helpers.numberToStringConverter(salePriceT))),
+          DataCell(Text(Helpers.numberToStringConverter(purchasePriceT))),
+        ]),
+      );
+    });
+
+    List<DataRow> supplierContainerListWidgetRowsEvening = [];
+
+    suppliersItemsEvening.forEach((key, value) {
+      List<DataRow> itemListWidget = [];
+
+      double salePriceT = 0;
+      double purchasePriceT = 0;
+
+      for (var itemData in value) {
+        if (itemData.activated == false) {
+          continue;
+        }
+        salePriceT += (itemData.sold * itemData.salePrice);
+        purchasePriceT += (itemData.sold * itemData.purchasePrice);
+      }
+
+      supplierContainerListWidgetRowsEvening.add(
         DataRow(cells: [
           DataCell(Text(key)),
           DataCell(Text(Helpers.numberToStringConverter(salePriceT))),
@@ -184,20 +249,24 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
             ),
             child: SizedBox(
               width: 300,
-              child: CustomDropdown(
-                dropdownItems:
-                    Constants.Sessions.map((item) => DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(item),
-                        )).toList(),
-                selectedValue: session,
-                onChanged: (String? newValue) async {
-                  setState(() {
-                    session = newValue!;
-                  });
-
-                  await loadData(dateInput);
-                },
+              // container with a border and text in it
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.blue,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  Constants.Sessions[0],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ),
@@ -233,7 +302,77 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
                       ),
                     ],
                     rows: [
-                      ...supplierContainerListWidgetRows,
+                      ...supplierContainerListWidgetRowsMorning,
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: 10,
+            ),
+            child: SizedBox(
+              width: 300,
+              // container with a border and text in it
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.blue,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  Constants.Sessions[1],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          CustomContainer(
+            outerPadding: const EdgeInsets.only(
+              bottom: 20,
+            ),
+            innerPadding: const EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 20,
+            ),
+            containerColor: const Color(0xFF8EB6D9),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  DataTable(
+                    columns: [
+                      DataColumn(
+                        label: Text('Supplier', style: tableColumnHeaderStyle),
+                      ),
+                      DataColumn(
+                        label: Text('Sale Price\nTotal',
+                            style: tableColumnHeaderStyle),
+                      ),
+                      DataColumn(
+                        label: Text('Purchase Price\nTotal',
+                            style: tableColumnHeaderStyle),
+                      ),
+                    ],
+                    rows: [
+                      ...supplierContainerListWidgetRowsEvening,
                     ],
                   ),
                 ],

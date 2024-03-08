@@ -141,6 +141,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    authController.loading.value = false;
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     authController.loading.value = false;
