@@ -127,55 +127,69 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
           ));
     }
 
-    List<DataRow> supplierContainerListWidgetRowsMorning = [];
+    List<DataRow> supplierContainerListWidgetRows = [];
+
+    double totalSalePriceTM = 0;
+    double totalPurchasePriceTM = 0;
+    double totalSalePriceTE = 0;
+    double totalPurchasePriceTE = 0;
+    double totalSalePrice = 0;
+    double totalPurchasePrice = 0;
 
     suppliersItemsMorning.forEach((key, value) {
       List<DataRow> itemListWidget = [];
 
-      double salePriceT = 0;
-      double purchasePriceT = 0;
+      double salePriceTM = 0;
+      double purchasePriceTM = 0;
+      double salePriceTE = 0;
+      double purchasePriceTE = 0;
 
       for (var itemData in value) {
         if (itemData.activated == false) {
           continue;
         }
-        salePriceT += (itemData.sold * itemData.salePrice);
-        purchasePriceT += (itemData.sold * itemData.purchasePrice);
+        salePriceTM += (itemData.sold * itemData.salePrice);
+        purchasePriceTM += (itemData.sold * itemData.purchasePrice);
       }
-
-      supplierContainerListWidgetRowsMorning.add(
-        DataRow(cells: [
-          DataCell(Text(key)),
-          DataCell(Text(Helpers.numberToStringConverter(salePriceT))),
-          DataCell(Text(Helpers.numberToStringConverter(purchasePriceT))),
-        ]),
-      );
-    });
-
-    List<DataRow> supplierContainerListWidgetRowsEvening = [];
-
-    suppliersItemsEvening.forEach((key, value) {
-      List<DataRow> itemListWidget = [];
-
-      double salePriceT = 0;
-      double purchasePriceT = 0;
-
-      for (var itemData in value) {
+      for (var itemData in suppliersItemsEvening[key]!) {
         if (itemData.activated == false) {
           continue;
         }
-        salePriceT += (itemData.sold * itemData.salePrice);
-        purchasePriceT += (itemData.sold * itemData.purchasePrice);
+        salePriceTE += (itemData.sold * itemData.salePrice);
+        purchasePriceTE += (itemData.sold * itemData.purchasePrice);
       }
 
-      supplierContainerListWidgetRowsEvening.add(
+      totalSalePriceTM += salePriceTM;
+      totalPurchasePriceTM += purchasePriceTM;
+      totalSalePriceTE += salePriceTE;
+      totalPurchasePriceTE += purchasePriceTE;
+      totalSalePrice += salePriceTM + salePriceTE;
+      totalPurchasePrice += purchasePriceTM + purchasePriceTE;
+
+      supplierContainerListWidgetRows.add(
         DataRow(cells: [
           DataCell(Text(key)),
-          DataCell(Text(Helpers.numberToStringConverter(salePriceT))),
-          DataCell(Text(Helpers.numberToStringConverter(purchasePriceT))),
+          DataCell(Text(Helpers.numberToStringConverter(salePriceTM))),
+          DataCell(Text(Helpers.numberToStringConverter(purchasePriceTM))),
+          DataCell(Text(Helpers.numberToStringConverter(salePriceTE))),
+          DataCell(Text(Helpers.numberToStringConverter(purchasePriceTE))),
+          DataCell(
+              Text(Helpers.numberToStringConverter(salePriceTM + salePriceTE))),
+          DataCell(Text(Helpers.numberToStringConverter(
+              purchasePriceTM + purchasePriceTE))),
         ]),
       );
     });
+
+    DataRow totalRow = DataRow(cells: [
+      DataCell(Text("Total")),
+      DataCell(Text(Helpers.numberToStringConverter(totalSalePriceTM))),
+      DataCell(Text(Helpers.numberToStringConverter(totalPurchasePriceTM))),
+      DataCell(Text(Helpers.numberToStringConverter(totalSalePriceTE))),
+      DataCell(Text(Helpers.numberToStringConverter(totalPurchasePriceTE))),
+      DataCell(Text(Helpers.numberToStringConverter(totalSalePrice))),
+      DataCell(Text(Helpers.numberToStringConverter(totalPurchasePrice))),
+    ]);
 
     Widget pageData = Center(
       child: Column(
@@ -242,37 +256,6 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
           const SizedBox(
             height: 20,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30,
-              vertical: 10,
-            ),
-            child: SizedBox(
-              width: 300,
-              // container with a border and text in it
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.blue,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  Constants.Sessions[0],
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
           CustomContainer(
             outerPadding: const EdgeInsets.only(
               bottom: 20,
@@ -293,16 +276,33 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
                         label: Text('Supplier', style: tableColumnHeaderStyle),
                       ),
                       DataColumn(
-                        label: Text('Sale Price\nTotal',
+                        label: Text('Morning\nSale Price',
                             style: tableColumnHeaderStyle),
                       ),
                       DataColumn(
-                        label: Text('Purchase Price\nTotal',
+                        label: Text('Morning\nPurchase Price',
+                            style: tableColumnHeaderStyle),
+                      ),
+                      DataColumn(
+                        label: Text('Evening\nSale Price',
+                            style: tableColumnHeaderStyle),
+                      ),
+                      DataColumn(
+                        label: Text('Evening\nPurchase Price',
+                            style: tableColumnHeaderStyle),
+                      ),
+                      DataColumn(
+                        label: Text('Total\nSale Price',
+                            style: tableColumnHeaderStyle),
+                      ),
+                      DataColumn(
+                        label: Text('Total\nPurchase Price',
                             style: tableColumnHeaderStyle),
                       ),
                     ],
                     rows: [
-                      ...supplierContainerListWidgetRowsMorning,
+                      ...supplierContainerListWidgetRows,
+                      totalRow,
                     ],
                   ),
                 ],
@@ -311,73 +311,6 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
           ),
           const SizedBox(
             height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30,
-              vertical: 10,
-            ),
-            child: SizedBox(
-              width: 300,
-              // container with a border and text in it
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.blue,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  Constants.Sessions[1],
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          CustomContainer(
-            outerPadding: const EdgeInsets.only(
-              bottom: 20,
-            ),
-            innerPadding: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 20,
-            ),
-            containerColor: const Color(0xFF8EB6D9),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  DataTable(
-                    columns: [
-                      DataColumn(
-                        label: Text('Supplier', style: tableColumnHeaderStyle),
-                      ),
-                      DataColumn(
-                        label: Text('Sale Price\nTotal',
-                            style: tableColumnHeaderStyle),
-                      ),
-                      DataColumn(
-                        label: Text('Purchase Price\nTotal',
-                            style: tableColumnHeaderStyle),
-                      ),
-                    ],
-                    rows: [
-                      ...supplierContainerListWidgetRowsEvening,
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
