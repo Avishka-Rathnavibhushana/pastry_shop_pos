@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
@@ -173,6 +174,10 @@ class UserPageLayout extends StatelessWidget {
               ),
               Expanded(
                 child: SingleChildScrollView(
+                  controller: ScrollController(
+                    initialScrollOffset: 0.0,
+                    keepScrollOffset: true,
+                  ),
                   scrollDirection: Axis.vertical,
                   physics: const BouncingScrollPhysics(),
                   child: Column(

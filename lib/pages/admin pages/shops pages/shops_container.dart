@@ -5,7 +5,7 @@ import 'package:pastry_shop_pos/models/shop.dart';
 
 // ignore: must_be_immutable
 class ShopsContainer extends StatelessWidget {
-  const ShopsContainer(
+  ShopsContainer(
       {super.key,
       required this.onPressed,
       required this.shops,
@@ -14,6 +14,7 @@ class ShopsContainer extends StatelessWidget {
   final void Function(String id) onPressed;
   final void Function(String id) deleteShop;
   final List<Shop> shops;
+  final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -100,66 +101,71 @@ class ShopsContainer extends StatelessWidget {
             horizontal: 0,
           ),
           containerColor: const Color(0xFFCDE8FF),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const [
-                DataColumn(
-                  label: Text(
-                    'Name',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+          child: Scrollbar(
+            isAlwaysShown: true,
+            controller: scrollController,
+            child: SingleChildScrollView(
+              controller: scrollController,
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columns: const [
+                  DataColumn(
+                    label: Text(
+                      'Name',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Address',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  DataColumn(
+                    label: Text(
+                      'Address',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Telephone',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  DataColumn(
+                    label: Text(
+                      'Telephone',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Suppliers',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  DataColumn(
+                    label: Text(
+                      'Suppliers',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Preview',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  DataColumn(
+                    label: Text(
+                      'Preview',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Delete',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  DataColumn(
+                    label: Text(
+                      'Delete',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-              ],
-              rows: rows,
+                ],
+                rows: rows,
+              ),
             ),
           ),
         ),
