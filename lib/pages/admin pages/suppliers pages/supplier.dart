@@ -584,6 +584,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       onSubmitted: (value) {
                         addItemToList(value);
                       },
+                      textInputAction: TextInputAction.done,
                     ),
                   ),
                 ),

@@ -116,6 +116,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                     labelText: 'Password',
                     hintText: 'Enter Password',
                     obscureText: true,
+                    textInputAction: TextInputAction.done,
                   ),
                 ),
               ),
@@ -141,6 +142,7 @@ class _AddShopContainerState extends State<AddShopContainer> {
                       address: shopAddressController.text,
                       tel: shopTelController.text,
                       suppliers: [],
+                      extra: {},
                     );
 
                     User user = User(

@@ -251,6 +251,7 @@ class _AddSupplierContainerState extends State<AddSupplierContainer> {
                     onSubmitted: (value) {
                       addItemToList(value);
                     },
+                    textInputAction: TextInputAction.done,
                   ),
                 ),
               ),
