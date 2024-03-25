@@ -81,15 +81,31 @@ class _SuppliersPageState extends State<SuppliersPage> {
     );
   }
 
-  List<Supplier> suppliers = [];
+  Map<String, List<Supplier>> suppliers = {};
 
   Future<void> loadData() async {
     // load suppliers from database
     SupplierController supplierController = Get.find<SupplierController>();
     List<Supplier> suppliersList = await supplierController.getSuppliersList();
 
+    // ShopController shopController = Get.find<ShopController>();
+    // List<String> shops = await shopController.getShopsNameList();
+
+    // shop wise suplier list
+    Map<String, List<Supplier>> shopWiseSupplier = {};
+
+    for (int i = 0; i < suppliersList.length; i++) {
+      for (int j = 0; j < suppliersList[i].shops.length; j++) {
+        if (shopWiseSupplier.containsKey(suppliersList[i].shops[j])) {
+          shopWiseSupplier[suppliersList[i].shops[j]]!.add(suppliersList[i]);
+        } else {
+          shopWiseSupplier[suppliersList[i].shops[j]] = [suppliersList[i]];
+        }
+      }
+    }
+
     setState(() {
-      suppliers = suppliersList;
+      suppliers = shopWiseSupplier;
     });
   }
 
