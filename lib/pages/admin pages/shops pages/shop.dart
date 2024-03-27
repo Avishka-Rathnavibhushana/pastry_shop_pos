@@ -13,6 +13,7 @@ import 'package:pastry_shop_pos/models/supplier_item.dart';
 import 'package:pastry_shop_pos/pages/loadingPage.dart';
 
 import '../../../components/custom_dropdown.dart';
+import '../../../components/custom_text_field.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key, required this.shop});
@@ -32,6 +33,8 @@ class _ShopPageState extends State<ShopPage> {
   double totalPaid = 0.0;
 
   AuthController authController = Get.find<AuthController>();
+
+  TextEditingController extraController = TextEditingController(text: "0");
 
   @override
   void initState() {
@@ -94,6 +97,10 @@ class _ShopPageState extends State<ShopPage> {
         }
       }
 
+      ShopController shopController = Get.find<ShopController>();
+      extraController.text = Helpers.numberToStringConverter(
+          await shopController.getShopExtra(widget.shop ?? "", date, session));
+
       setState(() {
         suppliersItems = suppliersItemsTemp;
       });
@@ -123,6 +130,7 @@ class _ShopPageState extends State<ShopPage> {
     }
 
     List<Widget> supplierContainerListWidget = [];
+    Map<String, ScrollController> scrollControllers = {};
 
     suppliersItems.forEach((key, value) {
       List<DataRow> itemListWidget = [];
@@ -177,6 +185,7 @@ class _ShopPageState extends State<ShopPage> {
 
       totalPrice += salePriceT;
       totalPaid += purchasePriceT;
+      scrollControllers[key] = ScrollController();
 
       Widget itemWidget = CustomContainer(
         outerPadding: const EdgeInsets.only(
@@ -187,94 +196,99 @@ class _ShopPageState extends State<ShopPage> {
           horizontal: 20,
         ),
         containerColor: const Color(0xFF8EB6D9),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                key,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+        child: Scrollbar(
+          isAlwaysShown: true,
+          controller: scrollControllers[key],
+          child: SingleChildScrollView(
+            controller: scrollControllers[key],
+            scrollDirection: Axis.horizontal,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  key,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              DataTable(
-                columns: [
-                  DataColumn(
-                    label: Text('ITEM', style: tableColumnHeaderStyle),
-                  ),
-                  DataColumn(
-                    label: Text('QTY', style: tableColumnHeaderStyle),
-                  ),
-                  DataColumn(
-                    label: Text('SOLD', style: tableColumnHeaderStyle),
-                  ),
-                  DataColumn(
-                    label: Text('Balance', style: tableColumnHeaderStyle),
-                  ),
-                  DataColumn(
-                    label: Text('Sale\nPrice', style: tableColumnHeaderStyle),
-                  ),
-                  DataColumn(
-                    label: Text('Sale Price\nTotal',
-                        style: tableColumnHeaderStyle),
-                  ),
-                  DataColumn(
-                    label:
-                        Text('Purchase\nPrice', style: tableColumnHeaderStyle),
-                  ),
-                  DataColumn(
-                    label: Text('Purchase Price\nTotal',
-                        style: tableColumnHeaderStyle),
-                  ),
-                  DataColumn(
-                    label: Text('CHEAP', style: tableColumnHeaderStyle),
-                  ),
-                ],
-                rows: [
-                  ...itemListWidget,
-                  DataRow(cells: [
-                    DataCell(Text(
-                      "Total",
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      qtyT.toString(),
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      soldT.toString(),
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      balanceT.toString(),
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      "",
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      Helpers.numberToStringConverter(salePriceT),
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      "",
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      Helpers.numberToStringConverter(purchasePriceT),
-                      style: tableColumnHeaderStyle,
-                    )),
-                    DataCell(Text(
-                      Helpers.numberToStringConverter(cheapT),
-                      style: tableColumnHeaderStyle,
-                    )),
-                  ]),
-                ],
-              ),
-            ],
+                DataTable(
+                  columns: [
+                    DataColumn(
+                      label: Text('ITEM', style: tableColumnHeaderStyle),
+                    ),
+                    DataColumn(
+                      label: Text('QTY', style: tableColumnHeaderStyle),
+                    ),
+                    DataColumn(
+                      label: Text('SOLD', style: tableColumnHeaderStyle),
+                    ),
+                    DataColumn(
+                      label: Text('Balance', style: tableColumnHeaderStyle),
+                    ),
+                    DataColumn(
+                      label: Text('Sale\nPrice', style: tableColumnHeaderStyle),
+                    ),
+                    DataColumn(
+                      label: Text('Sale Price\nTotal',
+                          style: tableColumnHeaderStyle),
+                    ),
+                    DataColumn(
+                      label: Text('Purchase\nPrice',
+                          style: tableColumnHeaderStyle),
+                    ),
+                    DataColumn(
+                      label: Text('Purchase Price\nTotal',
+                          style: tableColumnHeaderStyle),
+                    ),
+                    DataColumn(
+                      label: Text('CHEAP', style: tableColumnHeaderStyle),
+                    ),
+                  ],
+                  rows: [
+                    ...itemListWidget,
+                    DataRow(cells: [
+                      DataCell(Text(
+                        "Total",
+                        style: tableColumnHeaderStyle,
+                      )),
+                      DataCell(Text(
+                        qtyT.toString(),
+                        style: tableColumnHeaderStyle,
+                      )),
+                      DataCell(Text(
+                        soldT.toString(),
+                        style: tableColumnHeaderStyle,
+                      )),
+                      DataCell(Text(
+                        balanceT.toString(),
+                        style: tableColumnHeaderStyle,
+                      )),
+                      DataCell(Text(
+                        "",
+                        style: tableColumnHeaderStyle,
+                      )),
+                      DataCell(Text(
+                        Helpers.numberToStringConverter(salePriceT),
+                        style: tableColumnHeaderStyle,
+                      )),
+                      DataCell(Text(
+                        "",
+                        style: tableColumnHeaderStyle,
+                      )),
+                      DataCell(Text(
+                        Helpers.numberToStringConverter(purchasePriceT),
+                        style: tableColumnHeaderStyle,
+                      )),
+                      DataCell(Text(
+                        Helpers.numberToStringConverter(cheapT),
+                        style: tableColumnHeaderStyle,
+                      )),
+                    ]),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -470,7 +484,55 @@ class _ShopPageState extends State<ShopPage> {
             ),
           ),
           const SizedBox(
-            height: 10,
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 200,
+                child: CustomTextField(
+                  controller: extraController,
+                  labelText: "Short",
+                  hintText: "Enter amount",
+                  keyboardType: TextInputType.number,
+                  maxLength: 10,
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              CustomButton(
+                onPressed: () async {
+                  if (extraController.text == "") {
+                    Helpers.snackBarPrinter(
+                      "Failed!",
+                      "Please enter a value.",
+                      error: true,
+                    );
+                  } else {
+                    ShopController shopController = Get.find<ShopController>();
+                    await shopController.updateShopExtra(
+                      widget.shop ?? "",
+                      dateInput,
+                      double.parse(extraController.text),
+                      session,
+                    );
+
+                    setState(() {
+                      totalPrice -= double.parse(extraController.text);
+                    });
+                  }
+                },
+                text: "Submit",
+                fontSize: 12,
+                padding: 0,
+                styleFormPadding: 0,
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 20,
           ),
           const Align(
             alignment: Alignment.topLeft,

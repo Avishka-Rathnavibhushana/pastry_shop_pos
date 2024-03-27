@@ -34,7 +34,10 @@ class _CashierHomePageState extends State<CashierHomePage> {
   AuthController authController = Get.find<AuthController>();
   String session = Constants.Sessions[0];
 
+  double totalPriceWE = 0.0;
   double totalPrice = 0.0;
+
+  final TextEditingController extraController = TextEditingController();
 
   @override
   void initState() {
@@ -62,6 +65,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
   // load data from supplierItem
   Future<void> loadData(String date) async {
     setState(() {
+      totalPriceWE = 0.0;
       totalPrice = 0.0;
     });
 
@@ -103,6 +107,11 @@ class _CashierHomePageState extends State<CashierHomePage> {
         }
       }
 
+      ShopController shopController = Get.find<ShopController>();
+      extraController.text = Helpers.numberToStringConverter(
+          await shopController.getShopExtra(widget.shopName ?? "",
+              DateFormat('yyyy-MM-dd').format(DateTime.now()), session));
+
       setState(() {
         suppliersItems = suppliersItemsTemp;
       });
@@ -120,6 +129,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
   Widget build(BuildContext context) {
     List<Widget> supplierContainerListWidget = [];
 
+    totalPriceWE = 0.0;
     totalPrice = 0.0;
 
     suppliersItems.forEach((key, value) {
@@ -180,7 +190,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
         );
       }
 
-      totalPrice += salePriceT;
+      totalPriceWE += salePriceT;
 
       Widget itemWidget = CustomContainer(
         outerPadding: const EdgeInsets.only(
@@ -284,7 +294,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                       } else {
                         SupplierItemController supplierItemsController =
                             Get.find<SupplierItemController>();
-                        
+
                         // update item
                         bool result = await supplierItemsController
                             .updateItemInSupplierItem(
@@ -312,7 +322,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                         );
 
                         // if (result) {
-                        //   totalPrice = totalPrice -
+                        //   totalPriceWE = totalPriceWE -
                         //       (itemData.sold * itemData.salePrice) +
                         //       ((itemData.qty -
                         //               int.parse(textEditingControllerMapList[
@@ -373,6 +383,9 @@ class _CashierHomePageState extends State<CashierHomePage> {
       supplierContainerListWidget.add(itemWidget);
     });
 
+    totalPrice = totalPriceWE -
+        (extraController.text == "" ? 0 : double.parse(extraController.text));
+
     return Container(
       alignment: Alignment.center,
       child: Stack(
@@ -386,14 +399,6 @@ class _CashierHomePageState extends State<CashierHomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Text(
-                    //   "Date : ",
-                    //   style: const TextStyle(
-                    //     fontSize: 25,
-                    //     fontWeight: FontWeight.bold,
-                    //     // fontStyle: FontStyle.italic,
-                    //   ),
-                    // ),
                     Obx(
                       () => Text(
                         authController.todayDate.value,
@@ -455,7 +460,99 @@ class _CashierHomePageState extends State<CashierHomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Total Price :',
+                          'Total Price (without short):',
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          Helpers.numberToStringConverter(totalPriceWE),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 200,
+                    child: CustomTextField(
+                      controller: extraController,
+                      labelText: "Short",
+                      hintText: "Enter amount",
+                      keyboardType: TextInputType.number,
+                      maxLength: 10,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  CustomButton(
+                    onPressed: () async {
+                      if (extraController.text == "") {
+                        Helpers.snackBarPrinter(
+                          "Failed!",
+                          "Please enter a value.",
+                          error: true,
+                        );
+                      } else {
+                        ShopController shopController =
+                            Get.find<ShopController>();
+                        await shopController.updateShopExtra(
+                          widget.shopName ?? "",
+                          DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                          double.parse(extraController.text),
+                          session,
+                        );
+
+                        setState(() {
+                          totalPrice -= double.parse(extraController.text);
+                        });
+                      }
+                    },
+                    text: "Submit",
+                    fontSize: 12,
+                    padding: 0,
+                    styleFormPadding: 0,
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              CustomContainer(
+                outerPadding: EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 0,
+                ),
+                innerPadding: EdgeInsets.symmetric(
+                  vertical: 30,
+                  horizontal: 30,
+                ),
+                containerColor: Color(0xFFCDE8FF),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Total Price:',
                           textAlign: TextAlign.end,
                           style: TextStyle(
                             fontSize: 20,

@@ -63,6 +63,21 @@ class ShopController extends GetxController {
     }
   }
 
+  // // get shops list
+  // Future<List<String>> getShopsNameList() async {
+  //   try {
+  //     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .where('role', isEqualTo: 'CASHIER')
+  //         .get();
+  //     // Extract user names from the documents and return the list
+  //     return querySnapshot.docs.map((doc) => doc['name'] as String).toList();
+  //   } catch (e) {
+  //     print('Error getting shops list: $e');
+  //     return [];
+  //   }
+  // }
+
   // get suppliers of a specific shop
   Future<List<String>> getSuppliersOfShop(String shopId) async {
     try {
@@ -190,7 +205,8 @@ class ShopController extends GetxController {
   }
 
   // get shops collection-> shopid -> extra[date] value
-  Future<double> getShopExtra(String shopId, String date) async {
+  Future<double> getShopExtra(
+      String shopId, String date, String session) async {
     try {
       DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
           .collection('shops')
@@ -198,9 +214,10 @@ class ShopController extends GetxController {
           .get();
       if (docSnapshot.exists) {
         // get extra value map and return value if date exists
-        Map<String, dynamic> extra = docSnapshot.data() as Map<String, dynamic>;
-        if (extra.containsKey(date)) {
-          return extra[date];
+        Map<String, dynamic> extra =
+            (docSnapshot.data() as Map<String, dynamic>)["extra"];
+        if (extra.containsKey(date + " " + session)) {
+          return extra[date + " " + session];
         } else {
           return 0.0;
         }
@@ -212,9 +229,10 @@ class ShopController extends GetxController {
       return 0.0;
     }
   }
-  
+
   // update extra value map if date exists or add new date and value
-  Future<bool> updateShopExtra(String shopId, String date, double value) async {
+  Future<bool> updateShopExtra(
+      String shopId, String date, double value, String session) async {
     try {
       DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
           .collection('shops')
@@ -222,19 +240,18 @@ class ShopController extends GetxController {
           .get();
       if (docSnapshot.exists) {
         // get extra value map
-        Map<String, dynamic> extra = docSnapshot.data() as Map<String, dynamic>;
-        // update value if date exists
-        if (extra.containsKey(date)) {
-          extra[date] = value;
-        } else {
-          // add new date and value
-          extra.addAll({date: value});
-        }
-        // update extra value map
+        Map<String, dynamic> shopData =
+            docSnapshot.data() as Map<String, dynamic>;
+
+        // update extra value map if date exists or add new date and value
+        shopData["extra"][date + " " + session] = value;
+
+        // update shop with new extra value map
         await FirebaseFirestore.instance
             .collection('shops')
             .doc(shopId)
-            .update(extra);
+            .update(shopData);
+
         Helpers.snackBarPrinter(
           "Successful!",
           "Successfully updated the extra value.",
@@ -253,5 +270,4 @@ class ShopController extends GetxController {
       return false;
     }
   }
-
 }
