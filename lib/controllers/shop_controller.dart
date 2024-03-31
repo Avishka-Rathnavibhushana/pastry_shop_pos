@@ -5,6 +5,8 @@ import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/shop.dart';
 
 class ShopController extends GetxController {
+  var extraControllerValue = "0".obs;
+
   // create shop
   Future<bool> createShop(Shop shop) async {
     try {

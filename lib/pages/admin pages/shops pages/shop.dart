@@ -36,6 +36,8 @@ class _ShopPageState extends State<ShopPage> {
 
   TextEditingController extraController = TextEditingController(text: "0");
 
+  ShopController shopController = Get.find<ShopController>();
+
   @override
   void initState() {
     super.initState();
@@ -63,7 +65,6 @@ class _ShopPageState extends State<ShopPage> {
 
     try {
       if (widget.shop != null) {
-        ShopController shopController = Get.find<ShopController>();
         List<String> supplierList =
             await shopController.getSuppliersOfShop(widget.shop ?? "");
 
@@ -97,9 +98,10 @@ class _ShopPageState extends State<ShopPage> {
         }
       }
 
-      ShopController shopController = Get.find<ShopController>();
       extraController.text = Helpers.numberToStringConverter(
           await shopController.getShopExtra(widget.shop ?? "", date, session));
+
+      shopController.extraControllerValue.value = extraController.text;
 
       setState(() {
         suppliersItems = suppliersItemsTemp;
@@ -387,104 +389,232 @@ class _ShopPageState extends State<ShopPage> {
           const SizedBox(
             height: 20,
           ),
-          CustomContainer(
-            outerPadding: EdgeInsets.symmetric(
-              vertical: 0,
-              horizontal: 0,
-            ),
-            innerPadding: EdgeInsets.symmetric(
-              vertical: 30,
-              horizontal: 30,
-            ),
-            containerColor: Color(0xFFCDE8FF),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomContainer(
+                outerPadding: EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 0,
+                ),
+                innerPadding: EdgeInsets.symmetric(
+                  vertical: 30,
+                  horizontal: 30,
+                ),
+                containerColor: Color(0xFFCDE8FF),
+                child: Column(
                   children: [
-                    Text(
-                      'Total Price :',
-                      textAlign: TextAlign.end,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Text("Without Short",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Total Price :',
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          Helpers.numberToStringConverter(totalPrice),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(
-                      width: 10,
+                      height: 5,
                     ),
-                    Text(
-                      Helpers.numberToStringConverter(totalPrice),
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Total Paid :',
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          Helpers.numberToStringConverter(totalPaid),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'CHEAP :',
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          Helpers.numberToStringConverter(
+                              (totalPrice - totalPaid)),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 5,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              CustomContainer(
+                outerPadding: EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 0,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
+                innerPadding: EdgeInsets.symmetric(
+                  vertical: 30,
+                  horizontal: 30,
+                ),
+                containerColor: Color(0xFFCDE8FF),
+                child: Column(
                   children: [
-                    Text(
-                      'Total Paid :',
-                      textAlign: TextAlign.end,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Text("With Short",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Total Price :',
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Obx(
+                          () => Text(
+                            Helpers.numberToStringConverter(totalPrice -
+                                double.parse(
+                                    shopController.extraControllerValue.value)),
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(
-                      width: 10,
+                      height: 5,
                     ),
-                    Text(
-                      Helpers.numberToStringConverter(totalPaid),
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Total Paid :',
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          Helpers.numberToStringConverter(totalPaid),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'CHEAP :',
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          Helpers.numberToStringConverter((totalPrice -
+                              double.parse(
+                                  shopController.extraControllerValue.value) -
+                              totalPaid)),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'CHEAP :',
-                      textAlign: TextAlign.end,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      Helpers.numberToStringConverter((totalPrice - totalPaid)),
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(
-            height: 20,
+            height: 30,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -511,17 +641,18 @@ class _ShopPageState extends State<ShopPage> {
                       error: true,
                     );
                   } else {
-                    ShopController shopController = Get.find<ShopController>();
-                    await shopController.updateShopExtra(
+                    bool result = await shopController.updateShopExtra(
                       widget.shop ?? "",
                       dateInput,
                       double.parse(extraController.text),
                       session,
                     );
 
-                    setState(() {
-                      totalPrice -= double.parse(extraController.text);
-                    });
+                    // setState(() {
+                    // totalPrice -= double.parse(extraController.text);
+                    // });
+                    shopController.extraControllerValue.value =
+                        extraController.text;
                   }
                 },
                 text: "Submit",
