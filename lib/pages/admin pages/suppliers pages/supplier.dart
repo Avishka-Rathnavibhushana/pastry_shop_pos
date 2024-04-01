@@ -413,7 +413,7 @@ class _SupplierPageState extends State<SupplierPage> {
                         SupplierItem(
                           name: item,
                           date: supplierItem.date,
-                          sold: (supplierItem.qty -
+                          sold: (int.parse(qtyController.text) -
                               int.parse(remainingController.text)),
                           salePrice: double.parse(salePriceController.text),
                           purchasePrice:
