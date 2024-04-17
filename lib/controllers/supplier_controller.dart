@@ -191,7 +191,7 @@ class SupplierController extends GetxController {
   }
 
   // delete supplier
-  Future<bool> deleteSupplier(String supplierId) async {
+  Future<bool> deleteSupplier(String supplierId, String shopId) async {
     try {
       // get supplier by id
       Supplier? supplier = await getSupplierById(supplierId);
@@ -200,6 +200,49 @@ class SupplierController extends GetxController {
             error: true);
         return false;
       }
+
+      // remove the supplier from the shops
+      await FirebaseFirestore.instance.collection('shops').doc(shopId).update({
+        'suppliers': FieldValue.arrayRemove([supplierId])
+      });
+
+      // delete the supplierItems for the supplier
+      for (String session in Constants.Sessions) {
+        // delete collections in supplierItems
+        await FirebaseFirestore.instance
+            .collection('supplierItems')
+            .doc(supplierId)
+            .collection(shopId + " " + session)
+            .get()
+            .then((snapshot) {
+          for (DocumentSnapshot ds in snapshot.docs) {
+            ds.reference.delete();
+          }
+        });
+      }
+
+      Helpers.snackBarPrinter(
+          "Successful!", "Successfully deleted the supplier from shop.");
+      return true;
+    } catch (e) {
+      Helpers.snackBarPrinter("Failed!", "Failed to delete the supplier.",
+          error: true);
+      print('Error deleting supplier: $e');
+      return false;
+    }
+  }
+
+  // delete supplier across all shops
+  Future<bool> deleteSupplierCompletely(String supplierId) async {
+    try {
+      // get supplier by id
+      Supplier? supplier = await getSupplierById(supplierId);
+      if (supplier == null) {
+        Helpers.snackBarPrinter("Failed!", "The supplier doesn't exist.",
+            error: true);
+        return false;
+      }
+
       // get shops of the supplier
       List<String> shops = supplier.shops;
 

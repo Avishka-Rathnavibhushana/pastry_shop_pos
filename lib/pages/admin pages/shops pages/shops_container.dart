@@ -102,7 +102,7 @@ class ShopsContainer extends StatelessWidget {
           ),
           containerColor: const Color(0xFFCDE8FF),
           child: Scrollbar(
-            isAlwaysShown: true,
+            thumbVisibility: true,
             controller: scrollController,
             child: SingleChildScrollView(
               controller: scrollController,

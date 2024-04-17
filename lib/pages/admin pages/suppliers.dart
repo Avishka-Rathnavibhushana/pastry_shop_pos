@@ -44,7 +44,8 @@ class _SuppliersPageState extends State<SuppliersPage> {
     return result;
   }
 
-  Future<void> deleteSupplier(String id, BuildContext context) async {
+  Future<void> deleteSupplier(
+      String id, BuildContext context, String shop) async {
     AlertDialog alert = AlertDialog(
       title: const Text("Delete Supplier"),
       content: const Text("Are you sure you want to delete this supplier?"),
@@ -59,7 +60,7 @@ class _SuppliersPageState extends State<SuppliersPage> {
           onPressed: () async {
             SupplierController supplierController =
                 Get.find<SupplierController>();
-            bool result = await supplierController.deleteSupplier(id);
+            bool result = await supplierController.deleteSupplier(id, shop);
 
             if (result) {
               await loadData();
@@ -129,8 +130,8 @@ class _SuppliersPageState extends State<SuppliersPage> {
           SuppliersContainer(
             onPressed: widget.onPressed,
             suppliers: suppliers,
-            deleteSupplier: (id) {
-              deleteSupplier(id, context);
+            deleteSupplier: (id, shop) {
+              deleteSupplier(id, context, shop);
             },
           ),
         ],

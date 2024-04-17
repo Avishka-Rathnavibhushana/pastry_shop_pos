@@ -199,7 +199,7 @@ class _ShopPageState extends State<ShopPage> {
         ),
         containerColor: const Color(0xFF8EB6D9),
         child: Scrollbar(
-          isAlwaysShown: true,
+          thumbVisibility: true,
           controller: scrollControllers[key],
           child: SingleChildScrollView(
             controller: scrollControllers[key],

@@ -13,7 +13,7 @@ class SuppliersContainer extends StatelessWidget {
       required this.deleteSupplier});
 
   final void Function(String id) onPressed;
-  final void Function(String id) deleteSupplier;
+  final void Function(String id, String shop) deleteSupplier;
   final Map<String, List<Supplier>> suppliers;
 
   @override
@@ -60,7 +60,7 @@ class SuppliersContainer extends StatelessWidget {
               DataCell(
                 CustomButton(
                   onPressed: () {
-                    deleteSupplier(name);
+                    deleteSupplier(name, key);
                   },
                   isIcon: true,
                   isText: false,
@@ -76,21 +76,20 @@ class SuppliersContainer extends StatelessWidget {
             ],
           ),
         );
-        
       });
 
       Widget shopSupplierWidget = CustomContainer(
-          outerPadding: const EdgeInsets.symmetric(
+        outerPadding: const EdgeInsets.symmetric(
           vertical: 20,
-            horizontal: 0,
-          ),
-          innerPadding: const EdgeInsets.symmetric(
-            vertical: 30,
-            horizontal: 0,
-          ),
-          containerColor: const Color(0xFFCDE8FF),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+          horizontal: 0,
+        ),
+        innerPadding: const EdgeInsets.symmetric(
+          vertical: 30,
+          horizontal: 0,
+        ),
+        containerColor: const Color(0xFFCDE8FF),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
           child: Column(
             children: [
               Text(
