@@ -534,18 +534,6 @@ class _SupplierPageState extends State<SupplierPage> {
                           ? "0"
                           : textEditingControllerMapList[item]![3].text;
 
-                      if (textEditingControllerMapList[item]![0].text.isEmpty ||
-                          textEditingControllerMapList[item]![1].text.isEmpty ||
-                          textEditingControllerMapList[item]![2].text.isEmpty ||
-                          textEditingControllerMapList[item]![3].text.isEmpty) {
-                        Helpers.snackBarPrinter(
-                          "Failed!",
-                          "Fields cannot be empty.",
-                          error: true,
-                        );
-                        return;
-                      }
-
                       if (textEditingControllerMapList[item]![0].text ==
                               qtyInitial &&
                           textEditingControllerMapList[item]![1].text ==
@@ -563,6 +551,38 @@ class _SupplierPageState extends State<SupplierPage> {
                         // );
                         // return;
                         continue;
+                      }
+
+                      if (textEditingControllerMapList[item]![0].text.isEmpty ||
+                          textEditingControllerMapList[item]![1].text.isEmpty ||
+                          textEditingControllerMapList[item]![2].text.isEmpty ||
+                          textEditingControllerMapList[item]![3].text.isEmpty) {
+                        if (textEditingControllerMapList[item]![0]
+                            .text
+                            .isEmpty) {
+                          textEditingControllerMapList[item]![0].text = "0";
+                        }
+                        if (textEditingControllerMapList[item]![1]
+                            .text
+                            .isEmpty) {
+                          textEditingControllerMapList[item]![1].text = "0";
+                        }
+                        if (textEditingControllerMapList[item]![2]
+                            .text
+                            .isEmpty) {
+                          textEditingControllerMapList[item]![2].text = "0";
+                        }
+                        if (textEditingControllerMapList[item]![3]
+                            .text
+                            .isEmpty) {
+                          textEditingControllerMapList[item]![3].text = "0";
+                        }
+                        // Helpers.snackBarPrinter(
+                        //   "Failed!",
+                        //   "Fields cannot be empty.",
+                        //   error: true,
+                        // );
+                        // return;
                       }
 
                       // update item
