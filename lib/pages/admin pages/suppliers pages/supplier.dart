@@ -14,6 +14,7 @@ import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
+import 'package:pastry_shop_pos/pages/loadingPage.dart';
 
 import '../../../components/custom_dropdown.dart';
 
@@ -38,6 +39,8 @@ class _SupplierPageState extends State<SupplierPage> {
   List<DropdownMenuItem<String>> shopDropdownItems = [];
   String? shopSelectedValue = "Select a shop";
   List<String> shops = [];
+
+  AuthController authController = Get.find<AuthController>();
 
   // add shop to list
   void addShopToShopList(String shop) {
@@ -162,8 +165,9 @@ class _SupplierPageState extends State<SupplierPage> {
   }
 
   Future<void> _populateDropdownItems() async {
+    authController.loading.value = true;
+
     // load shops from database
-    AuthController authController = AuthController();
     List<DropdownMenuItem<String>> shops = [];
 
     await authController.loadShopsList().then((value) {
@@ -185,6 +189,7 @@ class _SupplierPageState extends State<SupplierPage> {
       ],
     );
     setState(() {});
+    authController.loading.value = false;
   }
 
   @override
@@ -201,6 +206,8 @@ class _SupplierPageState extends State<SupplierPage> {
 
   // load data from supplierItem
   Future<void> loadData(String date) async {
+    authController.loading.value = true;
+
     Map<String, List<SupplierItem>> supplierItemList = {};
 
     if (widget.supplier != null) {
@@ -241,6 +248,8 @@ class _SupplierPageState extends State<SupplierPage> {
         supplierItems = supplierItemListTemp;
       });
     }
+
+    authController.loading.value = false;
   }
 
   TextStyle tableColumnHeaderStyle = const TextStyle(
@@ -249,11 +258,24 @@ class _SupplierPageState extends State<SupplierPage> {
   );
 
   @override
+  void dispose() {
+    authController.loading.value = false;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (authController.loading.value) {
+      return Obx(() => LoadingPage(
+            loading: authController.loading.value,
+          ));
+    }
     List<Widget> supplierContainerListWidget = [];
 
     supplierItems.forEach((key, value) {
       List<DataRow> rows = [];
+
+      Map<String, List<dynamic>> textEditingControllerMapList = {};
 
       for (SupplierItem supplierItem in value) {
         String item = supplierItem.name;
@@ -273,6 +295,14 @@ class _SupplierPageState extends State<SupplierPage> {
         bool activated =
             supplierItem.activated != null ? supplierItem.activated! : false;
 
+        textEditingControllerMapList[item] = [
+          qtyController,
+          remainingController,
+          salePriceController,
+          purchasePriceController,
+          activated
+        ];
+
         rows.add(
           DataRow(
             cells: [
@@ -282,7 +312,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       width: 50,
                       height: 30,
                       child: CustomTextField(
-                        controller: qtyController,
+                        controller: textEditingControllerMapList[item]![0],
                         labelText: '',
                         hintText: '',
                         fontSize: 12,
@@ -297,7 +327,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       width: 50,
                       height: 30,
                       child: CustomTextField(
-                        controller: remainingController,
+                        controller: textEditingControllerMapList[item]![1],
                         labelText: '',
                         hintText: '',
                         fontSize: 12,
@@ -312,7 +342,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       width: 50,
                       height: 30,
                       child: CustomTextField(
-                        controller: salePriceController,
+                        controller: textEditingControllerMapList[item]![2],
                         labelText: '',
                         hintText: '',
                         fontSize: 12,
@@ -327,7 +357,7 @@ class _SupplierPageState extends State<SupplierPage> {
                       width: 50,
                       height: 30,
                       child: CustomTextField(
-                        controller: purchasePriceController,
+                        controller: textEditingControllerMapList[item]![3],
                         labelText: '',
                         hintText: '',
                         fontSize: 12,
@@ -349,95 +379,21 @@ class _SupplierPageState extends State<SupplierPage> {
                                     child: Text(item),
                                   ))
                               .toList(),
-                          selectedValue: activated ? "Yes" : "No",
+                          selectedValue: textEditingControllerMapList[item]![4]
+                              ? "Yes"
+                              : "No",
                           onChanged: (String? newValue) {
-                            activated = newValue == "Yes" ? true : false;
+                            textEditingControllerMapList[item]![4] =
+                                newValue == "Yes" ? true : false;
                           },
                           borderAvailable: false,
                         ),
                       )
-                    : Text(activated ? "Yes" : "No"),
+                    : Text(
+                        textEditingControllerMapList[item]![4] ? "Yes" : "No"),
               ),
               DataCell(
-                CustomButton(
-                  onPressed: () async {
-                    if (edit) {
-                      SupplierItemController supplierItemsController =
-                          Get.find<SupplierItemController>();
-
-                      qtyController.text =
-                          qty == "0" && qtyController.text == ""
-                              ? "0"
-                              : qtyController.text;
-                      remainingController.text =
-                          remaining == "0" && remainingController.text == ""
-                              ? "0"
-                              : remainingController.text;
-                      salePriceController.text =
-                          salePrice == "0" && salePriceController.text == ""
-                              ? "0"
-                              : salePriceController.text;
-                      purchasePriceController.text = purchasePrice == "0" &&
-                              purchasePriceController.text == ""
-                          ? "0"
-                          : purchasePriceController.text;
-
-                      if (qtyController.text.isEmpty ||
-                          remainingController.text.isEmpty ||
-                          salePriceController.text.isEmpty ||
-                          purchasePriceController.text.isEmpty) {
-                        Helpers.snackBarPrinter(
-                          "Failed!",
-                          "Fields cannot be empty.",
-                          error: true,
-                        );
-                        return;
-                      }
-
-                      if (qtyController.text == qty &&
-                          remainingController.text == remaining &&
-                          salePriceController.text == salePrice &&
-                          purchasePriceController.text == purchasePrice &&
-                          activated == supplierItem.activated) {
-                        Helpers.snackBarPrinter(
-                          "Failed!",
-                          "Item Values are same",
-                          error: true,
-                        );
-                        return;
-                      }
-
-                      // update item
-                      await supplierItemsController.updateItemInSupplierItem(
-                        widget.supplier ?? "",
-                        SupplierItem(
-                          name: item,
-                          date: supplierItem.date,
-                          sold: (int.parse(qtyController.text) -
-                              int.parse(remainingController.text)),
-                          salePrice: double.parse(salePriceController.text),
-                          purchasePrice:
-                              double.parse(purchasePriceController.text),
-                          qty: int.parse(qtyController.text),
-                          activated: activated,
-                        ),
-                        supplierItem.date,
-                        key,
-                        session,
-                      );
-                    }
-                  },
-                  isIcon: true,
-                  isText: false,
-                  icon: const Icon(
-                    Icons.save,
-                    color: Colors.white,
-                  ),
-                  fontSize: 12,
-                  padding: 0,
-                  styleFormPadding: 0,
-                  enabled: edit,
-                ),
+                Text("data"),
               ),
             ],
           ),
@@ -532,6 +488,126 @@ class _SupplierPageState extends State<SupplierPage> {
                   ),
                 ],
                 rows: rows,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              CustomButton(
+                onPressed: () async {
+                  authController.loading.value = true;
+                  if (edit) {
+                    SupplierItemController supplierItemsController =
+                        Get.find<SupplierItemController>();
+
+                    for (SupplierItem supplierItem in value) {
+                      String item = supplierItem.name;
+                      String qtyInitial = supplierItem.qty.toString();
+                      String remainingInitial =
+                          (supplierItem.qty - supplierItem.sold).toString();
+                      String salePriceInitial = Helpers.numberToStringConverter(
+                          supplierItem.salePrice);
+                      String purchasePriceInitial =
+                          Helpers.numberToStringConverter(
+                              supplierItem.purchasePrice);
+                      bool activatedInital = supplierItem.activated != null
+                          ? supplierItem.activated!
+                          : false;
+
+                      textEditingControllerMapList[item]![0]
+                          .text = qtyInitial == "0" &&
+                              textEditingControllerMapList[item]![0].text == ""
+                          ? "0"
+                          : textEditingControllerMapList[item]![0].text;
+                      textEditingControllerMapList[item]![1]
+                          .text = remainingInitial == "0" &&
+                              textEditingControllerMapList[item]![1].text == ""
+                          ? "0"
+                          : textEditingControllerMapList[item]![1].text;
+                      textEditingControllerMapList[item]![2]
+                          .text = salePriceInitial == "0" &&
+                              textEditingControllerMapList[item]![2].text == ""
+                          ? "0"
+                          : textEditingControllerMapList[item]![2].text;
+                      textEditingControllerMapList[item]![3]
+                          .text = purchasePriceInitial == "0" &&
+                              textEditingControllerMapList[item]![3].text == ""
+                          ? "0"
+                          : textEditingControllerMapList[item]![3].text;
+
+                      if (textEditingControllerMapList[item]![0].text.isEmpty ||
+                          textEditingControllerMapList[item]![1].text.isEmpty ||
+                          textEditingControllerMapList[item]![2].text.isEmpty ||
+                          textEditingControllerMapList[item]![3].text.isEmpty) {
+                        Helpers.snackBarPrinter(
+                          "Failed!",
+                          "Fields cannot be empty.",
+                          error: true,
+                        );
+                        return;
+                      }
+
+                      if (textEditingControllerMapList[item]![0].text ==
+                              qtyInitial &&
+                          textEditingControllerMapList[item]![1].text ==
+                              remainingInitial &&
+                          textEditingControllerMapList[item]![2].text ==
+                              salePriceInitial &&
+                          textEditingControllerMapList[item]![3].text ==
+                              purchasePriceInitial &&
+                          textEditingControllerMapList[item]![4] ==
+                              activatedInital) {
+                        // Helpers.snackBarPrinter(
+                        //   "Failed!",
+                        //   "Item Values are same",
+                        //   error: true,
+                        // );
+                        // return;
+                        continue;
+                      }
+
+                      // update item
+                      await supplierItemsController.updateItemInSupplierItem(
+                        widget.supplier ?? "",
+                        SupplierItem(
+                          name: item,
+                          date: supplierItem.date,
+                          sold: (int.parse(
+                                  textEditingControllerMapList[item]![0].text) -
+                              int.parse(
+                                  textEditingControllerMapList[item]![1].text)),
+                          salePrice: double.parse(
+                              textEditingControllerMapList[item]![2].text),
+                          purchasePrice: double.parse(
+                              textEditingControllerMapList[item]![3].text),
+                          qty: int.parse(
+                              textEditingControllerMapList[item]![0].text),
+                          activated: textEditingControllerMapList[item]![4],
+                        ),
+                        supplierItem.date,
+                        key,
+                        session,
+                        printSnack: false,
+                      );
+                    }
+
+                    Helpers.snackBarPrinter(
+                      "Success!",
+                      "Items updated successfully.",
+                    );
+                  }
+
+                  authController.loading.value = false;
+                },
+                isIcon: true,
+                isText: false,
+                icon: const Icon(
+                  Icons.save,
+                  color: Colors.white,
+                ),
+                fontSize: 12,
+                padding: 15,
+                styleFormPadding: 0,
+                enabled: edit,
               ),
             ],
           ),
