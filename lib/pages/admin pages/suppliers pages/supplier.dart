@@ -392,9 +392,6 @@ class _SupplierPageState extends State<SupplierPage> {
                     : Text(
                         textEditingControllerMapList[item]![4] ? "Yes" : "No"),
               ),
-              DataCell(
-                Text("data"),
-              ),
             ],
           ),
         );
@@ -471,15 +468,6 @@ class _SupplierPageState extends State<SupplierPage> {
                   DataColumn(
                     label: Text(
                       'Show',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Update',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
