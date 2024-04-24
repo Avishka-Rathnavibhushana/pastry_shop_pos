@@ -123,7 +123,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
     }
   }
 
-  String editShop = "";
+  bool editShops = false;
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +131,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
 
     totalPriceWE = 0.0;
     totalPrice = 0.0;
+
+    Map<String, dynamic> listOftextEditingControllerMapList = {};
 
     suppliersItems.forEach((key, value) {
       List<DataRow> itemListWidget = [];
@@ -158,7 +160,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
         itemListWidget.add(
           DataRow(cells: [
             DataCell(Text(item)),
-            DataCell(key == editShop
+            DataCell(editShops
                 ? SizedBox(
                     width: 50,
                     height: 30,
@@ -172,7 +174,7 @@ class _CashierHomePageState extends State<CashierHomePage> {
                     ),
                   )
                 : Text(qty)),
-            DataCell(key == editShop
+            DataCell(editShops
                 ? SizedBox(
                     width: 50,
                     height: 30,
@@ -189,6 +191,8 @@ class _CashierHomePageState extends State<CashierHomePage> {
           ]),
         );
       }
+
+      listOftextEditingControllerMapList[key] = textEditingControllerMapList;
 
       totalPriceWE += salePriceT;
 
@@ -255,121 +259,6 @@ class _CashierHomePageState extends State<CashierHomePage> {
                 rows: [
                   ...itemListWidget,
                 ],
-              ),
-              CustomButton(
-                onPressed: () async {
-                  if (key != editShop) {
-                    setState(() {
-                      editShop = key;
-                    });
-                    return;
-                  }
-
-                  authController.loading.value = true;
-
-                  try {
-                    for (var itemData in value) {
-                      if (itemData.activated == false) {
-                        continue;
-                      }
-                      if (textEditingControllerMapList[itemData.name]![0]
-                              .text ==
-                          "") {
-                        textEditingControllerMapList[itemData.name]![0].text =
-                            itemData.qty.toString();
-                      }
-                      if (textEditingControllerMapList[itemData.name]![1]
-                              .text ==
-                          "") {
-                        textEditingControllerMapList[itemData.name]![1].text =
-                            (itemData.qty - itemData.sold).toString();
-                      }
-
-                      if (itemData.qty.toString() ==
-                              textEditingControllerMapList[itemData.name]![0]
-                                  .text &&
-                          (itemData.qty - itemData.sold).toString() ==
-                              textEditingControllerMapList[itemData.name]![1]
-                                  .text) {
-                      } else {
-                        SupplierItemController supplierItemsController =
-                            Get.find<SupplierItemController>();
-
-                        // update item
-                        bool result = await supplierItemsController
-                            .updateItemInSupplierItem(
-                          key,
-                          SupplierItem(
-                            name: itemData.name,
-                            date: itemData.date,
-                            sold: int.parse(textEditingControllerMapList[
-                                        itemData.name]![0]
-                                    .text) -
-                                int.parse(textEditingControllerMapList[
-                                        itemData.name]![1]
-                                    .text),
-                            qty: int.parse(
-                                textEditingControllerMapList[itemData.name]![0]
-                                    .text),
-                            purchasePrice: itemData.purchasePrice,
-                            salePrice: itemData.salePrice,
-                            activated: itemData.activated,
-                          ),
-                          itemData.date,
-                          printSnack: false,
-                          widget.shopName ?? "",
-                          session,
-                        );
-
-                        // if (result) {
-                        //   totalPriceWE = totalPriceWE -
-                        //       (itemData.sold * itemData.salePrice) +
-                        //       ((itemData.qty -
-                        //               int.parse(textEditingControllerMapList[
-                        //                       itemData.name]![1]
-                        //                   .text)) *
-                        //           itemData.salePrice);
-                        //   int index = suppliersItems[key]!.indexWhere(
-                        //       (element) => element.name == itemData.name);
-
-                        //   suppliersItems[key]![index].sold = itemData.qty -
-                        //       int.parse(textEditingControllerMapList[
-                        //               itemData.name]![1]
-                        //           .text);
-                        //   suppliersItems[key]![index].qty = int.parse(
-                        //       textEditingControllerMapList[itemData.name]![0]
-                        //           .text);
-                        // }
-                      }
-                    }
-
-                    Helpers.snackBarPrinter(
-                        "Successful!", "Successfully updated.");
-                  } catch (e) {
-                    Helpers.snackBarPrinter(
-                      "Failed!",
-                      "Something is wrong. Please try again.",
-                      error: true,
-                    );
-                    print(e);
-                  } finally {
-                    await Future.delayed(Duration(seconds: 1));
-                    authController.loading.value = false;
-                    setState(() {
-                      editShop = "";
-                    });
-
-                    String dateInput =
-                        DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-                    loadData(dateInput);
-                  }
-                },
-                text: key == editShop ? "Submit" : "Edit",
-                fontSize: 12,
-                padding: 0,
-                styleFormPadding: 0,
-                enabled: key == editShop || editShop == "",
               ),
             ],
           ),
@@ -578,9 +467,120 @@ class _CashierHomePageState extends State<CashierHomePage> {
               const SizedBox(
                 height: 20,
               ),
+              CustomButton(
+                onPressed: () async {
+                  if (!editShops) {
+                    setState(() {
+                      editShops = true;
+                    });
+                    return;
+                  }
+
+                  authController.loading.value = true;
+
+                  try {
+                    suppliersItems.forEach((key, value) async {
+                      for (var itemData in value) {
+                        if (itemData.activated == false) {
+                          continue;
+                        }
+                        if (listOftextEditingControllerMapList[key]
+                                    [itemData.name]![0]
+                                .text ==
+                            "") {
+                          listOftextEditingControllerMapList[key]
+                                  [itemData.name]![0]
+                              .text = itemData.qty.toString();
+                        }
+                        if (listOftextEditingControllerMapList[key]
+                                    [itemData.name]![1]
+                                .text ==
+                            "") {
+                          listOftextEditingControllerMapList[key]
+                                  [itemData.name]![1]
+                              .text = (itemData.qty - itemData.sold).toString();
+                        }
+
+                        if (itemData.qty.toString() ==
+                                listOftextEditingControllerMapList[key]
+                                        [itemData.name]![0]
+                                    .text &&
+                            (itemData.qty - itemData.sold).toString() ==
+                                listOftextEditingControllerMapList[key]
+                                        [itemData.name]![1]
+                                    .text) {
+                        } else {
+                          SupplierItemController supplierItemsController =
+                              Get.find<SupplierItemController>();
+
+                          // update item
+                          bool result = await supplierItemsController
+                              .updateItemInSupplierItem(
+                            key,
+                            SupplierItem(
+                              name: itemData.name,
+                              date: itemData.date,
+                              sold: int.parse(
+                                      listOftextEditingControllerMapList[key]
+                                              [itemData.name]![0]
+                                          .text) -
+                                  int.parse(
+                                      listOftextEditingControllerMapList[key]
+                                              [itemData.name]![1]
+                                          .text),
+                              qty: int.parse(
+                                  listOftextEditingControllerMapList[key]
+                                          [itemData.name]![0]
+                                      .text),
+                              purchasePrice: itemData.purchasePrice,
+                              salePrice: itemData.salePrice,
+                              activated: itemData.activated,
+                            ),
+                            itemData.date,
+                            printSnack: false,
+                            widget.shopName ?? "",
+                            session,
+                          );
+                        }
+                      }
+                    });
+
+                    Helpers.snackBarPrinter(
+                        "Successful!", "Successfully updated.");
+                  } catch (e) {
+                    Helpers.snackBarPrinter(
+                      "Failed!",
+                      "Something is wrong. Please try again.",
+                      error: true,
+                    );
+                    print(e);
+                  } finally {
+                    await Future.delayed(Duration(seconds: 1));
+                    authController.loading.value = false;
+                    setState(() {
+                      editShops = false;
+                    });
+
+                    String dateInput =
+                        DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+                    await loadData(dateInput);
+                  }
+                },
+                text: editShops ? "Submit" : "Edit",
+                fontSize: 17,
+                padding: 20,
+                styleFormPadding: 0,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
               ...supplierContainerListWidget,
             ],
             shopName: "${Constants.Cashier} - ${widget.shopName!}",
+          ),
+          const SizedBox(
+            height: 20,
           ),
           Obx(
             () => LoadingPage(
