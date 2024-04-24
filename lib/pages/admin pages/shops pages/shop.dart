@@ -389,8 +389,11 @@ class _ShopPageState extends State<ShopPage> {
           const SizedBox(
             height: 20,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            direction: MediaQuery.of(context).size.width <= 600
+                ? Axis.vertical
+                : Axis.horizontal,
             children: [
               CustomContainer(
                 outerPadding: EdgeInsets.symmetric(
@@ -498,7 +501,8 @@ class _ShopPageState extends State<ShopPage> {
                 ),
               ),
               SizedBox(
-                width: 20,
+                width: MediaQuery.of(context).size.width <= 600 ? 0 : 20,
+                height: MediaQuery.of(context).size.width <= 600 ? 20 : 0,
               ),
               CustomContainer(
                 outerPadding: EdgeInsets.symmetric(
