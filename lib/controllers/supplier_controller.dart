@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';
@@ -205,6 +206,18 @@ class SupplierController extends GetxController {
       await FirebaseFirestore.instance.collection('shops').doc(shopId).update({
         'suppliers': FieldValue.arrayRemove([supplierId])
       });
+
+      supplier.shops.length == 1
+          ? await FirebaseFirestore.instance
+              .collection('suppliers')
+              .doc(supplierId)
+              .delete()
+          : await FirebaseFirestore.instance
+              .collection('suppliers')
+              .doc(supplierId)
+              .update({
+              'shops': FieldValue.arrayRemove([shopId])
+            });
 
       // delete the supplierItems for the supplier
       for (String session in Constants.Sessions) {
