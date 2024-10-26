@@ -1,4 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
+import 'package:pastry_shop_pos/controllers/supplier_item_controller.dart';
+import 'package:pastry_shop_pos/models/supplier.dart';
+import 'package:pastry_shop_pos/models/supplier_item.dart';
 
 class DatabaseChangeScripts {
   //get all suppliers from supplier document and chnage shop string varibale to shops list variable
@@ -134,6 +139,84 @@ class DatabaseChangeScripts {
       }
     } catch (e) {
       print('Error getting supplierItems list: $e');
+    }
+  }
+
+  // Script to update activated, salePrice and purchasePrice of supplier items specifying date, shop, session and supplierId
+  // Takes supplierId, date, shop, session as input and updates the supplier items in the supplierItems collection if ther is any change in the supplier items with updateFrom date
+  Future<bool> getItemsFromSupplierAndAddToSupplierItem(
+      String supplierId, String date, String shop, String session) async {
+    try {
+      SupplierItemController supplierItemController =
+          Get.find<SupplierItemController>();
+      // fetch items from the supplier
+      SupplierController supplierController = Get.find<SupplierController>();
+      Supplier? supplier = await supplierController.getSupplierById(supplierId);
+
+      List<SupplierItem> supplierItemsPreviousDay = [];
+
+      int updateFrom = 6;
+
+      DateTime dateTime = DateTime.parse(date);
+      DateTime previousDate = dateTime.subtract(Duration(days: updateFrom));
+      String previousDateStr = previousDate.toString().split(" ")[0];
+      supplierItemsPreviousDay =
+          await supplierItemController.getSupplierItemsByShopByTime(
+        supplierId,
+        previousDateStr,
+        shop,
+        session,
+      );
+
+      List<SupplierItem> supplierItemsCurrentDay =
+          await supplierItemController.getSupplierItemsByShopByTime(
+        supplierId,
+        date,
+        shop,
+        session,
+      );
+
+      if (supplier != null) {
+        int count = 0;
+        print(supplierId + "\n");
+        for (SupplierItem item in supplierItemsPreviousDay) {
+          SupplierItem? supplierItema = supplierItemsCurrentDay
+              .firstWhere((element) => element.name == item.name);
+          if (supplierItema == null) {
+            continue;
+          }
+
+          if (supplierItema.activated == item.activated &&
+              supplierItema.salePrice == item.salePrice &&
+              supplierItema.purchasePrice == item.purchasePrice) {
+            continue;
+          } else {
+            print(supplierItema.toMap());
+            print(item.toMap());
+            supplierItema.activated = item.activated;
+            supplierItema.salePrice = item.salePrice;
+            supplierItema.purchasePrice = item.purchasePrice;
+            await supplierItemController.updateItemInSupplierItem(
+              supplierId,
+              supplierItema,
+              date,
+              shop,
+              session,
+            );
+            count = count + 1;
+          }
+        }
+
+        print("Count: $count");
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(
+          'Error getting items from supplier and adding to supplier item: $e');
+      return false;
     }
   }
 }
