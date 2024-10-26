@@ -10,6 +10,7 @@ class SupplierItem {
   double? purchasePriceTotal;
   double? cheap;
   bool? activated;
+  bool? updateQty;
 
   SupplierItem({
     required this.name,
@@ -23,6 +24,7 @@ class SupplierItem {
     this.salePriceTotal,
     this.purchasePriceTotal,
     this.cheap,
+    this.updateQty,
   });
 
   // Factory constructor to create a SupplierItem object from a map (e.g., from Firestore)
@@ -39,6 +41,7 @@ class SupplierItem {
       purchasePriceTotal: (map['purchasePriceTotal'] ?? 0.0).toDouble(),
       cheap: (map['cheap'] ?? 0.0).toDouble(),
       activated: map['activated'] ?? false,
+      updateQty: map['updateQty'] ?? false,
     );
   }
 
@@ -56,6 +59,7 @@ class SupplierItem {
       'purchasePriceTotal': purchasePriceTotal,
       'cheap': cheap,
       'activated': activated,
+      'updateQty': updateQty,
     };
   }
 
@@ -69,6 +73,7 @@ class SupplierItem {
       'salePrice': salePrice,
       'purchasePrice': purchasePrice,
       'activated': activated,
+      'updateQty': updateQty,
     };
   }
 
@@ -82,6 +87,7 @@ class SupplierItem {
       salePrice: (map['salePrice'] ?? 0.0).toDouble(),
       purchasePrice: (map['purchasePrice'] ?? 0.0).toDouble(),
       activated: map['activated'] ?? false,
+      updateQty: map['updateQty'] ?? false,
     );
   }
 }

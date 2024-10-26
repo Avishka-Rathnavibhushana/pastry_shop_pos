@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier.dart';
@@ -253,6 +254,7 @@ class SupplierItemController extends GetxController {
           double salePrice = 0;
           double purchasePrice = 0;
           bool previousDayActivation = true;
+          bool previousDayUpdateQty = false;
           if (supplierItemsPreviousDay.length > 0) {
             if (supplierItemsPreviousDay
                 .where((element) => element.name == item)
@@ -260,21 +262,15 @@ class SupplierItemController extends GetxController {
               salePrice = 0;
               purchasePrice = 0;
               previousDayActivation = true;
+              previousDayUpdateQty = false;
             } else {
-              salePrice = supplierItemsPreviousDay
-                  .firstWhere((element) => element.name == item)
-                  .salePrice;
-              purchasePrice = supplierItemsPreviousDay
-                  .firstWhere(
-                    (element) => element.name == item,
-                  )
-                  .purchasePrice;
+              SupplierItem element = supplierItemsPreviousDay
+                  .firstWhere((element) => element.name == item);
+              salePrice = element.salePrice;
+              purchasePrice = element.purchasePrice;
 
-              previousDayActivation = supplierItemsPreviousDay
-                  .firstWhere(
-                    (element) => element.name == item,
-                  )
-                  .activated!;
+              previousDayActivation = element.activated!;
+              previousDayUpdateQty = element.updateQty!;
             }
           }
           supplierItems.add(
@@ -286,6 +282,7 @@ class SupplierItemController extends GetxController {
               purchasePrice: purchasePrice,
               date: date,
               activated: previousDayActivation,
+              updateQty: previousDayUpdateQty,
             ),
           );
         });
@@ -301,6 +298,79 @@ class SupplierItemController extends GetxController {
     } catch (e) {
       print(
           'Error getting items from supplier and adding to supplier item: $e');
+      return false;
+    }
+  }
+
+  // Update item in supplier item for a specific date to add items from previous session
+  Future<bool> updateSuppllierItemsOfaShopWithPreviousSessionRemQty(
+      String supplierId, String date, String shop, String session) async {
+    try {
+      String currentSession = session;
+      String currentDate = date;
+      // fetch items from the supplier item
+      List<SupplierItem> supplierItemsFromSupplierItem =
+          await getSupplierItemsByShopByTime(
+              supplierId, date, shop, currentSession);
+
+      // fetch items from the supplieritems of previous session
+      List<SupplierItem> supplierItemsFromSupplierItemPreviousSession = [];
+
+      if (currentSession == Constants.Sessions[0]) {
+        date = DateTime.parse(date)
+            .subtract(Duration(days: 1))
+            .toString()
+            .split(" ")[0];
+        session = Constants.Sessions[1];
+        supplierItemsFromSupplierItemPreviousSession =
+            await getSupplierItemsByShopByTime(supplierId, date, shop, session);
+      } else {
+        session = Constants.Sessions[0];
+        supplierItemsFromSupplierItemPreviousSession =
+            await getSupplierItemsByShopByTime(supplierId, date, shop, session);
+      }
+
+      // loop in supplierItemsFromSupplierItem list and update the qty of the items from previous session
+      for (int i = 0; i < supplierItemsFromSupplierItem.length; i++) {
+        SupplierItem supplierItem = supplierItemsFromSupplierItem[i];
+        // qty should be updated only if the item is available in the previous session
+        if (supplierItemsFromSupplierItemPreviousSession
+            .where((element) => element.name == supplierItem.name)
+            .isEmpty) {
+          continue;
+        }
+
+        // qty should be updated only if the UpdateQty is true
+        if (!supplierItem.updateQty!) {
+          continue;
+        }
+
+        SupplierItem supplierItemPreviousSession =
+            supplierItemsFromSupplierItemPreviousSession
+                .firstWhere((element) => element.name == supplierItem.name);
+
+        supplierItem.qty = (supplierItemPreviousSession.qty -
+                supplierItemPreviousSession.sold) +
+            supplierItem.qty;
+
+        // update thedatabase in item in the supplier item
+        await updateItemInSupplierItem(
+            supplierId, supplierItem, currentDate, shop, currentSession,
+            printSnack: false);
+      }
+
+      Helpers.snackBarPrinter("Successful!",
+          "Successfully updated the supplier items with previous session.");
+
+      return true;
+    } catch (e) {
+      print(
+          'Error getting items from supplier and adding to supplier item: $e');
+
+      Helpers.snackBarPrinter(
+          "Failed!", "Something is Wrong. Please try again.",
+          error: true);
+
       return false;
     }
   }

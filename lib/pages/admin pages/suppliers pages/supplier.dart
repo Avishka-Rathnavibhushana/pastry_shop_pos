@@ -294,13 +294,15 @@ class _SupplierPageState extends State<SupplierPage> {
             TextEditingController(text: purchasePrice);
         bool activated =
             supplierItem.activated != null ? supplierItem.activated! : false;
-
+        bool updateQty =
+            supplierItem.updateQty != null ? supplierItem.updateQty! : false;
         textEditingControllerMapList[item] = [
           qtyController,
           remainingController,
           salePriceController,
           purchasePriceController,
-          activated
+          activated,
+          updateQty,
         ];
 
         rows.add(
@@ -392,6 +394,31 @@ class _SupplierPageState extends State<SupplierPage> {
                     : Text(
                         textEditingControllerMapList[item]![4] ? "Yes" : "No"),
               ),
+              DataCell(
+                edit
+                    ? SizedBox(
+                        width: 90,
+                        height: 35,
+                        child: CustomDropdown(
+                          dropdownItems: ["Yes", "No"]
+                              .map((item) => DropdownMenuItem<String>(
+                                    value: item,
+                                    child: Text(item),
+                                  ))
+                              .toList(),
+                          selectedValue: textEditingControllerMapList[item]![5]
+                              ? "Yes"
+                              : "No",
+                          onChanged: (String? newValue) {
+                            textEditingControllerMapList[item]![5] =
+                                newValue == "Yes" ? true : false;
+                          },
+                          borderAvailable: false,
+                        ),
+                      )
+                    : Text(
+                        textEditingControllerMapList[item]![5] ? "Yes" : "No"),
+              ),
             ],
           ),
         );
@@ -474,6 +501,15 @@ class _SupplierPageState extends State<SupplierPage> {
                       ),
                     ),
                   ),
+                  DataColumn(
+                    label: Text(
+                      'Update Rem Qty',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ],
                 rows: rows,
               ),
@@ -499,6 +535,9 @@ class _SupplierPageState extends State<SupplierPage> {
                               supplierItem.purchasePrice);
                       bool activatedInital = supplierItem.activated != null
                           ? supplierItem.activated!
+                          : false;
+                      bool updateQtyInitial = supplierItem.updateQty != null
+                          ? supplierItem.updateQty!
                           : false;
 
                       textEditingControllerMapList[item]![0]
@@ -528,10 +567,14 @@ class _SupplierPageState extends State<SupplierPage> {
                               remainingInitial &&
                           textEditingControllerMapList[item]![2].text ==
                               salePriceInitial &&
-                          textEditingControllerMapList[item]![3].text ==
+                          textEditingControllerMapList[
+                                      item]![3]
+                                  .text ==
                               purchasePriceInitial &&
                           textEditingControllerMapList[item]![4] ==
-                              activatedInital) {
+                              activatedInital &&
+                          textEditingControllerMapList[item]![5] ==
+                              updateQtyInitial) {
                         // Helpers.snackBarPrinter(
                         //   "Failed!",
                         //   "Item Values are same",
@@ -590,6 +633,7 @@ class _SupplierPageState extends State<SupplierPage> {
                           qty: int.parse(
                               textEditingControllerMapList[item]![0].text),
                           activated: textEditingControllerMapList[item]![4],
+                          updateQty: textEditingControllerMapList[item]![5],
                         ),
                         supplierItem.date,
                         key,
