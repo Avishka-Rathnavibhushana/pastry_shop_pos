@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
-import 'package:get/route_manager.dart';
 import 'package:get/state_manager.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';

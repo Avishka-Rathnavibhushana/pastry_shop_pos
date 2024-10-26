@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
@@ -207,8 +206,6 @@ class _SupplierPageState extends State<SupplierPage> {
   // load data from supplierItem
   Future<void> loadData(String date) async {
     authController.loading.value = true;
-
-    Map<String, List<SupplierItem>> supplierItemList = {};
 
     if (widget.supplier != null) {
       SupplierController supplierController = Get.find<SupplierController>();

@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
-import 'package:pastry_shop_pos/helpers/helpers.dart';
-import 'package:pastry_shop_pos/models/shop.dart';
 import 'package:pastry_shop_pos/models/user.dart';
 
 class AccountantController extends GetxController {

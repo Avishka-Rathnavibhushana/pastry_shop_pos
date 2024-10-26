@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
 import 'package:pastry_shop_pos/components/custom_container.dart';
-import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
 import 'package:pastry_shop_pos/models/supplier.dart';
 
 class SuppliersContainer extends StatelessWidget {
@@ -29,6 +27,7 @@ class SuppliersContainer extends StatelessWidget {
         String tel = supplier.tel.toString();
 
         List<String> shopList = [];
+        // ignore: unnecessary_null_comparison
         if (supplier.shops != null) {
           shopList = supplier.shops as List<String>;
         }

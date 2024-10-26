@@ -182,6 +182,7 @@ class DatabaseChangeScripts {
         for (SupplierItem item in supplierItemsPreviousDay) {
           SupplierItem? supplierItema = supplierItemsCurrentDay
               .firstWhere((element) => element.name == item.name);
+          // ignore: unnecessary_null_comparison
           if (supplierItema == null) {
             continue;
           }

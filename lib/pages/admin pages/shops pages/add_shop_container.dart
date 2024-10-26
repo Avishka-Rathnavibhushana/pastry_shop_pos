@@ -6,7 +6,6 @@ import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/shop.dart';
 import 'package:pastry_shop_pos/models/user.dart';
-import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
 class AddShopContainer extends StatefulWidget {
   const AddShopContainer({super.key, required this.submit});

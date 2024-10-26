@@ -12,8 +12,6 @@ import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier_item.dart';
 import 'package:pastry_shop_pos/pages/loadingPage.dart';
 
-import '../components/custom_dropdown.dart';
-
 class AccountantHomePage extends StatefulWidget {
   const AccountantHomePage({
     super.key,
@@ -137,8 +135,6 @@ class _AccountantHomePageState extends State<AccountantHomePage> {
     double totalPurchasePrice = 0;
 
     suppliersItemsMorning.forEach((key, value) {
-      List<DataRow> itemListWidget = [];
-
       double salePriceTM = 0;
       double purchasePriceTM = 0;
       double salePriceTE = 0;

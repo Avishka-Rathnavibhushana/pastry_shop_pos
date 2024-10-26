@@ -1,5 +1,3 @@
-import 'dart:js_util';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/controllers/shop_controller.dart';

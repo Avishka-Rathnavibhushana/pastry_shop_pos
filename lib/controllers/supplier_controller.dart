@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
-import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier.dart';
 

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/components/custom_button.dart';
@@ -7,7 +6,6 @@ import 'package:pastry_shop_pos/components/custom_dropdown.dart';
 import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
-import 'package:pastry_shop_pos/models/user.dart';
 import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 import 'package:pastry_shop_pos/pages/chashier_home_page.dart';
 import 'package:pastry_shop_pos/pages/accountant_home_page.dart';

@@ -7,9 +7,7 @@ import 'package:pastry_shop_pos/components/custom_text_field.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
-import 'package:pastry_shop_pos/models/shop.dart';
 import 'package:pastry_shop_pos/models/user.dart';
-import 'package:pastry_shop_pos/pages/admin_home_page.dart';
 
 class AddAccountantContainer extends StatefulWidget {
   const AddAccountantContainer({super.key, required this.submit});

@@ -2,14 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/controllers/accountant_controller.dart';
 import 'package:pastry_shop_pos/controllers/auth_controller.dart';
-import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
-import 'package:pastry_shop_pos/models/shop.dart';
 import 'package:pastry_shop_pos/models/user.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/accountant%20pages/accountants_container.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/accountant%20pages/add_accountant_container.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/add_shop_container.dart';
-import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/shops_container.dart';
 
 class AccountantsPage extends StatefulWidget {
   const AccountantsPage({super.key, required this.onPressed});

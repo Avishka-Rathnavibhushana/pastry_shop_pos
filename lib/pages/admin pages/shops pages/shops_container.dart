@@ -25,6 +25,7 @@ class ShopsContainer extends StatelessWidget {
       String address = shop.address.toString();
       String tel = shop.tel.toString();
       List<String> suppliersList = [];
+      // ignore: unnecessary_null_comparison
       if (shop.suppliers != null) {
         suppliersList = shop.suppliers as List<String>;
       }
