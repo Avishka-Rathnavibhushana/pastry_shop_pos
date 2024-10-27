@@ -77,7 +77,7 @@ class _ShopMonthlyContainerPageState extends State<ShopMonthlyContainerPage> {
       SupplierItemController supplierItemController =
           Get.find<SupplierItemController>();
       Map<String, Map<String, Map<String, double>>> shopSalesLocal =
-          await supplierItemController.getMonthlySummaryByShop(
+          await supplierItemController.getMonthlySummaryByShop2(
               shopName, year, month);
       setState(() {
         shopSales = shopSalesLocal;

@@ -578,4 +578,71 @@ class SupplierItemController extends GetxController {
 
     return shopSales;
   }
+
+  Future<Map<String, Map<String, Map<String, double>>>>
+      getMonthlySummaryByShop2(String shopId, String year, String month) async {
+    Map<String, Map<String, Map<String, double>>> shopSales = {};
+
+    int daysInMonth = Constants.MONTHS[month]!;
+
+    int monthIndex = Constants.MONTHNAMES.indexOf(month);
+    monthIndex = monthIndex >= 0 ? monthIndex + 1 : -1;
+
+    for (int day = 1; day <= daysInMonth; day++) {
+      String date =
+          "$year-${monthIndex.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}";
+      Map<String, Map<String, double>> daySales = {
+        "Morning": {"Sale": 0, "Purchase": 0, "Cheap": 0},
+        "Evening": {"Sale": 0, "Purchase": 0, "Cheap": 0},
+      };
+
+      QuerySnapshot morningData = await FirebaseFirestore.instance
+          .collectionGroup("$shopId Morning")
+          .where("date", isEqualTo: date)
+          .get();
+
+      QuerySnapshot eveningData = await FirebaseFirestore.instance
+          .collectionGroup("$shopId Evening")
+          .where("date", isEqualTo: date)
+          .get();
+
+      // Process the documents for the 'Morning' collection
+      for (QueryDocumentSnapshot doc in morningData.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        for (var dataItem in data["items"]) {
+          int sold = dataItem["sold"];
+          double salePrice = dataItem["salePrice"];
+          double purchasePrice = dataItem["purchasePrice"];
+
+          daySales["Morning"]!["Sale"] =
+              daySales["Morning"]!["Sale"]! + (sold * salePrice);
+          daySales["Morning"]!["Purchase"] =
+              daySales["Morning"]!["Purchase"]! + (sold * purchasePrice);
+          daySales["Morning"]!["Cheap"] = daySales["Morning"]!["Cheap"]! +
+              ((sold * salePrice) - (sold * purchasePrice));
+        }
+      }
+
+      // Process the documents for the 'Evening' collection
+      for (QueryDocumentSnapshot doc in eveningData.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        for (var dataItem in data["items"]) {
+          int sold = dataItem["sold"];
+          double salePrice = dataItem["salePrice"];
+          double purchasePrice = dataItem["purchasePrice"];
+
+          daySales["Evening"]!["Sale"] =
+              daySales["Evening"]!["Sale"]! + (sold * salePrice);
+          daySales["Evening"]!["Purchase"] =
+              daySales["Evening"]!["Purchase"]! + (sold * purchasePrice);
+          daySales["Evening"]!["Cheap"] = daySales["Evening"]!["Cheap"]! +
+              ((sold * salePrice) - (sold * purchasePrice));
+        }
+      }
+
+      shopSales[date] = daySales;
+    }
+
+    return shopSales;
+  }
 }
