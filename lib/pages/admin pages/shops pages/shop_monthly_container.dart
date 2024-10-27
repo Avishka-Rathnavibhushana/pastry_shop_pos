@@ -127,7 +127,7 @@ class _ShopMonthlyContainerPageState extends State<ShopMonthlyContainerPage> {
 
   @override
   void dispose() {
-    // authController.loading.value = false;
+    authController.loading.value = false;
     super.dispose();
   }
 
