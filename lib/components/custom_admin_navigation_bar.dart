@@ -59,6 +59,15 @@ class CustomAdminNavigationBar extends StatelessWidget {
                 ? buttonBackgroundColorSelected
                 : buttonBackgroundColorNotSelected,
           ),
+          CustomButton(
+            onPressed: onPressed[4],
+            text: "Reports",
+            fontSize: 13,
+            padding: 0,
+            backgroundColor: selectedPage == 3
+                ? buttonBackgroundColorSelected
+                : buttonBackgroundColorNotSelected,
+          ),
         ],
       );
     } else {
@@ -104,6 +113,18 @@ class CustomAdminNavigationBar extends StatelessWidget {
           CustomButton(
             onPressed: onPressed[3],
             text: "Accoountants",
+            fontSize: 13,
+            padding: 0,
+            backgroundColor: selectedPage == 3
+                ? buttonBackgroundColorSelected
+                : buttonBackgroundColorNotSelected,
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          CustomButton(
+            onPressed: onPressed[4],
+            text: "Reports",
             fontSize: 13,
             padding: 0,
             backgroundColor: selectedPage == 3

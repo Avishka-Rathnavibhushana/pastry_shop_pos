@@ -4,6 +4,7 @@ import 'package:pastry_shop_pos/components/user_page_layout.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/Accountants.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/dashboard.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/shop.dart';
+import 'package:pastry_shop_pos/pages/admin%20pages/shops%20pages/shop_monthly_container.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/suppliers%20pages/supplier.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/suppliers.dart';
 import 'package:pastry_shop_pos/pages/admin%20pages/shops.dart';
@@ -57,6 +58,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
         AccountantsPage(
           onPressed: (String id) {},
         ),
+        const ShopMonthlyContainerPage(),
       ];
     });
   }
@@ -97,6 +99,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
               () {
                 setState(() {
                   selectedPage = 3;
+                  showSupplier = false;
+                  showShop = false;
+                });
+              },
+              () {
+                setState(() {
+                  selectedPage = 4;
                   showSupplier = false;
                   showShop = false;
                 });

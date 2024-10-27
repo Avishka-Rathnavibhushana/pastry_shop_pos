@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:pastry_shop_pos/constants/constants.dart';
+import 'package:pastry_shop_pos/controllers/shop_controller.dart';
 import 'package:pastry_shop_pos/controllers/supplier_controller.dart';
 import 'package:pastry_shop_pos/helpers/helpers.dart';
 import 'package:pastry_shop_pos/models/supplier.dart';
@@ -520,5 +521,61 @@ class SupplierItemController extends GetxController {
       print('Error updating supplier item: $e');
       return false;
     }
+  }
+
+  Future<Map<String, Map<String, Map<String, double>>>> getMonthlySummaryByShop(
+      String shopId, String year, String month) async {
+    ShopController shopController = Get.find<ShopController>();
+    List<String> supplierList = await shopController.getSuppliersOfShop(shopId);
+
+    Map<String, Map<String, Map<String, double>>> shopSales = {};
+
+    int daysInMonth = Constants.MONTHS[month]!;
+
+    int monthIndex = Constants.MONTHNAMES.indexOf(month);
+    monthIndex = monthIndex >= 0 ? monthIndex + 1 : -1;
+
+    for (int day = 1; day <= daysInMonth; day++) {
+      String date =
+          "$year-${monthIndex.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}";
+      Map<String, Map<String, double>> daySales = {
+        "Morning": {"Sale": 0, "Purchase": 0, "Cheap": 0},
+        "Evening": {"Sale": 0, "Purchase": 0, "Cheap": 0},
+      };
+
+      for (String supplierId in supplierList) {
+        // Fetch morning and evening sessions for each supplier on the given date
+        for (String session in ["Morning", "Evening"]) {
+          // Replace this with the actual data fetch for the supplier, shopId, and session
+          List<SupplierItem> data = await getSupplierItemsByShopByTime(
+              supplierId, date, shopId, session);
+
+          double salePriceT = 0;
+          double purchasePriceT = 0;
+          double cheapT = 0;
+
+          for (SupplierItem item in data) {
+            // print(item.toMap());
+            int sold = item.sold;
+            double salePrice = item.salePrice;
+            double purchasePrice = item.purchasePrice;
+
+            salePriceT += (sold * salePrice);
+            purchasePriceT += (sold * purchasePrice);
+            cheapT += ((sold * salePrice) - (sold * purchasePrice));
+          }
+
+          // Add the values to the session
+          daySales[session]!["Sale"] = daySales[session]!["Sale"]! + salePriceT;
+          daySales[session]!["Purchase"] =
+              daySales[session]!["Purchase"]! + purchasePriceT;
+          daySales[session]!["Cheap"] = daySales[session]!["Cheap"]! + cheapT;
+        }
+      }
+
+      shopSales[date] = daySales;
+    }
+
+    return shopSales;
   }
 }
